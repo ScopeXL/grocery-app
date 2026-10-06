@@ -40,7 +40,10 @@ CATEGORIES = [
     # (what to enter, a made-up example)
     ("ZIP codes, home and store", "12345, 54321"),
     ("Kroger store IDs: the 8-character ID and the store number", "01234567, 00123"),
-    ("Family first names and your surname", "Alex, Jamie, Sam, Rivera"),
+    (
+        "Family first names and your surname (2-letter names are skipped; use a full name)",
+        "Alex, Jamie, Sam, Rivera",
+    ),
     ("Street addresses: house number + street name, without Ave/Road", "1234 Maple, Olio"),
     ("Your domain (this also covers every subdomain)", "example.com"),
     ("Server host names and IP addresses", "portainer.example.com, 192.168.1.50"),
@@ -76,15 +79,27 @@ def load_terms() -> list[str] | None:
     return None
 
 
-def compile_terms(terms: list[str]) -> list[re.Pattern[str]]:
-    patterns: list[re.Pattern[str]] = []
-    for term in terms:
+MIN_TERM_LENGTH = 3
+
+
+def compile_terms(terms: list[str]) -> list[tuple[int, re.Pattern[str]]]:
+    """(term number, pattern) pairs. Numbers follow the file's order and are all we ever print."""
+    patterns: list[tuple[int, re.Pattern[str]]] = []
+    for number, term in enumerate(terms, 1):
+        if len(term) < MIN_TERM_LENGTH:
+            print(
+                f"warning: private term #{number} is shorter than {MIN_TERM_LENGTH} characters and "
+                "would match ordinary text (like /ed/ in download links), so it is skipped. "
+                "Use a longer form, such as a full name.",
+                file=sys.stderr,
+            )
+            continue
         pattern = re.escape(term)
         if term[:1].isalnum():
             pattern = r"(?<![A-Za-z0-9])" + pattern
         if term[-1:].isalnum():
             pattern += r"(?![A-Za-z0-9])"
-        patterns.append(re.compile(pattern, re.IGNORECASE))
+        patterns.append((number, re.compile(pattern, re.IGNORECASE)))
     return patterns
 
 
@@ -102,7 +117,7 @@ def public_identity() -> set[str]:
 
 
 class Scanner:
-    def __init__(self, patterns: list[re.Pattern[str]]) -> None:
+    def __init__(self, patterns: list[tuple[int, re.Pattern[str]]]) -> None:
         self.patterns = patterns
         self.hits: list[str] = []
         self.identity = public_identity()
@@ -111,7 +126,7 @@ class Scanner:
         for number, line in enumerate(content.splitlines(), 1):
             if path == "LICENSE" and line.startswith("Copyright"):
                 continue  # the MIT copyright line is an intended public identity
-            for index, pattern in enumerate(self.patterns, 1):
+            for index, pattern in self.patterns:
                 if pattern.search(line):
                     self.hits.append(f"{where}:{number}: private term #{index}")
 

@@ -113,8 +113,18 @@ screenshots: build
 
 # gitleaks (history + working tree) and the private-terms scan (tree + unpushed commits)
 scan:
+    #!/usr/bin/env bash
+    set -euo pipefail
     gitleaks git --redact --no-banner .
-    gitleaks dir --redact --no-banner .
+    # The working tree as git sees it (tracked + untracked, not ignored). `gitleaks dir` alone
+    # would also read ignored files such as .env, which hold real secrets on purpose and can
+    # never reach git or the image (images are built from `git archive`).
+    tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+    git ls-files -co --exclude-standard -z | while IFS= read -r -d '' file; do
+      [ -f "$file" ] || continue
+      mkdir -p "$tmp/$(dirname "$file")" && cp "$file" "$tmp/$file"
+    done
+    gitleaks dir --redact --no-banner --config .gitleaks.toml "$tmp"
     {{py}} scripts/private_scan.py tree
     {{py}} scripts/private_scan.py history
 

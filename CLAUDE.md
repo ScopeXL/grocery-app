@@ -163,3 +163,4 @@ Add one line each time something surprising costs time: the symptom, the cause, 
 - A root-owned named volume "fixed itself" in the smoke test: Docker re-copies the image's `/data` ownership into a volume while it is empty. Test with a non-empty volume.
 - `python3` on the build Mac is 3.9: repo scripts run through `uv run --no-project --python 3.14` (the justfile's `py`).
 - OrbStack's `docker` isn't always on PATH: the justfile and image scripts prepend `~/.orbstack/bin`.
+- `gitleaks dir` flagged `.env`: it ignores `.gitignore`. `just scan` copies only git-visible files to a temp folder and scans that.
