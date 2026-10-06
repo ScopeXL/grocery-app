@@ -29,6 +29,11 @@ updates:
     groups:
       frontend:
         patterns: ["*"]
+    ignore:
+      # TypeScript stays on 6.0.x until typescript-eslint and openapi-typescript support newer
+      # versions (ADR 0023).
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
 
   - package-ecosystem: docker
     directory: /
