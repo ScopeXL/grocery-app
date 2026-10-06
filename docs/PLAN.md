@@ -2,7 +2,7 @@
 
 This is the current plan for Dinner Bell, a household meal-planning and grocery-list PWA. It is the single source for what we are building and how. Decisions and their reasoning live in [`adr/`](adr/README.md). Screens, flows and visual design live in [`UX.md`](UX.md). Working rules for AI sessions live in [`../CLAUDE.md`](../CLAUDE.md).
 
-**Status:** M0 (foundation) is being built.
+**Status:** M0 (foundation) is released as 0.1.0 (2026-10-06). Once the owner's first Portainer deploy and phone checklist pass, its §12 section shrinks to one line. M1 is next.
 
 **Maintenance rule:** when a milestone ships, shrink its section to a one-line summary that points to the CHANGELOG. Keep this file about what is true now and what is left to do.
 
