@@ -183,7 +183,8 @@ def scan(mode: str, args: list[str], scanner: Scanner) -> None:
             # Already-pushed commits are public and can't be fixed without rewriting history,
             # so the release gate checks only what hasn't been published yet.
             commits = git("rev-list", "HEAD", "--not", "--remotes").split()
-            tags = git("tag", "--no-contains", "origin/main").split() if commits else []
+            # Tags origin/main can't reach yet, such as a release tag waiting to be pushed.
+            tags = git("tag", "--no-merged", "origin/main").split() if commits else []
         for sha in commits:
             scanner.commit(sha)
         for tag in tags:
