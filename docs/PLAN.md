@@ -207,11 +207,11 @@ frontend/
 | `stores` | id, location_id (unique), chain, name, address fields, timezone, chain_domain, departments (JSON) | Filled from the Locations API |
 | `store_sections` | id, store_id, key (`aisle:12`, `cat:produce`), label, sort_index, hidden | The walking order, editable per store |
 | `kroger_product_cache` | (product_id, location_id) → payload (JSON), fetched_at, expires_at, cache_control_raw | Kroger data, kept only as a cache (§7.4). Parsed into typed objects in `kroger/`; expired rows are purged hourly |
-| `items` | id, name, product_id?, upc?, size_value (FractionText)?, size_unit?, size_count?, size_source (`parsed`/`household`), each_weight (FractionText, lb)?, is_staple, section_override_key?, archived_at | The household's own data. A corrected size lives here |
+| `items` | id, name, product_id?, upc?, size_text?, size_source (`parsed`/`household`), sold_by (`UNIT`/`WEIGHT`)?, each_weight_lb (FractionText)?, is_staple, section_override_key?, archived_at | The household's own data. `size_text` is the canonical `format_size` text, confirmed when linking or corrected ("Fix size"); `sold_by` is confirmed when linking (ADR 0016) |
 | `dishes` | id, name, role (`main`/`side`), occasions (JSON list), servings?, photo_id?, notes?, recipe_url?, favorite, last_planned_at?, archived_at, created_at, updated_at | |
 | `dish_items` | id, dish_id, item_id, amount_kind (`packages`/`measure`/`count`), amount (FractionText), unit?, position | |
-| `dish_pairings` | main_id, side_id, times_chosen, last_chosen_at, pinned, hidden | Drives "usual sides". `pinned` and `hidden` record hand edits |
-| `photos` | id, webp (BLOB, ≤1600 px), thumb (BLOB, ≤400 px), created_at | Included in backups and export (ADR 0020) |
+| `dish_pairings` | main_id, side_id, times_chosen, last_chosen_at, pinned, hidden | Drives "usual sides" (M2). `pinned` and `hidden` record hand edits |
+| `photos` | id, webp (BLOB, ≤1600 px), thumb (BLOB, ≤400 px), width, height, created_at | Re-encoded without metadata (no GPS). Included in backups and export (ADR 0020) |
 | `plans` | id, status (`active`/`archived`), started_at, archived_at | Exactly one active plan |
 | `plan_meals` | id, plan_id, main_id, day?, occasion, scale (FractionText: 1/2, 1, 2), position, added_by_member_id, created_at, deleted_at | |
 | `plan_meal_sides` | plan_meal_id, side_id, position | Swapping a side changes one row |
@@ -223,7 +223,7 @@ frontend/
 | `kroger_tokens` (1 row) | access_enc, access_expires_at, refresh_enc, refresh_obtained_at, scope, connected_by, status (`connected`/`needs_reconnect`), version | Fernet-encrypted (§10). Always present; empty until connected |
 | `kroger_oauth_states` | state, code_verifier, device_id, expires_at, used_at | M5 |
 | `cart_sends` | id, trip_id, trip_item_id, upc, quantity, modality, sent_at, outcome (`added`/`failed`/`unknown`) | Guards against double-adds |
-| `kroger_api_usage` | api, window_started_at, calls, blocked_until?, last_429_at? | Tracks the daily limits |
+| `kroger_api_usage` | api, window_started_at, calls, blocked_until?, last_429_at?, probe_backoff_s? | Tracks the daily limits; `probe_backoff_s` is the current wait while probing an unknown window |
 
 A trip is a snapshot on purpose: later edits to meals or prices must not change a list someone is shopping from.
 
@@ -410,8 +410,9 @@ These were verified on 2026-10-06 against Kroger's developer docs, FAQ, Terms an
 - **Durable data is only the household's own:**
   - item names;
   - the product link (productId/UPC);
-  - the household-confirmed parsed size, and the each-weight;
+  - the household-confirmed package size and whether it's sold by unit or by weight, and the each-weight;
   - dish amounts, plans and trips.
+- **Only linked products are cached.** Search results stay in memory; products enter `kroger_product_cache` only when an item links to them.
 - **Refreshing prices:**
   - Opening the plan or list refreshes the prices used there if they're older than `price_max_age_minutes` (default 120) or past `expires_at`.
   - Refresh uses `filter.productId` batches of 50 if M1 confirms that batches return prices. Otherwise it fetches `GET /products/{id}?filter.locationId=` with concurrency 4; ~100 items is well within 10,000 a day.
@@ -515,6 +516,7 @@ def q(x: int | str | Decimal | Fraction) -> Fraction          # TypeError on flo
 def ceil_to(x: Fraction, step: Fraction) -> Fraction           # ceil(x/step)*step
 def round_half_up(x: Fraction) -> int                          # floor(x + 1/2), x >= 0
 def to_text(x: Fraction) -> str; def from_text(s: str) -> Fraction
+def to_mixed(x: Fraction) -> str                               # how people write it: "1 1/2"
 
 # units.py      exact and invertible within a Dimension; never across
 class Dimension(StrEnum): MASS; VOLUME; COUNT
@@ -528,9 +530,11 @@ def ratio(a: Quantity, b: Quantity) -> Fraction
     count: Fraction | None        # pieces per package: "6 ct"->6, "12 x 12 fl oz"->12, "each"->1
     measure: Quantity | None      # total content: "12 x 12 fl oz"->144 FL_OZ
     approximate: bool = False     # "about 1.25 lb"
-@dataclass(frozen=True) class Unparseable: text: str; reason: ParseFail   # EMPTY|RANGE|UNKNOWN_UNIT|NON_POSITIVE|MULTIPLE|TRAILING
-def parse_size(text: str | None) -> PackageSize | Unparseable
+    container: Container | None = None   # "3 lb bag" -> BAG, so the preview can say "the 3 lb bag"
+@dataclass(frozen=True) class Unparseable: text: str; reason: ParseFail   # EMPTY|RANGE|UNKNOWN_UNIT|NON_POSITIVE|MULTIPLE|TRAILING|TOO_LARGE
+def parse_size(text: str | None) -> PackageSize | Unparseable  # each part <= 10^9, so formats stay short
 def format_size(s: PackageSize) -> str
+def size_label(s: PackageSize) -> str                          # "12 x 12 fl oz": no "about", no container
 
 # money.py      cents are ints >= 0; effective <= regular
 @dataclass(frozen=True) class PriceInfo:
@@ -544,21 +548,24 @@ def effective_cents(p: PriceInfo, now: datetime) -> int
 def about_dollars(cents: int) -> int
 def headline(t: Totals, as_of_local: str) -> str
 
-# models.py     Product, Item (each_weight), AmountKind {PACKAGES, MEASURE, COUNT},
-#               Amount(kind, value, unit) with .scaled(k), Dish, Meal(main, sides, scale, occasion, day),
-#               PurchaseUnit {PACKAGE, EACH, POUND}, QuantityOverride(delta, unit), Extra,
-#               PlanInput(meals, items, have_it, overrides, swaps, extras) with .with_meal(m)
+# models.py     SoldBy, Product(product_id, size_text, sold_by, price), Item(id, name, size_override,
+#               each_weight), AmountKind {PACKAGES, MEASURE, COUNT}, Amount(kind, value, unit) with
+#               .scaled(k), effective_size(item, product), InvalidAmount (with a plain .message),
+#               Flag {NO_PRODUCT; NO_PRICE; SIZE_UNKNOWN; NEEDS_EACH_WEIGHT; NOT_CONVERTIBLE;
+#               EST_EACH_WEIGHT; SWAPPED; APPROX_SWAP; OVERRIDDEN; OVERRIDE_STALE; SHORT; HAVE_IT; ON_SALE}
+#               (built in M1, so amounts and the M2 list builder share them)
+#   M2 adds:    Dish, Meal(main, sides, scale, occasion, day), PurchaseUnit {PACKAGE, EACH, POUND},
+#               QuantityOverride(delta, unit), Extra, PlanInput(...) with .with_meal(m)
 
 # amounts.py    the picker only offers kinds that convert; validate rejects the rest
 def amount_options(item: Item, product: Product | None) -> AmountOptions
-def validate_amount(a: Amount, item: Item) -> None             # raises InvalidAmount
-def share_text(a: Amount, item: Item) -> str | None            # "about 3/8 of the 16 oz bag"
+def validate_amount(a: Amount, item: Item, product: Product | None) -> None   # raises InvalidAmount
+def share_text(a, item, product) -> str | None                 # "About 3/8 of the 16 oz package"
+def share_cost(a, item, product, now) -> int | None            # the amount's share, not the rounded buy
 def resolve_each_weight(item, product) -> tuple[Fraction | None, bool]   # (lb, came_from_kroger_estimate)
 def contribution(a, item, product, original, swapped) -> Contribution    # packages, lb, each, unconverted, flags
 
 # listbuild.py  one line per item; qty >= need unless SHORT; overshoot < 1 package / 1 piece / 1/4 lb
-class Flag(StrEnum): NO_PRODUCT; NO_PRICE; SIZE_UNKNOWN; NEEDS_EACH_WEIGHT; NOT_CONVERTIBLE; EST_EACH_WEIGHT
-                     SWAPPED; APPROX_SWAP; OVERRIDDEN; OVERRIDE_STALE; SHORT; HAVE_IT; ON_SALE
 def build_list(plan: PlanInput, now: datetime) -> ShoppingList     # lines sorted by (label.casefold(), key)
 
 # totals.py     total + savings == regular_total; all >= 0

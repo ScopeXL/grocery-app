@@ -1,6 +1,101 @@
 {
   "components": {
     "schemas": {
+      "ActiveStoreOut": {
+        "properties": {
+          "store": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoreOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "store"
+        ],
+        "title": "ActiveStoreOut",
+        "type": "object"
+      },
+      "AmountIn": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "packages",
+              "measure",
+              "count"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "maxLength": 24,
+            "minLength": 1,
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "value"
+        ],
+        "title": "AmountIn",
+        "type": "object"
+      },
+      "AmountOut": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "packages",
+              "measure",
+              "count"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "value",
+          "unit",
+          "text"
+        ],
+        "title": "AmountOut",
+        "type": "object"
+      },
       "BackupFileOut": {
         "properties": {
           "bytes": {
@@ -102,6 +197,20 @@
         "title": "BackupStatusOut",
         "type": "object"
       },
+      "ChooseStore": {
+        "properties": {
+          "location_id": {
+            "pattern": "^[0-9A-Za-z]{1,16}$",
+            "title": "Location Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "location_id"
+        ],
+        "title": "ChooseStore",
+        "type": "object"
+      },
       "ClientInfo": {
         "properties": {
           "resolved_ip": {
@@ -154,6 +263,44 @@
           "trusted_proxies_configured"
         ],
         "title": "ClientInfo",
+        "type": "object"
+      },
+      "CostOut": {
+        "description": "What the dish's own amounts cost at today's prices, as an estimate.",
+        "properties": {
+          "about_dollars": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "About Dollars"
+          },
+          "cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cents"
+          },
+          "unpriced": {
+            "title": "Unpriced",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "about_dollars",
+          "cents",
+          "unpriced"
+        ],
+        "title": "CostOut",
         "type": "object"
       },
       "DeviceOut": {
@@ -250,6 +397,505 @@
         "title": "DiagnosticsOut",
         "type": "object"
       },
+      "DishCard": {
+        "properties": {
+          "archived": {
+            "title": "Archived",
+            "type": "boolean"
+          },
+          "cost": {
+            "$ref": "#/components/schemas/CostOut"
+          },
+          "favorite": {
+            "title": "Favorite",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "item_images": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Item Images",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "occasions": {
+            "items": {
+              "enum": [
+                "breakfast",
+                "lunch",
+                "dinner",
+                "snack"
+              ],
+              "type": "string"
+            },
+            "title": "Occasions",
+            "type": "array"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "role": {
+            "enum": [
+              "main",
+              "side"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role",
+          "occasions",
+          "favorite",
+          "photo_url",
+          "item_images",
+          "cost",
+          "archived"
+        ],
+        "title": "DishCard",
+        "type": "object"
+      },
+      "DishCreate": {
+        "properties": {
+          "favorite": {
+            "default": false,
+            "title": "Favorite",
+            "type": "boolean"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/LineIn"
+            },
+            "maxItems": 60,
+            "title": "Lines",
+            "type": "array"
+          },
+          "name": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "occasions": {
+            "items": {
+              "enum": [
+                "breakfast",
+                "lunch",
+                "dinner",
+                "snack"
+              ],
+              "type": "string"
+            },
+            "maxItems": 4,
+            "title": "Occasions",
+            "type": "array"
+          },
+          "photo_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Id"
+          },
+          "recipe_url": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "pattern": "^https?://\\S+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipe Url"
+          },
+          "role": {
+            "enum": [
+              "main",
+              "side"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "servings": {
+            "anyOf": [
+              {
+                "maximum": 50.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Servings"
+          }
+        },
+        "required": [
+          "name",
+          "role"
+        ],
+        "title": "DishCreate",
+        "type": "object"
+      },
+      "DishLineOut": {
+        "properties": {
+          "amount": {
+            "$ref": "#/components/schemas/AmountOut"
+          },
+          "check_amount": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Check Amount"
+          },
+          "cost_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Cents"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemOut"
+          },
+          "share_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Text"
+          }
+        },
+        "required": [
+          "id",
+          "item",
+          "amount",
+          "share_text",
+          "cost_cents",
+          "check_amount"
+        ],
+        "title": "DishLineOut",
+        "type": "object"
+      },
+      "DishOut": {
+        "properties": {
+          "archived": {
+            "title": "Archived",
+            "type": "boolean"
+          },
+          "cost": {
+            "$ref": "#/components/schemas/CostOut"
+          },
+          "favorite": {
+            "title": "Favorite",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/DishLineOut"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "occasions": {
+            "items": {
+              "enum": [
+                "breakfast",
+                "lunch",
+                "dinner",
+                "snack"
+              ],
+              "type": "string"
+            },
+            "title": "Occasions",
+            "type": "array"
+          },
+          "photo_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Id"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "recipe_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipe Url"
+          },
+          "role": {
+            "enum": [
+              "main",
+              "side"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "servings": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Servings"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role",
+          "occasions",
+          "servings",
+          "notes",
+          "recipe_url",
+          "favorite",
+          "photo_id",
+          "photo_url",
+          "archived",
+          "lines",
+          "cost"
+        ],
+        "title": "DishOut",
+        "type": "object"
+      },
+      "DishUpdate": {
+        "description": "Only the fields sent change; send null to clear servings, notes, the link or the photo.",
+        "properties": {
+          "favorite": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Favorite"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "occasions": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "breakfast",
+                    "lunch",
+                    "dinner",
+                    "snack"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 4,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occasions"
+          },
+          "photo_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Id"
+          },
+          "recipe_url": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "pattern": "^https?://\\S+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipe Url"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "enum": [
+                  "main",
+                  "side"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          },
+          "servings": {
+            "anyOf": [
+              {
+                "maximum": 50.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Servings"
+          }
+        },
+        "title": "DishUpdate",
+        "type": "object"
+      },
+      "EachWeightOut": {
+        "properties": {
+          "prefill": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefill"
+          },
+          "presets": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Presets",
+            "type": "array"
+          }
+        },
+        "required": [
+          "presets",
+          "prefill"
+        ],
+        "title": "EachWeightOut",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -274,6 +920,283 @@
           "status"
         ],
         "title": "HealthOut",
+        "type": "object"
+      },
+      "ItemCreate": {
+        "properties": {
+          "name": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "product_id": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9A-Za-z]{1,16}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Id"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ItemCreate",
+        "type": "object"
+      },
+      "ItemOut": {
+        "properties": {
+          "archived": {
+            "title": "Archived",
+            "type": "boolean"
+          },
+          "each_weight_lb": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Each Weight Lb"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "is_staple": {
+            "title": "Is Staple",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "product_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Id"
+          },
+          "size_source": {
+            "enum": [
+              "parsed",
+              "household"
+            ],
+            "title": "Size Source",
+            "type": "string"
+          },
+          "size_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Text"
+          },
+          "sold_by": {
+            "anyOf": [
+              {
+                "enum": [
+                  "unit",
+                  "weight"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sold By"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "product_id",
+          "image_url",
+          "size_text",
+          "size_source",
+          "sold_by",
+          "each_weight_lb",
+          "is_staple",
+          "archived"
+        ],
+        "title": "ItemOut",
+        "type": "object"
+      },
+      "ItemUpdate": {
+        "description": "Only the fields sent change. `product_id: null` unlinks; `size_text: null` undoes a fix.",
+        "properties": {
+          "each_weight_lb": {
+            "anyOf": [
+              {
+                "maxLength": 24,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Each Weight Lb"
+          },
+          "is_staple": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Staple"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "product_id": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9A-Za-z]{1,16}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Id"
+          },
+          "size_text": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Text"
+          }
+        },
+        "title": "ItemUpdate",
+        "type": "object"
+      },
+      "KindOptionOut": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "packages",
+              "measure",
+              "count"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "presets": {
+            "items": {
+              "$ref": "#/components/schemas/AmountOut"
+            },
+            "title": "Presets",
+            "type": "array"
+          },
+          "step": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          }
+        },
+        "required": [
+          "kind",
+          "units",
+          "presets",
+          "step"
+        ],
+        "title": "KindOptionOut",
+        "type": "object"
+      },
+      "LineIn": {
+        "properties": {
+          "amount": {
+            "$ref": "#/components/schemas/AmountIn"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "amount"
+        ],
+        "title": "LineIn",
+        "type": "object"
+      },
+      "LinesIn": {
+        "properties": {
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/LineIn"
+            },
+            "maxItems": 60,
+            "title": "Lines",
+            "type": "array"
+          }
+        },
+        "required": [
+          "lines"
+        ],
+        "title": "LinesIn",
         "type": "object"
       },
       "LiveUpdatesInfo": {
@@ -416,6 +1339,278 @@
         "title": "MemberUpdate",
         "type": "object"
       },
+      "PhotoOut": {
+        "properties": {
+          "height": {
+            "title": "Height",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "width": {
+            "title": "Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "width",
+          "height"
+        ],
+        "title": "PhotoOut",
+        "type": "object"
+      },
+      "PickerOut": {
+        "description": "Everything the amount picker needs for one item (docs/UX.md \u00a74.10).",
+        "properties": {
+          "each_weight": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EachWeightOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fix_size": {
+            "title": "Fix Size",
+            "type": "boolean"
+          },
+          "item": {
+            "$ref": "#/components/schemas/ItemOut"
+          },
+          "kinds": {
+            "items": {
+              "$ref": "#/components/schemas/KindOptionOut"
+            },
+            "title": "Kinds",
+            "type": "array"
+          },
+          "product": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProductResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "item",
+          "product",
+          "kinds",
+          "each_weight",
+          "fix_size"
+        ],
+        "title": "PickerOut",
+        "type": "object"
+      },
+      "PreviewIn": {
+        "properties": {
+          "amount": {
+            "$ref": "#/components/schemas/AmountIn"
+          }
+        },
+        "required": [
+          "amount"
+        ],
+        "title": "PreviewIn",
+        "type": "object"
+      },
+      "PreviewOut": {
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AmountOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cost_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Cents"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "share_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Text"
+          },
+          "valid": {
+            "title": "Valid",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "valid",
+          "message",
+          "amount",
+          "share_text",
+          "cost_cents"
+        ],
+        "title": "PreviewOut",
+        "type": "object"
+      },
+      "PriceOut": {
+        "properties": {
+          "per_pound": {
+            "title": "Per Pound",
+            "type": "boolean"
+          },
+          "regular_cents": {
+            "title": "Regular Cents",
+            "type": "integer"
+          },
+          "sale_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sale Cents"
+          },
+          "sale_ends": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sale Ends"
+          }
+        },
+        "required": [
+          "regular_cents",
+          "sale_cents",
+          "sale_ends",
+          "per_pound"
+        ],
+        "title": "PriceOut",
+        "type": "object"
+      },
+      "ProductResult": {
+        "description": "A Kroger product, shown exactly as Kroger describes it. `product_id` links; never shown.",
+        "properties": {
+          "availability": {
+            "enum": [
+              "available",
+              "low",
+              "out",
+              "not_sold"
+            ],
+            "title": "Availability",
+            "type": "string"
+          },
+          "brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brand"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PriceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "product_id": {
+            "title": "Product Id",
+            "type": "string"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "sold_by": {
+            "enum": [
+              "unit",
+              "weight"
+            ],
+            "title": "Sold By",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_id",
+          "description",
+          "brand",
+          "size",
+          "image_url",
+          "price",
+          "availability",
+          "sold_by"
+        ],
+        "title": "ProductResult",
+        "type": "object"
+      },
       "SessionOut": {
         "properties": {
           "device_id": {
@@ -483,6 +1678,54 @@
           }
         },
         "title": "SettingsUpdate",
+        "type": "object"
+      },
+      "StoreOption": {
+        "description": "A store found near a ZIP code. `location_id` picks it; the screen never shows it.",
+        "properties": {
+          "address_lines": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Address Lines",
+            "type": "array"
+          },
+          "location_id": {
+            "title": "Location Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "location_id",
+          "name",
+          "address_lines"
+        ],
+        "title": "StoreOption",
+        "type": "object"
+      },
+      "StoreOut": {
+        "properties": {
+          "address_lines": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Address Lines",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "address_lines"
+        ],
+        "title": "StoreOut",
         "type": "object"
       },
       "ValidationError": {
@@ -857,6 +2100,437 @@
         ]
       }
     },
+    "/api/dishes": {
+      "get": {
+        "operationId": "list_dishes_api_dishes_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "role",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "main",
+                    "side"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Role"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "occasion",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "breakfast",
+                    "lunch",
+                    "dinner",
+                    "snack"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Occasion"
+            }
+          },
+          {
+            "in": "query",
+            "name": "favorite",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Favorite"
+            }
+          },
+          {
+            "in": "query",
+            "name": "archived",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Archived",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DishCard"
+                  },
+                  "title": "Response List Dishes Api Dishes Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Dishes",
+        "tags": [
+          "meals"
+        ]
+      },
+      "post": {
+        "operationId": "create_dish_api_dishes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DishCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Dish",
+        "tags": [
+          "meals"
+        ]
+      }
+    },
+    "/api/dishes/{dish_id}": {
+      "get": {
+        "operationId": "get_dish_api_dishes__dish_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dish_id",
+            "required": true,
+            "schema": {
+              "title": "Dish Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Dish",
+        "tags": [
+          "meals"
+        ]
+      },
+      "patch": {
+        "operationId": "update_dish_api_dishes__dish_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dish_id",
+            "required": true,
+            "schema": {
+              "title": "Dish Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DishUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Dish",
+        "tags": [
+          "meals"
+        ]
+      }
+    },
+    "/api/dishes/{dish_id}/archive": {
+      "post": {
+        "operationId": "archive_dish_api_dishes__dish_id__archive_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dish_id",
+            "required": true,
+            "schema": {
+              "title": "Dish Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Archive Dish",
+        "tags": [
+          "meals"
+        ]
+      }
+    },
+    "/api/dishes/{dish_id}/duplicate": {
+      "post": {
+        "operationId": "duplicate_dish_api_dishes__dish_id__duplicate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dish_id",
+            "required": true,
+            "schema": {
+              "title": "Dish Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Duplicate Dish",
+        "tags": [
+          "meals"
+        ]
+      }
+    },
+    "/api/dishes/{dish_id}/lines": {
+      "put": {
+        "operationId": "replace_lines_api_dishes__dish_id__lines_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dish_id",
+            "required": true,
+            "schema": {
+              "title": "Dish Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Replace Lines",
+        "tags": [
+          "meals"
+        ]
+      }
+    },
+    "/api/dishes/{dish_id}/restore": {
+      "post": {
+        "operationId": "restore_dish_api_dishes__dish_id__restore_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dish_id",
+            "required": true,
+            "schema": {
+              "title": "Dish Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Restore Dish",
+        "tags": [
+          "meals"
+        ]
+      }
+    },
     "/api/export": {
       "get": {
         "operationId": "export_api_export_get",
@@ -908,6 +2582,377 @@
         "summary": "Health",
         "tags": [
           "meta"
+        ]
+      }
+    },
+    "/api/items": {
+      "get": {
+        "operationId": "list_items_api_items_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ItemOut"
+                  },
+                  "title": "Response List Items Api Items Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Items",
+        "tags": [
+          "items"
+        ]
+      },
+      "post": {
+        "operationId": "create_item_api_items_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Item",
+        "tags": [
+          "items"
+        ]
+      }
+    },
+    "/api/items/{item_id}": {
+      "patch": {
+        "operationId": "update_item_api_items__item_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Item",
+        "tags": [
+          "items"
+        ]
+      }
+    },
+    "/api/items/{item_id}/archive": {
+      "post": {
+        "operationId": "archive_item_api_items__item_id__archive_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Archive Item",
+        "tags": [
+          "items"
+        ]
+      }
+    },
+    "/api/items/{item_id}/picker": {
+      "get": {
+        "operationId": "amount_picker_api_items__item_id__picker_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PickerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Amount Picker",
+        "tags": [
+          "items"
+        ]
+      }
+    },
+    "/api/items/{item_id}/preview": {
+      "post": {
+        "operationId": "preview_amount_api_items__item_id__preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview Amount",
+        "tags": [
+          "items"
+        ]
+      }
+    },
+    "/api/items/{item_id}/restore": {
+      "post": {
+        "operationId": "restore_item_api_items__item_id__restore_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Restore Item",
+        "tags": [
+          "items"
+        ]
+      }
+    },
+    "/api/kroger/products": {
+      "get": {
+        "description": "Search terms are never stored or logged (ADR 0016).",
+        "operationId": "search_products_api_kroger_products_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "title": "Q",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProductResult"
+                  },
+                  "title": "Response Search Products Api Kroger Products Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search Products",
+        "tags": [
+          "kroger"
         ]
       }
     },
@@ -1111,6 +3156,109 @@
         ]
       }
     },
+    "/api/photos": {
+      "post": {
+        "description": "The raw image is the request body (JPEG, PNG, WebP\u2026), up to 15 MB.",
+        "operationId": "upload_photo_api_photos_post",
+        "requestBody": {
+          "content": {
+            "image/*": {
+              "schema": {
+                "format": "binary",
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhotoOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Upload Photo",
+        "tags": [
+          "meals"
+        ]
+      }
+    },
+    "/api/photos/{photo_id}": {
+      "get": {
+        "operationId": "get_photo_api_photos__photo_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "photo_id",
+            "required": true,
+            "schema": {
+              "title": "Photo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Photo",
+        "tags": [
+          "meals"
+        ]
+      }
+    },
+    "/api/photos/{photo_id}/thumb": {
+      "get": {
+        "operationId": "get_thumb_api_photos__photo_id__thumb_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "photo_id",
+            "required": true,
+            "schema": {
+              "title": "Photo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Thumb",
+        "tags": [
+          "meals"
+        ]
+      }
+    },
     "/api/settings": {
       "get": {
         "operationId": "get_settings_api_settings_get",
@@ -1168,6 +3316,113 @@
         "summary": "Update Settings",
         "tags": [
           "household"
+        ]
+      }
+    },
+    "/api/stores/active": {
+      "get": {
+        "operationId": "get_active_store_api_stores_active_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActiveStoreOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Active Store",
+        "tags": [
+          "stores"
+        ]
+      },
+      "put": {
+        "operationId": "choose_store_api_stores_active_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChooseStore"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Choose Store",
+        "tags": [
+          "stores"
+        ]
+      }
+    },
+    "/api/stores/search": {
+      "get": {
+        "operationId": "search_stores_api_stores_search_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "zip",
+            "required": true,
+            "schema": {
+              "pattern": "^\\d{5}$",
+              "title": "Zip",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StoreOption"
+                  },
+                  "title": "Response Search Stores Api Stores Search Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search Stores",
+        "tags": [
+          "stores"
         ]
       }
     },

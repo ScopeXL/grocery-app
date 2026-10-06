@@ -115,6 +115,15 @@ def cmd_inspect_backup(args: argparse.Namespace) -> None:
     print(json.dumps(backup.inspect_backup(Path(args.file)), indent=2))
 
 
+def cmd_smoke_kroger(args: argparse.Namespace) -> None:
+    import asyncio
+    import os
+
+    from dinnerbell.kroger import smoke
+
+    raise SystemExit(asyncio.run(smoke.run(os.environ, sys.stdout)))
+
+
 def cmd_openapi(args: argparse.Namespace) -> None:
     from dinnerbell.app import create_app
 
@@ -145,6 +154,9 @@ def main(argv: list[str] | None = None) -> None:
     inspect = sub.add_parser("inspect-backup", help="show a backup's revision and row counts")
     inspect.add_argument("file")
     inspect.set_defaults(func=cmd_inspect_backup)
+    sub.add_parser(
+        "smoke-kroger", help="a few real Kroger calls (needs KROGER_LIVE=1 and local keys)"
+    ).set_defaults(func=cmd_smoke_kroger)
     openapi = sub.add_parser("openapi", help="print the OpenAPI schema")
     openapi.add_argument("--out")
     openapi.set_defaults(func=cmd_openapi)

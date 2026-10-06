@@ -20,7 +20,8 @@ The real Cache-Control values on API responses couldn't be verified during plann
 **Kept permanently.** Only the household's own data:
 - item names;
 - product links (productId and UPC);
-- corrected sizes and each-weights;
+- the facts the household confirms when it links a product, because the amount math needs them even when nothing may be cached: the package size (as Kroger states it, or as corrected) and whether it's sold by unit or by weight;
+- each-weights;
 - dish amounts, plans;
 - trip records: names, quantities, estimates and totals.
 
@@ -30,7 +31,7 @@ The real Cache-Control values on API responses couldn't be verified during plann
 - This holds until the M1 smoke test records what Kroger actually sends, in `docs/KROGER.md`.
 - Expired rows are purged hourly.
 
-**Search.** Results are held in memory for at most 60 s. Search terms are never stored or logged.
+**Search.** Results are held in memory for at most 60 s. Search terms are never stored or logged. Only products the household links to an item go into `kroger_product_cache`; search results never do.
 
 **Trips.**
 - An active trip holds the Kroger fields it needs for shopping, as temporary storage for that trip.

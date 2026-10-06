@@ -16,6 +16,57 @@ from dinnerbell.db import migrate
 from dinnerbell.db.models import Base
 
 MIGRATIONS = Path(migrate.__file__).parent.parent / "migrations"
+FIXTURE_DBS = Path(__file__).parent / "fixtures" / "db"
+
+
+def released_revisions() -> list[str]:
+    lock = (MIGRATIONS / "released.lock").read_text().splitlines()
+    return [line.split()[0] for line in lock if line.strip() and not line.startswith("#")]
+
+
+def row_counts(db: Path) -> dict[str, int]:
+    conn = sqlite3.connect(db)
+    try:
+        tables = [
+            name
+            for (name,) in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table' AND name != 'alembic_version'"
+            )
+        ]
+        return {t: conn.execute(f'SELECT count(*) FROM "{t}"').fetchone()[0] for t in tables}  # noqa: S608
+    finally:
+        conn.close()
+
+
+@pytest.mark.parametrize("fixture", sorted(FIXTURE_DBS.glob("*.sql")), ids=lambda path: path.stem)
+def test_released_databases_upgrade_to_head_keeping_every_row(
+    tmp_path: Path, fixture: Path
+) -> None:
+    db = tmp_path / "dinnerbell.db"
+    conn = sqlite3.connect(db)
+    conn.executescript(fixture.read_text())
+    conn.close()
+    before = row_counts(db)
+    assert all(before.values()), "a fixture needs synthetic rows in every table"
+    assert migrate.current_revision(db) == fixture.stem
+    assert migrate.upgrade(db) == migrate.head_revision()
+    migrate.verify(db)
+    after = row_counts(db)
+    assert {table: after[table] for table in before} == before
+    conn = sqlite3.connect(db)
+    try:
+        assert conn.execute("PRAGMA foreign_key_check").fetchall() == []
+    finally:
+        conn.close()
+
+
+def test_unreleased_migrations_are_tested_against_the_last_release() -> None:
+    """CLAUDE.md rule 4: a schema change needs an upgrade test from the last release's data."""
+    latest = released_revisions()[-1]
+    if migrate.head_revision() != latest:
+        assert (FIXTURE_DBS / f"{latest}.sql").is_file(), (
+            f"build it: cd backend && uv run python -m tests.fixtures.db.build {latest}"
+        )
 
 
 def test_empty_database_upgrades_to_a_single_head(tmp_path: Path) -> None:

@@ -196,6 +196,10 @@ release LEVEL:
 
 # ---- helpers ----------------------------------------------------------------------------------
 
+# Opt-in real Kroger check with the local .env keys: ~6 calls; prints statuses, headers and shapes
+smoke-kroger:
+    cd backend && KROGER_LIVE=1 uv run --env-file ../.env dinnerbell smoke-kroger
+
 # Show a backup's migration revision, app version and row counts
 inspect-backup FILE:
     cd backend && uv run dinnerbell inspect-backup {{FILE}}

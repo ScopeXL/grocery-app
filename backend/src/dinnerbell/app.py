@@ -14,8 +14,9 @@ from dinnerbell.auth.models import Device
 from dinnerbell.auth.ratelimit import LoginLimiter
 from dinnerbell.auth.router import router as auth_router
 from dinnerbell.auth.sessions import AuthState, SessionCodec
+from dinnerbell.catalog.router import router as items_router
 from dinnerbell.core.clock import Clock, SystemClock
-from dinnerbell.core.config import Settings
+from dinnerbell.core.config import KrogerMode, Settings
 from dinnerbell.core.errors import install_error_handlers
 from dinnerbell.core.logging import get_logger
 from dinnerbell.core.version import build_info
@@ -25,15 +26,41 @@ from dinnerbell.events.hub import EventHub
 from dinnerbell.events.router import router as events_router
 from dinnerbell.household.models import AppMeta
 from dinnerbell.household.router import router as household_router
+from dinnerbell.kroger.catalog import ProductCatalog
+from dinnerbell.kroger.client import KrogerApi
+from dinnerbell.kroger.dbusage import DbUsageStore
+from dinnerbell.kroger.errors import install_kroger_error_handler
+from dinnerbell.kroger.fake import FakeKroger
+from dinnerbell.kroger.live import LiveKroger
+from dinnerbell.kroger.router import fake_images as kroger_fake_images
+from dinnerbell.kroger.router import router as kroger_router
+from dinnerbell.kroger.usage import UsageGuard
+from dinnerbell.meals import service as meals_service
+from dinnerbell.meals.router import router as meals_router
 from dinnerbell.meta.router import router as meta_router
 from dinnerbell.meta.testing import router as testing_router
 from dinnerbell.state import AppState
+from dinnerbell.stores.router import router as stores_router
 from dinnerbell.web.csrf import CSRFGuard
 from dinnerbell.web.headers import SecurityHeaders
 from dinnerbell.web.spa import mount_spa
 
 log = get_logger(__name__)
 BACKUP_CHECK_INTERVAL_S = 600
+CACHE_PURGE_INTERVAL_S = 3600
+PHOTO_PURGE_INTERVAL_S = 6 * 3600
+
+
+def make_kroger(settings: Settings, db: Database, clock: Clock) -> KrogerApi:
+    if settings.kroger_mode is KrogerMode.FAKE:
+        return FakeKroger(clock)
+    assert settings.kroger_client_id and settings.kroger_client_secret  # checked by Settings
+    return LiveKroger(
+        settings.kroger_client_id.get_secret_value(),
+        settings.kroger_client_secret.get_secret_value(),
+        usage=UsageGuard(DbUsageStore(db), clock),
+        clock=clock,
+    )
 
 
 async def load_auth_state(db: Database) -> AuthState:
@@ -89,6 +116,8 @@ def create_app(
         db = make_database(settings.db_path)
         hub = EventHub(ping_interval_s=ping_interval_s)
         db.publisher = hub.publish
+        kroger = make_kroger(settings, db, the_clock)
+        catalog = ProductCatalog(kroger, db, the_clock)
         state = AppState(
             settings=settings,
             clock=the_clock,
@@ -103,8 +132,19 @@ def create_app(
                 zone=settings.zone,
                 clock=the_clock,
             ),
+            catalog=catalog,
         )
+
+        async def purge_kroger_cache() -> None:
+            await catalog.purge_expired()
+
+        async def purge_orphan_photos() -> None:
+            async with db.write() as tx:
+                await meals_service.purge_orphan_photos(tx.session, the_clock.now())
+
         state.jobs.every("nightly-backup", BACKUP_CHECK_INTERVAL_S, state.backups.tick)
+        state.jobs.every("kroger-cache-purge", CACHE_PURGE_INTERVAL_S, purge_kroger_cache)
+        state.jobs.every("orphan-photos", PHOTO_PURGE_INTERVAL_S, purge_orphan_photos)
         app.state.dinnerbell = state
         state.started = True
         log.info("app.started", version=build_info().version, revision=build_info().revision)
@@ -114,6 +154,7 @@ def create_app(
             state.started = False
             hub.close()
             await state.jobs.stop()
+            await kroger.aclose()
             await db.dispose()
             log.info("app.stopped")
 
@@ -126,9 +167,16 @@ def create_app(
         redoc_url=None,
     )
     install_error_handlers(app)
+    install_kroger_error_handler(app, settings.zone)
     app.include_router(meta_router)
     app.include_router(auth_router)
     app.include_router(household_router)
+    app.include_router(stores_router)
+    app.include_router(kroger_router)
+    if settings.kroger_mode is KrogerMode.FAKE:
+        app.include_router(kroger_fake_images)
+    app.include_router(items_router)
+    app.include_router(meals_router)
     app.include_router(events_router)
     if settings.dinnerbell_test_mode:
         app.include_router(testing_router)

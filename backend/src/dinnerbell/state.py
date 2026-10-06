@@ -15,6 +15,7 @@ from dinnerbell.core.jobs import Jobs
 from dinnerbell.db.backup import BackupService
 from dinnerbell.db.engine import Database
 from dinnerbell.events.hub import EventHub
+from dinnerbell.kroger.catalog import ProductCatalog
 
 
 @dataclass
@@ -27,6 +28,7 @@ class AppState:
     codec: SessionCodec
     limiter: LoginLimiter
     backups: BackupService
+    catalog: ProductCatalog
     jobs: Jobs = field(default_factory=Jobs)
     started: bool = False
 

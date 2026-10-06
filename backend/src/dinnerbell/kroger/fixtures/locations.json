@@ -1,0 +1,67 @@
+[
+  {
+    "locationId": "99999001",
+    "storeNumber": "00001",
+    "divisionNumber": "999",
+    "chain": "SAMPLE MARKET",
+    "name": "Sample Market Downtown",
+    "phone": "5555550100",
+    "address": {
+      "addressLine1": "100 Sample Street",
+      "city": "Sampleton",
+      "county": "Sample",
+      "state": "ST",
+      "zipCode": "00001"
+    },
+    "geolocation": { "latitude": 0.5, "longitude": -0.5 },
+    "hours": {
+      "timezone": "America/New_York",
+      "gmtOffset": "(UTC-05:00) Eastern Time (US & Canada)",
+      "Open24": false
+    },
+    "departments": [
+      { "departmentId": "01", "name": "Produce" },
+      { "departmentId": "02", "name": "Bakery" },
+      { "departmentId": "03", "name": "Deli" },
+      { "departmentId": "04", "name": "Meat & Seafood" },
+      { "departmentId": "05", "name": "Dairy" },
+      { "departmentId": "06", "name": "Frozen" },
+      { "departmentId": "07", "name": "Pharmacy", "phone": "5555550101" }
+    ]
+  },
+  {
+    "locationId": "99999901",
+    "storeNumber": "00901",
+    "divisionNumber": "999",
+    "chain": "SHELL COMPANY",
+    "name": "Sample Fuel Center",
+    "address": {
+      "addressLine1": "102 Sample Street",
+      "city": "Sampleton",
+      "state": "ST",
+      "zipCode": "00001"
+    },
+    "hours": { "timezone": "America/New_York", "open24": true },
+    "departments": [{ "departmentId": "90", "name": "Fuel" }]
+  },
+  {
+    "locationId": "99999002",
+    "storeNumber": "00002",
+    "divisionNumber": "999",
+    "chain": "SAMPLE MARKET",
+    "name": "Sample Market Northside",
+    "address": {
+      "addressLine1": "200 Example Avenue",
+      "addressLine2": "Unit 2",
+      "city": "Sampleton",
+      "state": "ST",
+      "zipCode": "00002"
+    },
+    "hours": { "timezone": "America/New_York", "Open24": true },
+    "departments": [
+      { "departmentId": "01", "name": "Produce" },
+      { "departmentId": "04", "name": "Meat & Seafood" },
+      { "departmentId": "05", "name": "Dairy" }
+    ]
+  }
+]

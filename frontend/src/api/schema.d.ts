@@ -191,6 +191,110 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/dishes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Dishes */
+        get: operations["list_dishes_api_dishes_get"];
+        put?: never;
+        /** Create Dish */
+        post: operations["create_dish_api_dishes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dishes/{dish_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Dish */
+        get: operations["get_dish_api_dishes__dish_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Dish */
+        patch: operations["update_dish_api_dishes__dish_id__patch"];
+        trace?: never;
+    };
+    "/api/dishes/{dish_id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive Dish */
+        post: operations["archive_dish_api_dishes__dish_id__archive_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dishes/{dish_id}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Duplicate Dish */
+        post: operations["duplicate_dish_api_dishes__dish_id__duplicate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dishes/{dish_id}/lines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace Lines */
+        put: operations["replace_lines_api_dishes__dish_id__lines_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dishes/{dish_id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore Dish */
+        post: operations["restore_dish_api_dishes__dish_id__restore_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/export": {
         parameters: {
             query?: never;
@@ -217,6 +321,129 @@ export interface paths {
         };
         /** Health */
         get: operations["health_api_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Items */
+        get: operations["list_items_api_items_get"];
+        put?: never;
+        /** Create Item */
+        post: operations["create_item_api_items_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/items/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Item */
+        patch: operations["update_item_api_items__item_id__patch"];
+        trace?: never;
+    };
+    "/api/items/{item_id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive Item */
+        post: operations["archive_item_api_items__item_id__archive_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/items/{item_id}/picker": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Amount Picker */
+        get: operations["amount_picker_api_items__item_id__picker_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/items/{item_id}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Amount */
+        post: operations["preview_amount_api_items__item_id__preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/items/{item_id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore Item */
+        post: operations["restore_item_api_items__item_id__restore_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/kroger/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search Products
+         * @description Search terms are never stored or logged (ADR 0016).
+         */
+        get: operations["search_products_api_kroger_products_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -294,6 +521,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload Photo
+         * @description The raw image is the request body (JPEG, PNG, WebP…), up to 15 MB.
+         */
+        post: operations["upload_photo_api_photos_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/photos/{photo_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Photo */
+        get: operations["get_photo_api_photos__photo_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/photos/{photo_id}/thumb": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Thumb */
+        get: operations["get_thumb_api_photos__photo_id__thumb_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/settings": {
         parameters: {
             query?: never;
@@ -310,6 +591,41 @@ export interface paths {
         head?: never;
         /** Update Settings */
         patch: operations["update_settings_api_settings_patch"];
+        trace?: never;
+    };
+    "/api/stores/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Active Store */
+        get: operations["get_active_store_api_stores_active_get"];
+        /** Choose Store */
+        put: operations["choose_store_api_stores_active_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/stores/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search Stores */
+        get: operations["search_stores_api_stores_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/version": {
@@ -333,6 +649,36 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActiveStoreOut */
+        ActiveStoreOut: {
+            store: components["schemas"]["StoreOut"] | null;
+        };
+        /** AmountIn */
+        AmountIn: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "packages" | "measure" | "count";
+            /** Unit */
+            unit?: string | null;
+            /** Value */
+            value: string;
+        };
+        /** AmountOut */
+        AmountOut: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "packages" | "measure" | "count";
+            /** Text */
+            text: string;
+            /** Unit */
+            unit: string | null;
+            /** Value */
+            value: string;
+        };
         /** BackupFileOut */
         BackupFileOut: {
             /** Bytes */
@@ -366,6 +712,11 @@ export interface components {
             /** Stale */
             stale: boolean;
         };
+        /** ChooseStore */
+        ChooseStore: {
+            /** Location Id */
+            location_id: string;
+        };
         /** ClientInfo */
         ClientInfo: {
             /** Resolved Ip */
@@ -378,6 +729,18 @@ export interface components {
             x_forwarded_for: string | null;
             /** X Forwarded Proto */
             x_forwarded_proto: string | null;
+        };
+        /**
+         * CostOut
+         * @description What the dish's own amounts cost at today's prices, as an estimate.
+         */
+        CostOut: {
+            /** About Dollars */
+            about_dollars: number | null;
+            /** Cents */
+            cents: number | null;
+            /** Unpriced */
+            unpriced: number;
         };
         /** DeviceOut */
         DeviceOut: {
@@ -414,6 +777,129 @@ export interface components {
             /** Version */
             version: string;
         };
+        /** DishCard */
+        DishCard: {
+            /** Archived */
+            archived: boolean;
+            cost: components["schemas"]["CostOut"];
+            /** Favorite */
+            favorite: boolean;
+            /** Id */
+            id: string;
+            /** Item Images */
+            item_images: string[];
+            /** Name */
+            name: string;
+            /** Occasions */
+            occasions: ("breakfast" | "lunch" | "dinner" | "snack")[];
+            /** Photo Url */
+            photo_url: string | null;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "main" | "side";
+        };
+        /** DishCreate */
+        DishCreate: {
+            /**
+             * Favorite
+             * @default false
+             */
+            favorite: boolean;
+            /** Lines */
+            lines?: components["schemas"]["LineIn"][];
+            /** Name */
+            name: string;
+            /** Notes */
+            notes?: string | null;
+            /** Occasions */
+            occasions?: ("breakfast" | "lunch" | "dinner" | "snack")[];
+            /** Photo Id */
+            photo_id?: string | null;
+            /** Recipe Url */
+            recipe_url?: string | null;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "main" | "side";
+            /** Servings */
+            servings?: number | null;
+        };
+        /** DishLineOut */
+        DishLineOut: {
+            amount: components["schemas"]["AmountOut"];
+            /** Check Amount */
+            check_amount: string | null;
+            /** Cost Cents */
+            cost_cents: number | null;
+            /** Id */
+            id: string;
+            item: components["schemas"]["ItemOut"];
+            /** Share Text */
+            share_text: string | null;
+        };
+        /** DishOut */
+        DishOut: {
+            /** Archived */
+            archived: boolean;
+            cost: components["schemas"]["CostOut"];
+            /** Favorite */
+            favorite: boolean;
+            /** Id */
+            id: string;
+            /** Lines */
+            lines: components["schemas"]["DishLineOut"][];
+            /** Name */
+            name: string;
+            /** Notes */
+            notes: string | null;
+            /** Occasions */
+            occasions: ("breakfast" | "lunch" | "dinner" | "snack")[];
+            /** Photo Id */
+            photo_id: string | null;
+            /** Photo Url */
+            photo_url: string | null;
+            /** Recipe Url */
+            recipe_url: string | null;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "main" | "side";
+            /** Servings */
+            servings: number | null;
+        };
+        /**
+         * DishUpdate
+         * @description Only the fields sent change; send null to clear servings, notes, the link or the photo.
+         */
+        DishUpdate: {
+            /** Favorite */
+            favorite?: boolean | null;
+            /** Name */
+            name?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Occasions */
+            occasions?: ("breakfast" | "lunch" | "dinner" | "snack")[] | null;
+            /** Photo Id */
+            photo_id?: string | null;
+            /** Recipe Url */
+            recipe_url?: string | null;
+            /** Role */
+            role?: ("main" | "side") | null;
+            /** Servings */
+            servings?: number | null;
+        };
+        /** EachWeightOut */
+        EachWeightOut: {
+            /** Prefill */
+            prefill: string | null;
+            /** Presets */
+            presets: string[];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -423,6 +909,80 @@ export interface components {
         HealthOut: {
             /** Status */
             status: string;
+        };
+        /** ItemCreate */
+        ItemCreate: {
+            /** Name */
+            name: string;
+            /** Product Id */
+            product_id?: string | null;
+        };
+        /** ItemOut */
+        ItemOut: {
+            /** Archived */
+            archived: boolean;
+            /** Each Weight Lb */
+            each_weight_lb: string | null;
+            /** Id */
+            id: string;
+            /** Image Url */
+            image_url: string | null;
+            /** Is Staple */
+            is_staple: boolean;
+            /** Name */
+            name: string;
+            /** Product Id */
+            product_id: string | null;
+            /**
+             * Size Source
+             * @enum {string}
+             */
+            size_source: "parsed" | "household";
+            /** Size Text */
+            size_text: string | null;
+            /** Sold By */
+            sold_by: ("unit" | "weight") | null;
+        };
+        /**
+         * ItemUpdate
+         * @description Only the fields sent change. `product_id: null` unlinks; `size_text: null` undoes a fix.
+         */
+        ItemUpdate: {
+            /** Each Weight Lb */
+            each_weight_lb?: string | null;
+            /** Is Staple */
+            is_staple?: boolean | null;
+            /** Name */
+            name?: string | null;
+            /** Product Id */
+            product_id?: string | null;
+            /** Size Text */
+            size_text?: string | null;
+        };
+        /** KindOptionOut */
+        KindOptionOut: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "packages" | "measure" | "count";
+            /** Presets */
+            presets: components["schemas"]["AmountOut"][];
+            /** Step */
+            step: string | null;
+            /** Units */
+            units: string[];
+        };
+        /** LineIn */
+        LineIn: {
+            amount: components["schemas"]["AmountIn"];
+            /** Item Id */
+            item_id: string;
+        };
+        /** LinesIn */
+        LinesIn: {
+            /** Lines */
+            lines: components["schemas"]["LineIn"][];
         };
         /** LiveUpdatesInfo */
         LiveUpdatesInfo: {
@@ -465,6 +1025,82 @@ export interface components {
             /** Name */
             name?: string | null;
         };
+        /** PhotoOut */
+        PhotoOut: {
+            /** Height */
+            height: number;
+            /** Id */
+            id: string;
+            /** Width */
+            width: number;
+        };
+        /**
+         * PickerOut
+         * @description Everything the amount picker needs for one item (docs/UX.md §4.10).
+         */
+        PickerOut: {
+            each_weight: components["schemas"]["EachWeightOut"] | null;
+            /** Fix Size */
+            fix_size: boolean;
+            item: components["schemas"]["ItemOut"];
+            /** Kinds */
+            kinds: components["schemas"]["KindOptionOut"][];
+            product: components["schemas"]["ProductResult"] | null;
+        };
+        /** PreviewIn */
+        PreviewIn: {
+            amount: components["schemas"]["AmountIn"];
+        };
+        /** PreviewOut */
+        PreviewOut: {
+            amount: components["schemas"]["AmountOut"] | null;
+            /** Cost Cents */
+            cost_cents: number | null;
+            /** Message */
+            message: string | null;
+            /** Share Text */
+            share_text: string | null;
+            /** Valid */
+            valid: boolean;
+        };
+        /** PriceOut */
+        PriceOut: {
+            /** Per Pound */
+            per_pound: boolean;
+            /** Regular Cents */
+            regular_cents: number;
+            /** Sale Cents */
+            sale_cents: number | null;
+            /** Sale Ends */
+            sale_ends: string | null;
+        };
+        /**
+         * ProductResult
+         * @description A Kroger product, shown exactly as Kroger describes it. `product_id` links; never shown.
+         */
+        ProductResult: {
+            /**
+             * Availability
+             * @enum {string}
+             */
+            availability: "available" | "low" | "out" | "not_sold";
+            /** Brand */
+            brand: string | null;
+            /** Description */
+            description: string;
+            /** Image Url */
+            image_url: string | null;
+            price: components["schemas"]["PriceOut"] | null;
+            /** Product Id */
+            product_id: string;
+            /** Size */
+            size: string | null;
+            /**
+             * Sold By
+             * @enum {string}
+             */
+            sold_by: "unit" | "weight";
+        };
         /** SessionOut */
         SessionOut: {
             /** Device Id */
@@ -484,6 +1120,25 @@ export interface components {
         SettingsUpdate: {
             /** Household Name */
             household_name?: string | null;
+        };
+        /**
+         * StoreOption
+         * @description A store found near a ZIP code. `location_id` picks it; the screen never shows it.
+         */
+        StoreOption: {
+            /** Address Lines */
+            address_lines: string[];
+            /** Location Id */
+            location_id: string;
+            /** Name */
+            name: string;
+        };
+        /** StoreOut */
+        StoreOut: {
+            /** Address Lines */
+            address_lines: string[];
+            /** Name */
+            name: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -778,6 +1433,268 @@ export interface operations {
             };
         };
     };
+    list_dishes_api_dishes_get: {
+        parameters: {
+            query?: {
+                role?: ("main" | "side") | null;
+                q?: string | null;
+                occasion?: ("breakfast" | "lunch" | "dinner" | "snack") | null;
+                favorite?: boolean | null;
+                archived?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DishCard"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_dish_api_dishes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DishCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DishOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_dish_api_dishes__dish_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dish_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DishOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_dish_api_dishes__dish_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dish_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DishUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DishOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    archive_dish_api_dishes__dish_id__archive_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dish_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DishOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    duplicate_dish_api_dishes__dish_id__duplicate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dish_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DishOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    replace_lines_api_dishes__dish_id__lines_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dish_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LinesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DishOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    restore_dish_api_dishes__dish_id__restore_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dish_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DishOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     export_api_export_get: {
         parameters: {
             query?: never;
@@ -825,6 +1742,264 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthOut"];
+                };
+            };
+        };
+    };
+    list_items_api_items_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_item_api_items_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ItemCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_item_api_items__item_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ItemUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    archive_item_api_items__item_id__archive_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    amount_picker_api_items__item_id__picker_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PickerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_amount_api_items__item_id__preview_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreviewOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    restore_item_api_items__item_id__restore_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_products_api_kroger_products_get: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductResult"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -979,6 +2154,88 @@ export interface operations {
             };
         };
     };
+    upload_photo_api_photos_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "image/*": string;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhotoOut"];
+                };
+            };
+        };
+    };
+    get_photo_api_photos__photo_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                photo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_thumb_api_photos__photo_id__thumb_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                photo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_settings_api_settings_get: {
         parameters: {
             query?: never;
@@ -1019,6 +2276,90 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_active_store_api_stores_active_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActiveStoreOut"];
+                };
+            };
+        };
+    };
+    choose_store_api_stores_active_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChooseStore"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_stores_api_stores_search_get: {
+        parameters: {
+            query: {
+                zip: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreOption"][];
                 };
             };
             /** @description Validation Error */

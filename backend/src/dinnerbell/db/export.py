@@ -17,8 +17,23 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from dinnerbell.db.models import Base
 
-EXPORT_TABLES: tuple[str, ...] = ("household", "members")
-EXPORT_EXCLUDED: tuple[str, ...] = ("app_meta", "devices")
+EXPORT_TABLES: tuple[str, ...] = (
+    "household",
+    "members",
+    "stores",
+    "store_sections",
+    "items",
+    "photos",
+    "dishes",
+    "dish_items",
+)
+# Not household data: secrets and sessions, or Kroger's data, which may only be cached (ADR 0016).
+EXPORT_EXCLUDED: tuple[str, ...] = (
+    "app_meta",
+    "devices",
+    "kroger_product_cache",
+    "kroger_api_usage",
+)
 FORMAT = "dinner-bell-export"
 FORMAT_VERSION = 1
 

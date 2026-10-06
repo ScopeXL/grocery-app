@@ -1,0 +1,553 @@
+[
+  {
+    "productId": "0000000000001",
+    "upc": "0000000000001",
+    "productPageURI": "/p/sample-whole-milk/0000000000001",
+    "brand": "Sample Farms",
+    "categories": ["Dairy"],
+    "description": "Sample Whole Milk",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [
+          { "size": "thumbnail", "url": "/api/kroger/fake-images/0000000000001.svg" },
+          { "size": "medium", "url": "/api/kroger/fake-images/0000000000001.svg" },
+          { "size": "large", "url": "/api/kroger/fake-images/0000000000001.svg" }
+        ]
+      },
+      {
+        "perspective": "back",
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/back.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000001",
+        "size": "1 gal",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "curbside": true, "delivery": true, "instore": true, "shiptohome": false },
+        "price": {
+          "regular": 3.49,
+          "promo": 2.99,
+          "regularPerUnitEstimate": 3.49,
+          "promoPerUnitEstimate": 2.99,
+          "expirationDate": { "value": "2026-10-13T03:59:59Z", "timezone": "UTC" }
+        }
+      }
+    ],
+    "aisleLocations": [
+      { "number": "21", "side": "L", "description": "DAIRY", "bayNumber": "4", "shelfNumber": "2" }
+    ]
+  },
+  {
+    "productId": "0000000000002",
+    "upc": "0000000000002",
+    "productPageURI": "/p/sample-shredded-cheddar/0000000000002",
+    "brand": "Sample Farms",
+    "categories": ["Dairy"],
+    "description": "Sample Shredded Cheddar Cheese",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [
+          { "size": "thumbnail", "url": "/api/kroger/fake-images/0000000000002.svg" },
+          { "size": "medium", "url": "/api/kroger/fake-images/0000000000002.svg" }
+        ]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000002",
+        "size": "8 oz bag",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "curbside": true, "delivery": true, "inStore": true, "shipToHome": false },
+        "price": { "regular": 2.5, "promo": 0, "regularPerUnitEstimate": 2.5 }
+      }
+    ],
+    "aisleLocations": [
+      { "number": "21", "side": "R", "description": "DAIRY", "bayNumber": "8" }
+    ]
+  },
+  {
+    "productId": "0000000000003",
+    "upc": "0000000000003",
+    "productPageURI": "/p/sample-ground-beef/0000000000003",
+    "brand": "Sample Butcher",
+    "categories": ["Meat & Seafood"],
+    "description": "Sample Ground Beef 80% Lean",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000003.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000003",
+        "size": "1 lb",
+        "soldBy": "Unit",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 5.49, "promo": 4.99, "expirationDate": "2026-10-10" }
+      }
+    ],
+    "aisleLocations": [{ "number": "0", "description": "MEAT" }]
+  },
+  {
+    "productId": "0000000000004",
+    "upc": "0000000000004",
+    "productPageURI": "/p/sample-yellow-onion/0000000000004",
+    "brand": "Sample Produce",
+    "categories": ["Produce"],
+    "description": "Sample Yellow Onion",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000004.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000004",
+        "size": "1 lb",
+        "soldBy": "weight",
+        "fulfillment": { "instore": true },
+        "price": { "regular": 1.49, "promo": 0, "regularPerUnitEstimate": 0.75 }
+      }
+    ],
+    "aisleLocations": [{ "number": "0", "description": "PRODUCE" }]
+  },
+  {
+    "productId": "0000000000005",
+    "upc": "0000000000005",
+    "productPageURI": "/p/sample-flour-tortillas/0000000000005",
+    "brand": "Sample Kitchen",
+    "categories": ["International"],
+    "description": "Sample Flour Tortillas",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000005.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000005",
+        "size": "10 ct",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 2.29 }
+      }
+    ],
+    "aisleLocations": [
+      { "number": "9", "side": "R", "description": "INTERNATIONAL", "bayNumber": "3" }
+    ]
+  },
+  {
+    "productId": "0000000000006",
+    "upc": "0000000000006",
+    "productPageURI": "/p/sample-taco-shells/0000000000006",
+    "brand": "Sample Kitchen",
+    "categories": ["International"],
+    "description": "Sample Taco Shells",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000006.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000006",
+        "size": "12 ct",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 2.29, "promo": 0 }
+      }
+    ],
+    "aisleLocations": [
+      { "number": "9", "side": "R", "description": "INTERNATIONAL", "bayNumber": "2" }
+    ]
+  },
+  {
+    "productId": "0000000000007",
+    "upc": "0000000000007",
+    "productPageURI": "/p/sample-white-rice/0000000000007",
+    "brand": "Sample Pantry",
+    "categories": ["Pasta, Sauces, Grain"],
+    "description": "Sample Long Grain White Rice",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000007.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000007",
+        "size": "2 lb bag",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 2.19 }
+      }
+    ],
+    "aisleLocations": [
+      { "number": "10", "side": "L", "description": "RICE & BEANS", "bayNumber": "6" }
+    ]
+  },
+  {
+    "productId": "0000000000008",
+    "upc": "0000000000008",
+    "productPageURI": "/p/sample-chunky-salsa/0000000000008",
+    "brand": "Sample Kitchen",
+    "categories": ["International"],
+    "description": "Sample Chunky Salsa",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000008.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000008",
+        "size": "16 oz",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": {
+          "regular": 3.29,
+          "promo": 2.5,
+          "effectiveDate": "2026-10-01",
+          "expirationDate": "2026-10-14"
+        }
+      }
+    ],
+    "aisleLocations": [
+      { "number": "9", "side": "L", "description": "INTERNATIONAL", "bayNumber": "5" }
+    ]
+  },
+  {
+    "productId": "0000000000009",
+    "upc": "0000000000009",
+    "productPageURI": "/p/sample-romaine-hearts/0000000000009",
+    "brand": "Sample Produce",
+    "categories": ["Produce"],
+    "description": "Sample Romaine Hearts",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000009.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000009",
+        "size": "3 ct",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 3.99 }
+      }
+    ],
+    "aisleLocations": [{ "number": "0", "description": "PRODUCE" }]
+  },
+  {
+    "productId": "0000000000010",
+    "upc": "0000000000010",
+    "productPageURI": "/p/sample-black-beans/0000000000010",
+    "brand": "Sample Pantry",
+    "categories": ["Canned & Packaged"],
+    "description": "Sample Black Beans",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000010.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000010",
+        "size": "15 oz can",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 1.09 }
+      }
+    ],
+    "aisleLocations": [
+      { "number": "10", "side": "L", "description": "RICE & BEANS", "bayNumber": "2" }
+    ]
+  },
+  {
+    "productId": "0000000000011",
+    "upc": "0000000000011",
+    "productPageURI": "/p/sample-sparkling-water/0000000000011",
+    "brand": "Sample Springs",
+    "categories": ["Beverages"],
+    "description": "Sample Sparkling Water",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000011.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000011",
+        "size": "12 x 12 fl oz",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 4.99 }
+      }
+    ],
+    "aisleLocations": [
+      { "number": "14", "side": "R", "description": "BEVERAGES", "bayNumber": "1" }
+    ]
+  },
+  {
+    "productId": "0000000000012",
+    "upc": "0000000000012",
+    "productPageURI": "/p/sample-hass-avocado/0000000000012",
+    "brand": "Sample Produce",
+    "categories": ["Produce"],
+    "description": "Sample Hass Avocado",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000012.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000012",
+        "size": "1 each",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 0.99 }
+      }
+    ],
+    "aisleLocations": [{ "number": "0", "description": "PRODUCE" }]
+  },
+  {
+    "productId": "0000000000013",
+    "upc": "0000000000013",
+    "productPageURI": "/p/sample-olive-oil/0000000000013",
+    "brand": "Sample Pantry",
+    "categories": ["Baking Goods"],
+    "description": "Sample Extra Virgin Olive Oil",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000013.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000013",
+        "size": "16.9 fl oz (500 mL)",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 8.99 }
+      }
+    ],
+    "aisleLocations": [
+      { "number": "12", "side": "L", "description": "OILS", "bayNumber": "7" }
+    ]
+  },
+  {
+    "productId": "0000000000014",
+    "upc": "0000000000014",
+    "productPageURI": "/p/sample-chicken-thighs/0000000000014",
+    "brand": "Sample Butcher",
+    "categories": ["Meat & Seafood"],
+    "description": "Sample Bone-In Chicken Thighs",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000014.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000014",
+        "size": "about 2.2 lb",
+        "soldBy": "WEIGHT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 2.99, "promo": 2.49, "regularPerUnitEstimate": 6.58 }
+      }
+    ],
+    "aisleLocations": []
+  },
+  {
+    "productId": "0000000000015",
+    "upc": "0000000000015",
+    "productPageURI": "/p/sample-roma-tomato/0000000000015",
+    "brand": "Sample Produce",
+    "categories": ["Produce"],
+    "description": "Sample Roma Tomato",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000015.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000015",
+        "size": "1 lb",
+        "soldBy": "WEIGHT",
+        "fulfillment": { "instore": true },
+        "price": { "regular": 1.29, "regularPerUnitEstimate": 0.32 }
+      }
+    ],
+    "aisleLocations": [{ "number": "0", "description": "PRODUCE" }]
+  },
+  {
+    "productId": "0000000000016",
+    "upc": "0000000000016",
+    "productPageURI": "/p/sample-mixed-greens/0000000000016",
+    "brand": "Sample Produce",
+    "categories": ["Produce"],
+    "description": "Sample Spring Mix Greens",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000016.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000016",
+        "size": "Varies",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 4.49 }
+      }
+    ],
+    "aisleLocations": [{ "number": "0", "description": "PRODUCE" }]
+  },
+  {
+    "productId": "0000000000017",
+    "upc": "0000000000017",
+    "productPageURI": "/p/sample-sour-cream/0000000000017",
+    "brand": "Sample Farms",
+    "categories": ["Dairy"],
+    "description": "Sample Sour Cream",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000017.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000017",
+        "size": "16 oz",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "LOW" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 2.29 }
+      }
+    ],
+    "aisleLocations": [
+      { "number": "21", "side": "L", "description": "DAIRY", "bayNumber": "9" }
+    ]
+  },
+  {
+    "productId": "0000000000018",
+    "upc": "0000000000018",
+    "productPageURI": "/p/sample-aged-gouda/0000000000018",
+    "brand": "Sample Cheesemakers",
+    "categories": ["Deli"],
+    "description": "Sample Aged Gouda Cheese",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000018.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000018",
+        "size": "7 oz",
+        "soldBy": "UNIT",
+        "fulfillment": { "instore": false, "delivery": false }
+      }
+    ],
+    "aisleLocations": []
+  },
+  {
+    "productId": "0000000000019",
+    "upc": "0000000000019",
+    "productPageURI": "/p/sample-lime/0000000000019",
+    "brand": "Sample Produce",
+    "categories": ["Produce"],
+    "description": "Sample Lime",
+    "items": [
+      {
+        "itemId": "0000000000019",
+        "size": "1 each",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 0.33 }
+      }
+    ],
+    "aisleLocations": [{ "number": "0", "description": "PRODUCE" }]
+  },
+  {
+    "productId": "0000000000020",
+    "upc": "0000000000020",
+    "productPageURI": "/p/sample-shredded-lettuce/0000000000020",
+    "brand": "Sample Produce",
+    "categories": ["Produce"],
+    "description": "Sample Shredded Iceberg Lettuce",
+    "images": [
+      {
+        "perspective": "front",
+        "featured": true,
+        "sizes": [{ "size": "medium", "url": "/api/kroger/fake-images/0000000000020.svg" }]
+      }
+    ],
+    "items": [
+      {
+        "itemId": "0000000000020",
+        "size": "8 oz bag",
+        "soldBy": "UNIT",
+        "inventory": { "stockLevel": "HIGH" },
+        "fulfillment": { "instore": true },
+        "price": { "regular": 1.99 }
+      }
+    ],
+    "aisleLocations": [{ "number": "0", "description": "PRODUCE" }]
+  }
+]
