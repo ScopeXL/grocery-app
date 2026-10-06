@@ -111,7 +111,7 @@ screenshots: build
 
 # ---- privacy -----------------------------------------------------------------------------------
 
-# gitleaks (history + working tree) and the private-terms scan (tree + history)
+# gitleaks (history + working tree) and the private-terms scan (tree + unpushed commits)
 scan:
     gitleaks git --redact --no-banner .
     gitleaks dir --redact --no-banner .

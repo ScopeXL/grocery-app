@@ -10,7 +10,8 @@ local paths) listed in a private file that never enters the repo or the image. I
   private_scan.py msg FILE       a commit message (commit-msg hook)
   private_scan.py range SPEC     commits about to be pushed (pre-push hook), e.g. A..B
   private_scan.py tree           the working tree (tracked + untracked, not ignored)
-  private_scan.py history        every commit, message and tag in the repository
+  private_scan.py history        commits not pushed yet (what can still be fixed); --all audits
+                                 every commit and tag, including ones already public
   private_scan.py context REF    the files `git archive REF` sends to docker build
   private_scan.py image IMAGE    a built image's labels, environment and layer history
 
@@ -160,9 +161,17 @@ def scan(mode: str, args: list[str], scanner: Scanner) -> None:
                 scanner.text("path", path)
                 scanner.blob(path, full.read_bytes(), path=path)
     elif mode == "history":
-        for sha in git("rev-list", "--all").split():
+        if args[:1] == ["--all"]:
+            commits = git("rev-list", "--all").split()
+            tags = git("for-each-ref", "refs/tags", "--format=%(refname:short)").split()
+        else:
+            # Already-pushed commits are public and can't be fixed without rewriting history,
+            # so the release gate checks only what hasn't been published yet.
+            commits = git("rev-list", "HEAD", "--not", "--remotes").split()
+            tags = git("tag", "--no-contains", "origin/main").split() if commits else []
+        for sha in commits:
             scanner.commit(sha)
-        for tag in git("for-each-ref", "refs/tags", "--format=%(refname:short)").split():
+        for tag in tags:
             scanner.text(f"tag {tag}", git("for-each-ref", f"refs/tags/{tag}", "--format=%(contents)"))
     elif mode == "context":
         archive = git_bytes("archive", "--format=tar", args[0])

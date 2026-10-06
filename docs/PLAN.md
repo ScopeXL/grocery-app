@@ -1766,7 +1766,7 @@ This applies to code, docs, tests, fixtures, commit messages and the CHANGELOG. 
 | `staged` | the staged diff |
 | `msg` | commit messages |
 | `range` | diffs, messages, and author and committer fields of a pushed range |
-| `tree`, `history` | the working tree; `git log -p --all` plus tag messages |
+| `tree`, `history` | the working tree; commits not pushed yet (`history --all` audits everything, including commits already public, which can't be fixed without rewriting history) |
 | `context` | the `git archive` tar |
 | `image` | the image's labels, env and history |
 
