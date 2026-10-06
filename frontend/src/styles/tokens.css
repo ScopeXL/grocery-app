@@ -19,6 +19,8 @@
   --on-lemon: #2b1d30;
   --tomato: #c2381e;
   --rule: #dde1da;
+  /* Product photos sit on white in both themes, like a label (docs/UX.md §7.5). */
+  --photo-tile: #ffffff;
 
   --marker-basil: #1e6b45;
   --marker-tomato: #c2381e;
@@ -65,6 +67,7 @@
   --color-on-lemon: var(--on-lemon);
   --color-tomato: var(--tomato);
   --color-rule: var(--rule);
+  --color-photo-tile: var(--photo-tile);
 
   --font-sans: "Atkinson Hyperlegible Next Variable", ui-sans-serif, system-ui, sans-serif;
 

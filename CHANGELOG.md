@@ -6,10 +6,22 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+### Added
+
+- Choose your store by ZIP code, in a short first-run guide or later in Settings.
+- Make Mains and Sides step by step. A half-made meal is saved on your phone as you go.
+- Add what a meal needs from your store, with Kroger's photos, sizes and prices, or as plain
+  text.
+- Say how much a meal uses: part of a package, a weight, a kitchen measure or a count. A preview
+  shows what that means, like "About half the 8 oz bag" and "about $1.25".
+- Each meal shows what it costs at today's prices, and each item its share.
+- Meal photos, favorites, Duplicate, and Archive with Undo.
+
 ### Behind the scenes
 
 - Sturdier releases: they check GitHub access before starting, can resume after a failed upload,
   and the privacy check now also reads release tags.
+- Kroger's product details are used live and kept only as long as Kroger allows.
 
 ## [0.1.0] - 2026-10-06
 

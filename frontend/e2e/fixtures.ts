@@ -39,8 +39,19 @@ export async function resetServer(request: APIRequestContext): Promise<void> {
   expect(response.status()).toBe(204);
 }
 
-/** Sign in from a fresh browser, passing the iPhone install guide if it appears. */
-export async function signIn(page: Page, name = "Sample Parent"): Promise<void> {
+/** The fake Kroger's first store (synthetic). */
+export const SAMPLE_STORE = "99999001";
+
+/**
+ * Sign in from a fresh browser, passing the iPhone install guide if it appears. Unless asked
+ * not to, the household's store is chosen first (through the API), so the tabs open instead of
+ * the first-run steps.
+ */
+export async function signIn(
+  page: Page,
+  name = "Sample Parent",
+  { withStore = true }: { withStore?: boolean } = {},
+): Promise<void> {
   await page.goto("/");
   const continueInSafari = page.getByRole("button", { name: "Continue in Safari" });
   const password = page.getByLabel("Household password");
@@ -50,6 +61,7 @@ export async function signIn(page: Page, name = "Sample Parent"): Promise<void> 
   await password.fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { name: "Who’s using this phone?" })).toBeVisible();
+  if (withStore) await chooseStore(page);
   const existing = page.getByRole("button", { name });
   if (await existing.count()) {
     await existing.click();
@@ -59,5 +71,16 @@ export async function signIn(page: Page, name = "Sample Parent"): Promise<void> 
     await page.getByLabel("Your name").fill(name);
     await page.getByRole("button", { name: "Add me" }).click();
   }
-  await expect(page.getByRole("heading", { name: "This week" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: withStore ? "This week" : "Choose your store" }),
+  ).toBeVisible();
+}
+
+/** Choose the sample store with the page's own session (no UI). */
+export async function chooseStore(page: Page): Promise<void> {
+  const response = await page.request.put("/api/stores/active", {
+    data: { location_id: SAMPLE_STORE },
+    headers: { "X-Dinner-Bell": "1" },
+  });
+  expect(response.status()).toBe(200);
 }

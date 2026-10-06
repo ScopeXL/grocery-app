@@ -13,6 +13,7 @@ import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { MemberBadge } from "../../ui/MemberBadge";
 import { Screen, Section } from "../../ui/Screen";
+import { ChooseStore } from "../stores/ChooseStore";
 
 const LIVE_TEXT: Record<LiveStatus, string> = {
   live: "Live updates: connected",
@@ -32,6 +33,59 @@ function Row({ children }: { children: ReactNode }) {
 
 function useSession() {
   return useQuery({ queryKey: qk.session(), queryFn: fetchSession });
+}
+
+function StoreSettings() {
+  const active = useQuery({
+    queryKey: qk.activeStore(),
+    queryFn: async () => unwrap(await api.GET("/api/stores/active")),
+  });
+  const [changing, setChanging] = useState(false);
+  const store = active.data?.store;
+  if (active.isPending) return null;
+  return (
+    <Section title="Store">
+      {store && !changing ? (
+        <Row>
+          <div className="flex-1">
+            <p className="text-body font-semibold">{store.name}</p>
+            {store.address_lines.map((line) => (
+              <p key={line} className="text-secondary text-ink-soft">
+                {line}
+              </p>
+            ))}
+          </div>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setChanging(true);
+            }}
+          >
+            Change store
+          </Button>
+        </Row>
+      ) : (
+        <div className="flex flex-col gap-2 p-4">
+          <ChooseStore
+            onChosen={() => {
+              setChanging(false);
+              showToast("Store saved");
+            }}
+          />
+          {store ? (
+            <Button
+              variant="quiet"
+              onClick={() => {
+                setChanging(false);
+              }}
+            >
+              Keep {store.name}
+            </Button>
+          ) : null}
+        </div>
+      )}
+    </Section>
+  );
 }
 
 function ThisPhone() {
@@ -323,6 +377,7 @@ function About() {
 export function SettingsScreen() {
   return (
     <Screen title="Settings">
+      <StoreSettings />
       <ThisPhone />
       <Household />
       <Devices />

@@ -164,4 +164,5 @@ Add one line each time something surprising costs time: the symptom, the cause, 
 - `python3` on the build Mac is 3.9: repo scripts run through `uv run --no-project --python 3.14` (the justfile's `py`).
 - OrbStack's `docker` isn't always on PATH: the justfile and image scripts prepend `~/.orbstack/bin`.
 - `gitleaks dir` flagged `.env`: it ignores `.gitignore`. `just scan` copies only git-visible files to a temp folder and scans that.
+- WebKit e2e runs failed with page errors "… due to access control checks": a hard reload (`page.goto`) cut off a request still in flight. Move between screens with in-app links, or wait for the screen's data before reloading.
 - The 0.1.0 push failed after tagging ("could not read Username"): the HTTPS remote had no saved login. The remote is now SSH, preflight dry-runs the push, and `release-tag` resumes. Auto mode blocks Claude from changing a git remote; that's the owner's step.

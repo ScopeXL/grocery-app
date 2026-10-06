@@ -6,4 +6,11 @@ export const qk = {
   devices: () => ["devices"] as const,
   diagnostics: () => ["diagnostics"] as const,
   backups: () => ["backups"] as const,
+  activeStore: () => ["stores", "active"] as const,
+  dishes: () => ["dishes"] as const,
+  dishList: (role: string, archived: boolean) => ["dishes", "list", role, archived] as const,
+  dish: (id: string) => ["dishes", "one", id] as const,
+  items: () => ["items"] as const,
+  picker: (itemId: string) => ["items", "picker", itemId] as const,
+  productSearch: (term: string) => ["products", term] as const,
 };

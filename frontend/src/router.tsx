@@ -8,13 +8,17 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-import { ApiError } from "./api/client";
+import { api, ApiError, unwrap } from "./api/client";
 import { qk } from "./api/keys";
 import { SignInScreen } from "./features/auth/SignInScreen";
 import { WhoScreen } from "./features/auth/WhoScreen";
 import { ListScreen } from "./features/list/ListScreen";
+import { MealDetailScreen } from "./features/meals/MealDetailScreen";
+import { EditMealScreen, NewMealScreen } from "./features/meals/MealEditor";
 import { MealsScreen } from "./features/meals/MealsScreen";
+import type { Role } from "./features/meals/types";
 import { MoreScreen } from "./features/more/MoreScreen";
+import { FirstRunScreen, type FirstRunStep } from "./features/onboarding/FirstRunScreen";
 import { InstallScreen } from "./features/onboarding/InstallScreen";
 import { PlanScreen } from "./features/plan/PlanScreen";
 import { AboutScreen } from "./features/settings/AboutScreen";
@@ -149,9 +153,62 @@ const whoRoute = createRoute({
   path: "/who",
   component: WhoScreen,
 });
+const welcomeRoute = createRoute({
+  getParentRoute: () => signedRoute,
+  path: "/welcome",
+  validateSearch: (search: Record<string, unknown>): { step?: FirstRunStep } =>
+    search.step === "dinner" || search.step === "done" ? { step: search.step } : {},
+  component: function Welcome() {
+    const { step } = welcomeRoute.useSearch();
+    return <FirstRunScreen step={step ?? "store"} />;
+  },
+});
+const newMealRoute = createRoute({
+  getParentRoute: () => signedRoute,
+  path: "/meals/new",
+  validateSearch: (search: Record<string, unknown>): { role?: Role; first?: boolean } => {
+    const valid: { role?: Role; first?: boolean } = {};
+    if (search.role === "main" || search.role === "side") valid.role = search.role;
+    if (search.first === true || search.first === "true") valid.first = true;
+    return valid;
+  },
+  component: function NewMeal() {
+    const { role, first } = newMealRoute.useSearch();
+    return <NewMealScreen role={role} first={first} />;
+  },
+});
+const editMealRoute = createRoute({
+  getParentRoute: () => signedRoute,
+  path: "/meals/$dishId/edit",
+  component: function EditMeal() {
+    const { dishId } = editMealRoute.useParams();
+    return <EditMealScreen dishId={dishId} />;
+  },
+});
+
+/** The tabs need a store first (UX §4.3); offline or unknown, the app doesn't block on it. */
+async function hasStore(client: QueryClient): Promise<boolean> {
+  try {
+    const active = await client.query({
+      queryKey: qk.activeStore(),
+      queryFn: async () => unwrap(await api.GET("/api/stores/active")),
+      staleTime: 60_000,
+      retry: false, // offline should open the app at once, not after retries
+    });
+    return active.store !== null;
+  } catch {
+    return true;
+  }
+}
+
 const tabsRoute = createRoute({
   getParentRoute: () => signedRoute,
   id: "tabs",
+  beforeLoad: async ({ context }) => {
+    if (!(await hasStore(context.queryClient))) {
+      throw redirect({ to: "/welcome", search: { step: "store" } });
+    }
+  },
   component: TabsLayout,
 });
 const planRoute = createRoute({
@@ -162,7 +219,20 @@ const planRoute = createRoute({
 const mealsRoute = createRoute({
   getParentRoute: () => tabsRoute,
   path: "/meals",
-  component: MealsScreen,
+  validateSearch: (search: Record<string, unknown>): { role?: Role } =>
+    search.role === "side" ? { role: "side" } : {},
+  component: function Meals() {
+    const { role } = mealsRoute.useSearch();
+    return <MealsScreen role={role ?? "main"} />;
+  },
+});
+const mealRoute = createRoute({
+  getParentRoute: () => tabsRoute,
+  path: "/meals/$dishId",
+  component: function Meal() {
+    const { dishId } = mealRoute.useParams();
+    return <MealDetailScreen dishId={dishId} />;
+  },
 });
 const listRoute = createRoute({
   getParentRoute: () => tabsRoute,
@@ -190,7 +260,18 @@ const routeTree = rootRoute.addChildren([
   signInRoute,
   signedRoute.addChildren([
     whoRoute,
-    tabsRoute.addChildren([planRoute, mealsRoute, listRoute, moreRoute, settingsRoute, aboutRoute]),
+    welcomeRoute,
+    newMealRoute,
+    editMealRoute,
+    tabsRoute.addChildren([
+      planRoute,
+      mealsRoute,
+      mealRoute,
+      listRoute,
+      moreRoute,
+      settingsRoute,
+      aboutRoute,
+    ]),
   ]),
 ]);
 

@@ -14,12 +14,26 @@ test("every tab teaches what goes there", async ({ page }) => {
 test("nothing scrolls sideways at phone width", async ({ page, isMobile }) => {
   test.skip(!isMobile, "phone only");
   await signIn(page);
-  for (const path of ["/", "/meals", "/list", "/more", "/settings", "/about"]) {
-    await page.goto(path);
+  // Move the way a person does (in-app links), not by reloading the page between screens.
+  const screens: [link: string | null, heading: string][] = [
+    [null, "This week"],
+    ["Meals", "Meals"],
+    ["New meal", "New meal"],
+    ["Meals", "Meals"],
+    ["List", "Shopping list"],
+    ["More", "More"],
+    ["Settings", "Settings"],
+    ["More", "More"],
+    ["About & privacy", "About"],
+  ];
+  for (const [link, heading] of screens) {
+    if (link === "New meal") await page.getByRole("button", { name: link }).click();
+    else if (link) await page.getByRole("link", { name: link, exact: true }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(heading);
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
-    expect(overflow, `horizontal overflow on ${path}`).toBeLessThanOrEqual(0);
+    expect(overflow, `horizontal overflow on ${heading}`).toBeLessThanOrEqual(0);
   }
 });
 

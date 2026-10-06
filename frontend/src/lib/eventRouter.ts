@@ -47,6 +47,15 @@ export function createEventHandler(queryClient: QueryClient, onSignedOut: () => 
       case "settings.changed":
         invalidate(qk.settings());
         invalidate(qk.session());
+        invalidate(qk.activeStore());
+        break;
+      case "dishes.changed":
+        invalidate(qk.dishes());
+        break;
+      case "items.changed":
+        // An item's size or link changes how dishes read their amounts and costs.
+        invalidate(qk.items());
+        invalidate(qk.dishes());
         break;
       case "session.expired":
         onSignedOut();
