@@ -36,15 +36,19 @@ LIST_PATHS = [
 HOOK_MODES = {"staged", "msg", "range"}
 MAX_BYTES = 2_000_000
 CATEGORIES = [
-    "ZIP code(s) of your store and home",
-    "Kroger store location ID(s)",
-    "household member first names, and your surname",
-    "street address(es)",
-    "your domain and the app's subdomain",
-    "Portainer host name(s) and IP address(es)",
-    "home network ranges (e.g. 192.168.1.)",
-    "this Mac's username and home folder path",
-    "personal email addresses",
+    # (what to enter, a made-up example)
+    ("ZIP codes, home and store", "12345, 54321"),
+    ("Kroger store IDs: the 8-character ID and the store number", "01234567, 00123"),
+    ("Family first names and your surname", "Alex, Jamie, Sam, Rivera"),
+    ("Street addresses: house number + street name, without Ave/Road", "1234 Maple, Olio"),
+    ("Your domain (this also covers every subdomain)", "example.com"),
+    ("Server host names and IP addresses", "portainer.example.com, 192.168.1.50"),
+    ("Home network: the address prefix, with the trailing dot", "192.168.1."),
+    (
+        "This Mac's home folder path (not your username if it's also your public GitHub name)",
+        "/Users/alex",
+    ),
+    ("Personal email addresses (not your GitHub noreply address)", "alex@example.com"),
 ]
 
 
@@ -193,15 +197,20 @@ def setup() -> int:
         return 0
     target = LIST_PATHS[0]
     if not sys.stdin.isatty():
-        print(f"No private-terms list yet. Create {target} with one term per line;")
-        print("categories: " + "; ".join(CATEGORIES) + ".")
+        print(f"No private-terms list yet. Create {target} with one term per line:")
+        for category, example in CATEGORIES:
+            print(f"  {category}  (e.g. {example})")
         return 0
     print("Dinner Bell keeps household details out of the public repo by scanning for them.")
-    print(f"Enter terms for each category (comma-separated, Enter to skip). Saved to {target}.")
+    print("For each category, type the values separated by commas, or press Enter to skip.")
+    print("Each value is matched anywhere in the text, so a distinctive part is enough.")
+    print(f"Saved to {target}; edit it any time (one value per line).\n")
     lines = ["# Dinner Bell private terms: one per line. Never commit this file."]
-    for category in CATEGORIES:
-        answer = input(f"  {category}: ").strip()
+    for category, example in CATEGORIES:
+        print(category)
+        answer = input(f"  e.g. {example}\n  > ").strip()
         lines.extend(term.strip() for term in answer.split(",") if term.strip())
+        print()
     if len(lines) == 1:
         print("No terms entered; nothing saved.")
         return 0
