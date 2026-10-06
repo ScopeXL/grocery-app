@@ -2,7 +2,7 @@
 
 This is the current plan for Dinner Bell, a household meal-planning and grocery-list PWA. It is the single source for what we are building and how. Decisions and their reasoning live in [`adr/`](adr/README.md). Screens, flows and visual design live in [`UX.md`](UX.md). Working rules for AI sessions live in [`../CLAUDE.md`](../CLAUDE.md).
 
-**Status:** M0 (foundation) is released as 0.1.0 (2026-10-06). Once the owner's first Portainer deploy and phone checklist pass, its §12 section shrinks to one line. M1 is next.
+**Status:** M0 (foundation) shipped as 0.1.0 on 2026-10-06. M1 (store, items and meals) is next; it starts once the owner has registered a Kroger production app for Dinner Bell (§12).
 
 **Maintenance rule:** when a milestone ships, shrink its section to a one-line summary that points to the CHANGELOG. Keep this file about what is true now and what is left to do.
 
@@ -1846,58 +1846,7 @@ The deploy pipeline comes first, so every later milestone ships to the Portainer
 
 ### M0 Foundation → 0.1.0
 
-**Scope**
-- **Scaffold:** `backend/` and `frontend/` as in §4. The final `CLAUDE.md`, the justfile, `just check` covering both halves, git hooks, CI, Dependabot, `.gitleaks.toml`, `private_scan.py`, and the `.env.example` and compose examples.
-- **Backend:**
-  - Settings with fail-loud validation; DB engine with pragmas and the write lock.
-  - The Alembic baseline (`household`, `app_meta`, `members`, `devices`).
-  - The boot sequence: backup → migrate → verify → serve. Nightly backups and the backup endpoints.
-  - `/api/health`, `/api/version` and diagnostics.
-  - Auth: login, sessions, devices, member picker, rate limiting, CSRF, security headers, log redaction.
-  - SPA serving, and the SSE hub with heartbeat and `hello`.
-- **Frontend:**
-  - Design tokens (light and dark) with the AA contrast test; the self-hosted Atkinson Hyperlegible Next font.
-  - The tab bar with four teaching empty screens.
-  - Sign-in, including the iPhone install-guide-first step; the member picker.
-  - A Settings stub: version, last backup, devices, "Live updates: connected".
-  - The PWA: manifest, icons, app-shell service worker, update prompt. The offline pill.
-- **Testing:** the three Playwright projects; `just screenshots`.
-- **Release:**
-  - Dockerfile, `.dockerignore`, the smoke and verify scripts, the deploy skill.
-  - `docs/DEPLOY.md` (with proxy snippets), `docs/RESTORE.md`, `docs/RELEASING.md`, `docs/KROGER.md` (with an empty "verified" table).
-  - The first deploy to Portainer.
-- **Tools (with the owner's OK, asked at the start of M0):**
-  - install `gitleaks` and `pnpm` with Homebrew;
-  - suggest the Context7 MCP server (current library docs) and, optionally, the Playwright MCP server;
-  - confirm the frontmatter of the deploy skill against the current Claude Code docs.
-
-**Owner's one-time setup**
-- **PATH:** put `~/.orbstack/bin` on the shell PATH (OrbStack is already installed).
-- **Docker Hub:**
-  - Create a personal access token, then run `docker login -u scopexl`.
-  - Turn on immutable tags for `^\d+\.\d+\.\d+$`.
-- **Private terms:** create the list (`just setup` walks through it).
-- **GitHub email privacy:** turn on "Keep my email addresses private" and "Block command line pushes that expose my email".
-- **Portainer stack** from the compose example:
-  - `APP_PASSWORD` (a passphrase of 12+ characters);
-  - `APP_SECRET_KEY` (`openssl rand -base64 48`, also kept in a password manager);
-  - `APP_BASE_URL`, `TZ`, `TRUSTED_PROXIES`;
-  - `KROGER_MODE=fake`.
-- **Proxy:** a host for the app with HTTP/2 on, plus the SSE snippet for the proxy type, and DNS.
-
-**Acceptance**
-- `just check` and `just e2e` are green locally and in CI. Screenshots are reviewed at both sizes in both themes.
-- `preflight` provably blocks a planted fake secret and a planted private term.
-- The image runs as uid 10001 and reports healthy. `/api/version` shows `0.1.0` and the git SHA. Both architectures are verified on Docker Hub.
-- A restart keeps data. A failing migration (test) stops startup and leaves the DB byte-identical. The negative volume cases exit 73.
-
-**Phone checklist**
-- [ ] On cellular (Wi-Fi off), the app URL opens the sign-in screen over HTTPS.
-- [ ] iPhone: the install guide comes first. Add to Home Screen, open from the icon, sign in.
-- [ ] Pick your name.
-- [ ] More → Settings shows 0.1.0 and "Live updates: connected".
-- [ ] Switch the phone to dark mode; the app follows.
-- [ ] In airplane mode the app still opens and shows only the quiet offline pill.
+Shipped as 0.1.0 on 2026-10-06; the phone checklist passed on the owner's Portainer deploy. What it delivered is in the [CHANGELOG](../CHANGELOG.md).
 
 ### M1 Store, items and meals → 0.2.0
 
@@ -2030,6 +1979,8 @@ The deploy pipeline comes first, so every later milestone ships to the Portainer
 
 ## 13. Risks and unknowns
 
+Item numbers stay fixed because other sections cite them, so settled items leave gaps. M0's deploy settled 12 (the reverse proxy), 13 (the Docker host) and 17 (tooling versions).
+
 | # | Risk or unknown | How it gets resolved |
 |---|---|---|
 | 1 | `filter.productId` batches may ignore `filter.locationId`, returning no price or aisle | M1 smoke test. If confirmed, refresh per ID with `GET /products/{id}?filter.locationId=` at concurrency 4 (well within 10,000/day) |
@@ -2043,12 +1994,9 @@ The deploy pipeline comes first, so every later milestone ships to the Portainer
 | 9 | Variety in size strings; pricing loose produce by weight | The parser plus "Fix size"; a household each-weight with presets; Kroger's estimate only when sane; otherwise "no price" |
 | 10 | The image host's CORS, `Vary`, hotlink rules and cache headers; opaque responses inflating storage quota | M3: a header probe with a synthetic product ID, plus device tests. Entry cap, `purgeOnQuotaError`, `persist()`, release on finish |
 | 11 | iOS PWA quirks: separate storage after install, wake lock only from iOS 18.4, eviction, no Background Sync, IndexedDB drops | Install guide before the password; `persist()`; outbox flush in the foreground; IndexedDB reopen wrapper; a wake-lock tip; real-device checklist every release |
-| 12 | Unknown reverse proxy: SSE buffering or compression, HTTP/1.1 connection limits, the right `TRUSTED_PROXIES` | Per-proxy snippets; the diagnostics page; the buffering detector with quiet polling fallback; `just proxy-matrix`; a two-phone check at the M0 deploy |
-| 13 | The Portainer host's Docker Engine version (`--start-interval` needs 25+) and volume type | Checked at the M0 deploy. Startup refuses NFS, CIFS and an unwritable `/data` with a clear fix. Drop `--start-interval` if the engine is older |
 | 14 | Backups share a disk with the DB; `APP_SECRET_KEY` could be lost | The download endpoint, plus a host-level volume backup note in DEPLOY.md. The key lives in a password manager; losing it resets sessions and the Kroger link only |
 | 15 | The private-terms list is incomplete | `just setup` prompts for every category; preflight fails on a missing or empty list; the image scan |
 | 16 | More phone clock skew than expected; a service-worker update activating mid-trip after iOS kills the app | Offset correction plus the server clamp, with observed skew logged. IndexedDB migrations. The server accepts every op version ever shipped |
-| 17 | Tooling compatibility: Python 3.14 wheels, TypeScript 7 with typescript-eslint, Vite 8 with vite-plugin-pwa 2 | Settled during M0 setup. Fallbacks (3.13, TS 6, compatible pins) are each recorded in an ADR |
 | 18 | Playwright WebKit is not iOS Safari | The phone checklist on every release; service-worker tests run on Chromium |
 | 19 | Whether `promo` is a loyalty-card-only price | Shown as "Sale" with its end date; checked against a shelf tag in M2 |
 
