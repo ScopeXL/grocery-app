@@ -155,4 +155,11 @@ frontend/src/
 
 ## Gotchas that already bit
 
-None yet. Add one line each time something surprising costs time: the symptom, the cause, and the fix.
+Add one line each time something surprising costs time: the symptom, the cause, and the fix.
+
+- Active tab not highlighted: two competing Tailwind color classes; CSS order decides, not class order. Use the router's `data-[status=active]:` variant.
+- WebKit screenshot runs report inline-style CSP violations: Playwright's WebKit screenshot code injects a `<style>`. Only the screenshot spec turns `cspGuard` off.
+- `?raw` CSS imports are empty under Vitest: it stubs CSS unless `test.css.include` matches the file.
+- A root-owned named volume "fixed itself" in the smoke test: Docker re-copies the image's `/data` ownership into a volume while it is empty. Test with a non-empty volume.
+- `python3` on the build Mac is 3.9: repo scripts run through `uv run --no-project --python 3.14` (the justfile's `py`).
+- OrbStack's `docker` isn't always on PATH: the justfile and image scripts prepend `~/.orbstack/bin`.
