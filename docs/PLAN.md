@@ -1850,7 +1850,7 @@ Shipped as 0.1.0 on 2026-10-06; the phone checklist passed on the owner's Portai
 
 ### M1 Store, items and meals → 0.2.0
 
-**Owner setup:** register a Kroger production app just for Dinner Bell, named without "Kroger", with the GitHub URL of `PRIVACY.md` as its privacy policy. Put the keys in the local `.env` and in Portainer with `KROGER_MODE=live`.
+**Owner setup:** register a Kroger production app just for Dinner Bell, named without "Kroger", with the GitHub URL of `PRIVACY.md` as its privacy policy (registered 2026-10-06). Put the keys in the local `.env` and in Portainer. `KROGER_MODE` stays `fake` locally; Portainer switches to `live` at the M1 deploy.
 
 **Scope**
 - **Kroger:** the client (token cache, retries, usage counters, the 429 state), the fake client and synthetic fixtures, and `just smoke-kroger`. Its results go into `docs/KROGER.md` (§13 items 1–4).

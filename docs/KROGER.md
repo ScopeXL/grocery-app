@@ -4,7 +4,8 @@ Dinner Bell uses the public Kroger APIs for product photos, sizes, prices and ai
 to add items to a Kroger cart (M5). The design is in [PLAN.md §7](PLAN.md#7-kroger-integration);
 the caching rules are in [ADR 0016](adr/0016-kroger-data-and-terms.md).
 
-**Status:** not connected yet. `KROGER_MODE=fake` serves synthetic sample products until M1.
+**Status:** a Dinner Bell app is registered (2026-10-06) but not connected yet. `KROGER_MODE=fake`
+serves synthetic sample products until M1.
 
 ## Register a Kroger app (before M1)
 
@@ -17,8 +18,11 @@ Use an app registered only for Dinner Bell, so other tools can't use up its dail
 4. Privacy policy URL: `https://github.com/ScopeXL/grocery-app/blob/main/PRIVACY.md`.
 5. M5 only: add the redirect URI `<APP_BASE_URL>/api/kroger/callback`, exactly as written.
 6. Put the client ID and secret in the Portainer stack variables and your local `.env`
-   (`KROGER_CLIENT_ID`, `KROGER_CLIENT_SECRET`), and set `KROGER_MODE=live`. They must never be
-   committed; the scans block it.
+   (`KROGER_CLIENT_ID`, `KROGER_CLIENT_SECRET`). They must never be committed; the scans block
+   it.
+7. Keep `KROGER_MODE=fake` in the local `.env`: development and tests use sample data, and
+   `just smoke-kroger` is the only local command that calls Kroger. Set `KROGER_MODE=live` in
+   Portainer when deploying M1; that release's deploy report says so.
 
 ## Verified behaviour
 
