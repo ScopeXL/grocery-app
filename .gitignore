@@ -1,0 +1,43 @@
+# Secrets and local configuration (never committed: CLAUDE.md hard rule 1)
+.env
+.env.*
+!.env.example
+.private/
+CLAUDE.local.md
+.claude/settings.local.json
+
+# Data: databases, backups and anything from a real household
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+.data/
+/data/
+backups/
+
+# Review screenshots and captures (fake data only, still never committed)
+/.screenshots/
+*.har
+*.heic
+
+# Python
+__pycache__/
+*.py[cod]
+/backend/.venv/
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+/backend/dist/
+
+# Frontend
+node_modules/
+/frontend/dist/
+/frontend/dev-dist/
+/frontend/test-results/
+/frontend/playwright-report/
+*.tsbuildinfo
+
+# OS and editors
+.DS_Store
+.idea/
+.vscode/

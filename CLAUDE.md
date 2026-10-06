@@ -7,7 +7,7 @@ Dinner Bell is a household meal-planning and grocery-list PWA:
 
 It is built and maintained entirely by AI sessions. Most of its users aren't technical and use it on a phone, often in a store aisle with weak signal.
 
-**Status:** planning complete. **M0 (foundation) has not started.** The commands below exist from M0 onwards.
+**Status:** M0 (foundation) is being built. See docs/PLAN.md §12 for what each milestone includes.
 
 **Read first:**
 - [`docs/PLAN.md`](docs/PLAN.md): what we're building and how, plus milestones. It's long, so start from its contents list and read only the sections your task touches.
@@ -112,6 +112,7 @@ frontend/src/
 - **Frontend:**
   - Strict TypeScript; call the API only through the generated client; use the query-key factory.
   - Only design tokens; no raw hex in components.
+  - No dependency may inject styles at runtime (strict CSP; ADR 0023). The e2e tests fail on any CSP violation.
   - Every action needs a visible button. Swipes are shortcuts only.
   - Prefer Undo over confirmations.
   - Offline state is a quiet pill, never an error wall.

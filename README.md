@@ -7,7 +7,7 @@ A household meal-planning and grocery app, built for phones:
 - **Shop it aisle by aisle.** The list works offline and syncs live between family members' phones.
 - **Or order online.** Send the list to your Kroger cart for pickup or delivery.
 
-**Status:** planning complete. The first release (0.1.0) will come out of milestone M0.
+**Status:** the first release (0.1.0) is being built (milestone M0).
 
 ## Documentation
 
@@ -18,7 +18,7 @@ A household meal-planning and grocery app, built for phones:
 
 ## Self-hosting
 
-Dinner Bell ships as one Docker image, `scopexl/dinner-bell`, with all state on a `/data` volume and all configuration in environment variables. Deployment and restore guides will be added in M0.
+Dinner Bell ships as one Docker image, `scopexl/dinner-bell`, with all state on a `/data` volume and all configuration in environment variables. See [Deploying](docs/DEPLOY.md), [Restoring a backup](docs/RESTORE.md) and [Releasing](docs/RELEASING.md).
 
 ## Not affiliated with Kroger
 

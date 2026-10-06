@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(just check)",
+      "Bash(just lint)",
+      "Bash(just typecheck)",
+      "Bash(just test)",
+      "Bash(just fmt)",
+      "Bash(just build)",
+      "Bash(just e2e)",
+      "Bash(just screenshots)",
+      "Bash(just scan)",
+      "Bash(just api-types)",
+      "Bash(just api-types-check)",
+      "Bash(just migrations-check)",
+      "Bash(just smoke-image *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.data/**)",
+      "Read(./backend/.data/**)",
+      "Read(./.private/**)",
+      "Read(~/.config/dinner-bell/**)"
+    ]
+  }
+}

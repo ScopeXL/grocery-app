@@ -1,0 +1,50 @@
+# gitleaks configuration (docs/adr/0017-privacy-guardrails.md).
+# Household-specific values (names, ZIP, store, domain) can't be listed in a public file; the
+# local private-terms scan (scripts/private_scan.py) covers those.
+title = "Dinner Bell"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "dockerhub-pat"
+description = "Docker Hub personal access token"
+regex = '''dckr_pat_[A-Za-z0-9_-]{20,}'''
+
+[[rules]]
+id = "dinnerbell-secret-assignment"
+description = "A real value assigned to a Dinner Bell secret (env-file or shell style)"
+regex = '''(?m)^\s*(?:export\s+)?(APP_SECRET_KEY|APP_PASSWORD|KROGER_CLIENT_SECRET)=["']?([^\s"'#$]{8,})'''
+secretGroup = 2
+[[rules.allowlists]]
+regexTarget = "secret"
+regexes = [
+  '''change-me-to-a-long-random-string''',
+  '''change-me-household-passphrase''',
+  '''\$\{[A-Z_]+\}''',
+  '''smoke-password-0000''',
+  '''e2e-household-passphrase''',
+  '''e2e-only-secret-key-0123456789abcdef''',
+]
+
+[[rules]]
+id = "fernet-token"
+description = "Fernet-encrypted token (encrypted Kroger tokens never belong in git)"
+regex = '''gAAAAA[A-Za-z0-9_=-]{60,}'''
+
+[[rules]]
+id = "dinnerbell-session-cookie"
+description = "A Dinner Bell session cookie value"
+regex = '''(?:__Host-)?dinnerbell=v1\.[0-9a-f-]{36}\.\d+\.\d+\.[A-Za-z0-9_-]{16,}'''
+
+[[allowlists]]
+paths = [
+  '''(^|/)node_modules/''',
+  '''(^|/)\.venv/''',
+  '''(^|/)dist/''',
+  '''(^|/)test-results/''',
+  '''(^|/)playwright-report/''',
+  '''(^|/)\.screenshots/''',
+  '''pnpm-lock\.yaml$''',
+  '''uv\.lock$''',
+]

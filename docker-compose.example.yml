@@ -1,0 +1,33 @@
+# Portainer stack for Dinner Bell (docs/DEPLOY.md). Paste into Stacks → Add stack → Web editor,
+# then fill in the stack's environment variables. Placeholders only; never commit real values.
+services:
+  dinner-bell:
+    image: scopexl/dinner-bell:latest # or pin a version, e.g. scopexl/dinner-bell:0.1.0
+    restart: unless-stopped
+    environment:
+      APP_BASE_URL: ${APP_BASE_URL} # e.g. https://dinner.example.com
+      APP_SECRET_KEY: ${APP_SECRET_KEY} # openssl rand -base64 48; keep it in a password manager
+      APP_PASSWORD: ${APP_PASSWORD} # the household passphrase, 12+ characters
+      TZ: ${TZ} # e.g. America/New_York
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES} # your proxy's IP or network, e.g. 172.18.0.0/16
+      KROGER_MODE: ${KROGER_MODE:-fake}
+      KROGER_CLIENT_ID: ${KROGER_CLIENT_ID:-}
+      KROGER_CLIENT_SECRET: ${KROGER_CLIENT_SECRET:-}
+    volumes:
+      - dinnerbell_data:/data # a named volume: correct ownership with no extra steps
+    ports:
+      - "8080:8080" # or remove this and attach the container to your proxy's network
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  dinnerbell_data:

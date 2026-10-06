@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Private-terms scan of every commit about to be pushed (messages, authors, diffs).
+set -euo pipefail
+zero=0000000000000000000000000000000000000000
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$zero" ] && continue # deleting a branch: nothing to scan
+  if [ "$remote_sha" = "$zero" ]; then
+    range="$local_sha --not --remotes"
+  else
+    range="$remote_sha..$local_sha"
+  fi
+  # shellcheck disable=SC2086
+  just hook-pre-push "$range"
+done

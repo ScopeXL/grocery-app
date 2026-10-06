@@ -2,7 +2,7 @@
 
 This is the current plan for Dinner Bell, a household meal-planning and grocery-list PWA. It is the single source for what we are building and how. Decisions and their reasoning live in [`adr/`](adr/README.md). Screens, flows and visual design live in [`UX.md`](UX.md). Working rules for AI sessions live in [`../CLAUDE.md`](../CLAUDE.md).
 
-**Status:** planning complete. M0 has not started.
+**Status:** M0 (foundation) is being built.
 
 **Maintenance rule:** when a milestone ships, shrink its section to a one-line summary that points to the CHANGELOG. Keep this file about what is true now and what is left to do.
 
@@ -91,6 +91,7 @@ The full reasoning for each decision is in the ADR it links to.
 | [0020](adr/0020-photos-in-sqlite.md) | Meal photos are stored in SQLite as WebP |
 | [0021](adr/0021-forward-only-migrations.md) | Migrations are forward-only and run at startup after a backup |
 | [0022](adr/0022-git-identity-and-commits.md) | Commits use the noreply identity; commit when green; push only on deploy |
+| [0023](adr/0023-ui-primitives-and-typescript-6.md) | UI primitives use platform features (no runtime style injection, so the strict CSP holds); TypeScript pinned to 6.0 |
 
 ---
 
@@ -119,8 +120,8 @@ These were checked on npm and PyPI on 2026-10-06 and get pinned in M0. Anything 
 | Side | Versions |
 |---|---|
 | Python | 3.14; FastAPI 0.142; SQLAlchemy 2.1 (install `sqlalchemy[asyncio]`, since greenlet is no longer implicit); Alembic 1.20; pydantic 2.13; pydantic-settings 2.15; structlog 26; httpx 0.28; uvicorn 0.54; cryptography 50; Pillow 12; Hypothesis 6.168; pytest 9.1; ruff 0.16; pyright 1.1.414; tzdata |
-| Frontend | Node 26 (`.node-version`); pnpm 12, pinned via `packageManager` (Node 25+ no longer bundles corepack); React 19.3; Vite 8; Tailwind 4.3; TanStack Router 1.170 and Query 5.104; vite-plugin-pwa 2.0; openapi-typescript 7.13 and openapi-fetch 0.17; Vitest 5; Playwright 1.63; ESLint 10 with typescript-eslint; Prettier; `@fontsource-variable/atkinson-hyperlegible-next` 5.3; Radix primitives, vaul, sonner, lucide-react, idb and idb-keyval |
-| TypeScript | 7.0, the new native compiler, if typescript-eslint supports it at M0; otherwise TS 6.x |
+| Frontend | Node 26 (`.node-version`); pnpm 12, pinned via `packageManager` (Node 25+ no longer bundles corepack); React 19.3; Vite 8; Tailwind 4.3; TanStack Router 1.170 and Query 5.104; vite-plugin-pwa 2.0; openapi-typescript 7.13 and openapi-fetch 0.17; Vitest 5; Playwright 1.63; ESLint 10 with typescript-eslint; Prettier; `@fontsource-variable/atkinson-hyperlegible-next` 5.3; lucide-react; workbox; idb and idb-keyval (M3). Nothing that injects styles at runtime ([ADR 0023](adr/0023-ui-primitives-and-typescript-6.md)) |
+| TypeScript | 6.0, pinned: typescript-eslint doesn't support 7.x yet ([ADR 0023](adr/0023-ui-primitives-and-typescript-6.md)) |
 
 ### 4.3 Backend layout
 
@@ -169,8 +170,8 @@ frontend/
     api/       openapi.json + schema.d.ts (generated, committed), client.ts (openapi-fetch wrapper), keys.ts (query keys)
     lib/       db.ts (idb), outbox.ts, events.ts (SSE), eventRouter.ts, connection.ts, clock.ts,
                wakeLock.ts, images.ts, persist.ts, format.ts
-    ui/        Button, Sheet (vaul), Toast with Undo (sonner), Checkbox, Stepper, ProductImage,
-               EmptyState, TabBar, OfflinePill, MarkerStrike, AmountPicker
+    ui/        Button, Sheet (native <dialog>), Toast with Undo, Checkbox, Stepper, ProductImage,
+               EmptyState, TabBar, OfflinePill, MarkerStrike, AmountPicker (no runtime style injection)
     features/  onboarding, auth, plan, meals, list, shopping, history, settings
     styles/    tokens.css (Tailwind v4 @theme: design tokens defined once)
     sw.ts      service worker (vite-plugin-pwa injectManifest)

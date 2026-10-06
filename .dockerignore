@@ -1,0 +1,22 @@
+# Allowlist: only what the image needs. (Images are also built from `git archive`, so untracked
+# files can never reach them; this is a second layer.)
+*
+!VERSION
+!LICENSE
+!backend/pyproject.toml
+!backend/uv.lock
+!backend/.python-version
+!backend/src/**
+!frontend/package.json
+!frontend/pnpm-lock.yaml
+!frontend/pnpm-workspace.yaml
+!frontend/index.html
+!frontend/vite.config.ts
+!frontend/tsconfig*.json
+!frontend/src/**
+!frontend/public/**
+**/__pycache__
+**/*.db*
+**/.DS_Store
+**/*.test.ts
+**/*.test.tsx

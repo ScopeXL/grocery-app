@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Private-terms scan of the commit message.
+exec just hook-commit-msg "$1"

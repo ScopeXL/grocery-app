@@ -1,0 +1,173 @@
+/*
+ * Design tokens: the "Fridge door" direction (docs/UX.md §7, docs/adr/0012).
+ * Components use these tokens only; never raw hex. src/styles/tokens.test.ts checks that every
+ * text/background pair meets WCAG AA in both themes.
+ */
+@import "tailwindcss";
+@import "@fontsource-variable/atkinson-hyperlegible-next";
+
+:root {
+  color-scheme: light dark;
+
+  --counter: #f3f4f1;
+  --paper: #ffffff;
+  --ink: #2b1d30;
+  --ink-soft: #5e5163;
+  --basil: #1e6b45;
+  --on-basil: #ffffff;
+  --lemon: #ffdb3d;
+  --on-lemon: #2b1d30;
+  --tomato: #c2381e;
+  --rule: #dde1da;
+
+  --marker-basil: #1e6b45;
+  --marker-tomato: #c2381e;
+  --marker-carrot: #a3500f;
+  --marker-eggplant: #5b3a8c;
+  --marker-beet: #9c1b4e;
+  --marker-olive: #56611a;
+  --marker-cocoa: #6f4428;
+  --marker-plum: #7a2f6b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --counter: #1a121e;
+    --paper: #241a29;
+    --ink: #f3ecf4;
+    --ink-soft: #bfb2c4;
+    --basil: #6bcb95;
+    --on-basil: #1a121e;
+    --lemon: #ffdb3d;
+    --on-lemon: #2b1d30;
+    --tomato: #ff8266;
+    --rule: #3a2e40;
+
+    --marker-basil: #6bcb95;
+    --marker-tomato: #ff8266;
+    --marker-carrot: #f2a15a;
+    --marker-eggplant: #b79ceb;
+    --marker-beet: #f088b4;
+    --marker-olive: #bfcb6b;
+    --marker-cocoa: #d9a57e;
+    --marker-plum: #e08fd0;
+  }
+}
+
+@theme inline {
+  --color-counter: var(--counter);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-basil: var(--basil);
+  --color-on-basil: var(--on-basil);
+  --color-lemon: var(--lemon);
+  --color-on-lemon: var(--on-lemon);
+  --color-tomato: var(--tomato);
+  --color-rule: var(--rule);
+
+  --font-sans: "Atkinson Hyperlegible Next Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --text-caption: 15px;
+  --text-caption--line-height: 1.4;
+  --text-secondary: 17px;
+  --text-secondary--line-height: 1.45;
+  --text-body: 18px;
+  --text-body--line-height: 1.45;
+  --text-row: 22px;
+  --text-row--line-height: 1.25;
+  --text-title: 28px;
+  --text-title--line-height: 1.15;
+  --text-total: 36px;
+  --text-total--line-height: 1.1;
+
+  --radius-sheet: 20px;
+  --radius-button: 14px;
+  --radius-tile: 10px;
+}
+
+@layer base {
+  html {
+    background: var(--counter);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 18px;
+    line-height: 1.45;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    min-height: 100dvh;
+    margin: 0;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--basil);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Native <dialog> used as a bottom sheet (no style injection, so the strict CSP holds). */
+@layer components {
+  dialog.sheet {
+    margin: auto auto 0;
+    width: 100%;
+    max-width: 560px;
+    border: none;
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 0 0 env(safe-area-inset-bottom);
+  }
+
+  dialog.sheet::backdrop {
+    background: rgb(26 18 30 / 0.45);
+  }
+
+  @media (min-width: 1024px) {
+    dialog.sheet {
+      margin: auto;
+      border-radius: var(--radius-sheet);
+    }
+  }
+}
+
+/* Notepad rules under empty states: the paper list on the fridge. */
+.ruled-lines {
+  background-image: repeating-linear-gradient(to bottom, transparent 0 31px, var(--rule) 31px 32px);
+}
+
+.marker-basil {
+  --marker: var(--marker-basil);
+}
+.marker-tomato {
+  --marker: var(--marker-tomato);
+}
+.marker-carrot {
+  --marker: var(--marker-carrot);
+}
+.marker-eggplant {
+  --marker: var(--marker-eggplant);
+}
+.marker-beet {
+  --marker: var(--marker-beet);
+}
+.marker-olive {
+  --marker: var(--marker-olive);
+}
+.marker-cocoa {
+  --marker: var(--marker-cocoa);
+}
+.marker-plum {
+  --marker: var(--marker-plum);
+}

@@ -1,0 +1,2 @@
+# Released migrations: <revision> <sha256 of the file with LF line endings>.
+# Appended by `just bump` (scripts/release.py). A test fails if a listed file changes.

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Secret + private-terms scan of staged files (installed by `just setup`).
+exec just hook-pre-commit
