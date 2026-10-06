@@ -4,7 +4,8 @@
   release.py bump patch|minor|major   VERSION, CHANGELOG section + links, released.lock
   release.py tag [--trailer TEXT]     commit the release files, tag vX.Y.Z, push atomically
 
-`tag` refuses unless the only changes since `just preflight` are the release files.
+`tag` refuses unless the only changes since `just preflight` are the release files. If its push
+fails after the commit and tag are made, run `tag` again: it pushes them and never re-tags.
 """
 
 from __future__ import annotations
@@ -12,10 +13,12 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import hashlib
+import os
 import re
 import subprocess
 import sys
 from pathlib import Path
+from typing import NoReturn
 
 REPO = Path(__file__).resolve().parent.parent
 VERSION_FILE = REPO / "VERSION"
@@ -38,7 +41,7 @@ def git(*args: str) -> str:
     ).stdout.strip()
 
 
-def fail(message: str) -> None:
+def fail(message: str) -> NoReturn:
     print(f"release: {message}", file=sys.stderr)
     raise SystemExit(1)
 
@@ -115,6 +118,8 @@ def release_notes(version: str) -> str:
 
 
 def tag(trailer: str | None) -> None:
+    # The deploy skill runs this without a terminal: fail rather than wait for a password prompt.
+    os.environ["GIT_TERMINAL_PROMPT"] = "0"
     if not STAMP.is_file():
         fail("run `just preflight` first")
     stamped_tree = STAMP.read_text().strip()
@@ -123,19 +128,55 @@ def tag(trailer: str | None) -> None:
     unexpected = (changed | untracked) - RELEASE_FILES
     if unexpected:
         fail("files changed since preflight: " + ", ".join(sorted(unexpected)))
+    if git("rev-parse", "--abbrev-ref", "HEAD") != "main":
+        fail("releases are tagged on main")
     version = current_version()
     name = f"v{version}"
     if git("tag", "--list", name):
-        fail(f"tag {name} already exists")
-    if git("rev-parse", "--abbrev-ref", "HEAD") != "main":
-        fail("releases are tagged on main")
+        resume(name)
+        return
     git("add", *sorted(p for p in RELEASE_FILES if (REPO / p).exists()))
     message = f"Release {name}"
     if trailer:
         message += f"\n\n{trailer}"
     git("commit", "-m", message)
     git("tag", "-a", name, "-m", f"Dinner Bell {name}\n\n{release_notes(version)}")
-    subprocess.run(["git", "push", "--atomic", "origin", "main", name], cwd=REPO, check=True)
+    push(name)
+
+
+def resume(name: str) -> None:
+    """Push a release that an earlier run committed and tagged but couldn't push."""
+    if git("status", "--porcelain"):
+        fail(f"{name} is already tagged here; commit or discuss the uncommitted changes first")
+    if on_github(name):
+        fail(f"{name} is already on GitHub; carry on with `just smoke-image {name}`")
+    if git("log", "-1", "--format=%s", name) != f"Release {name}":
+        fail(f"tag {name} exists but isn't on a release commit")
+    if subprocess.run(["git", "merge-base", "--is-ancestor", name, "HEAD"], cwd=REPO).returncode:
+        fail(f"tag {name} isn't on main")
+    print(f"{name} was committed and tagged earlier but never pushed. Pushing it now.", flush=True)
+    push(name)
+
+
+def on_github(name: str) -> bool:
+    listed = subprocess.run(
+        ["git", "ls-remote", "--tags", "origin", f"refs/tags/{name}"],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+    )
+    if listed.returncode:
+        fail(f"can't reach GitHub ({listed.stderr.strip()}); see docs/RELEASING.md")
+    return bool(listed.stdout.strip())
+
+
+def push(name: str) -> None:
+    if subprocess.run(["git", "push", "--atomic", "origin", "main", name], cwd=REPO).returncode:
+        fail(
+            f"{name} is committed and tagged on this machine, but the push failed (git's message "
+            'is above; for access problems see docs/RELEASING.md, "Pushing to GitHub"). Fix it, '
+            "then run `just release-tag` again: it pushes the same commit and tag."
+        )
     STAMP.unlink()
     print(f"Tagged and pushed {name}.")
 

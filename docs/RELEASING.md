@@ -16,9 +16,9 @@ does the rest. This page explains the pieces, and how to release without Claude.
 
 | Step | Command | Stops the release when |
 |---|---|---|
-| Gate | `just preflight` | Not on main, uncommitted changes, behind origin, any check/e2e/scan failure, smoke-test failure, Docker not ready |
+| Gate | `just preflight` | Not on main, uncommitted changes, behind origin, a dry-run push to GitHub fails, any check/e2e/scan failure, smoke-test failure, Docker not ready |
 | Version | `just bump <level>` | `[Unreleased]` is empty |
-| Tag | `just release-tag` | Anything besides `VERSION`, `CHANGELOG.md` and `released.lock` changed since preflight |
+| Tag | `just release-tag ["Co-Authored-By: …"]` | Anything besides `VERSION`, `CHANGELOG.md` and `released.lock` changed since preflight. If only the push fails, run it again: it resumes |
 | Smoke | `just smoke-image vX.Y.Z` | The image from the tag doesn't start healthy, fails a probe, or starts on a bad volume |
 | Push | `just image` | The version already exists on Docker Hub |
 | Verify | `just image-verify` | Platforms missing, tags disagree, the pulled image fails a probe, or the image scan finds a private term |
@@ -36,6 +36,22 @@ Without Claude: `just release patch` runs all of it.
   3. In Docker Hub: **Repository → Settings → Immutable tags**, with the rule `^\d+\.\d+\.\d+$`.
 - **Private-terms list:** `just setup` walks you through creating
   `~/.config/dinner-bell/private-terms.txt`. Preflight refuses to release without it.
+- **GitHub:** pushes go over SSH; see *Pushing to GitHub* below.
+
+## Pushing to GitHub
+
+A release pushes without a terminal, so git must reach GitHub without asking for a password.
+Preflight checks this with a dry-run push before anything is tagged.
+
+- This repo's remote uses SSH: `git remote get-url origin` shows
+  `git@github.com:ScopeXL/grocery-app.git`, and `ssh -T git@github.com` answers
+  "Hi <your GitHub name>!".
+- To switch a clone that uses HTTPS, run
+  `git remote set-url origin git@github.com:ScopeXL/grocery-app.git`.
+- An HTTPS remote works only with a saved login whose token has the `workflow` scope, because
+  releases include `.github/workflows/`.
+- If a release's push fails anyway, the release commit and tag stay on this Mac. Fix access, then
+  run `just release-tag` again: it pushes them without re-tagging.
 
 ## Rolling back
 

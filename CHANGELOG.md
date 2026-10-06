@@ -6,6 +6,11 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+### Behind the scenes
+
+- Sturdier releases: they check GitHub access before starting, can resume after a failed upload,
+  and the privacy check now also reads release tags.
+
 ## [0.1.0] - 2026-10-06
 
 ### Added

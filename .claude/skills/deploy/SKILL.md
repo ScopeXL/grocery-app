@@ -45,9 +45,12 @@ Requested level: "$level" (empty means you choose, below).
    Make sure `CHANGELOG.md` `[Unreleased]` describes the release in plain English a household
    member understands (internal work collapses to one "Behind the scenes" line). Edit it, show
    it, then run `just bump <level>`.
-4. **Tag.** Run `just release-tag --trailer "Co-Authored-By: <your model name and noreply address>"`.
+4. **Tag.** Run `just release-tag "Co-Authored-By: <your model name and noreply address>"`.
    It refuses if anything other than the release files changed since preflight, then commits,
-   tags `vX.Y.Z` and pushes branch and tag together.
+   tags `vX.Y.Z` and pushes branch and tag together. If the push fails, show git's message and
+   stop. Once the cause is fixed (docs/RELEASING.md, "Pushing to GitHub"; a git remote change is
+   the owner's to make), run the same command again: it pushes the existing commit and tag, and
+   never re-tags.
 5. **Image.** Run `just smoke-image vX.Y.Z`, then `just image` (multi-arch build from
    `git archive` of the tag, pushed as `X.Y.Z`, `X.Y` and `latest`). If the push fails after
    the tag was pushed, run `just image` again for the same tag; never retag.

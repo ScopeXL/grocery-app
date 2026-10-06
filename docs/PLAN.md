@@ -1504,9 +1504,9 @@ Bash runs in strict mode (`set -euo pipefail`), with `set dotenv-load := false`.
 | `screenshots` | Fake-mode captures of the key screens at 390×844 and 1440×900, light and dark, into the gitignored `.screenshots/` |
 | `scan` | `gitleaks git --redact` (full history), `gitleaks dir .`, and `private_scan.py tree history context` |
 | `hook-pre-commit`, `hook-commit-msg`, `hook-pre-push` | gitleaks on staged files, plus the private scan of the staged diff, the message, and the pushed range |
-| `preflight` | git gate (on `main`, fetched, not behind, clean) → `check` → `build` → `e2e` → `scan` → `smoke-image` → Docker gate (context, containerd store, logged in to Docker Hub). Stamps the tree hash into `.git/dinnerbell-preflight` |
+| `preflight` | git gate (on `main`, fetched, not behind, clean, a dry-run push reaches GitHub without a prompt) → `check` → `build` → `e2e` → `scan` → `smoke-image` → Docker gate (context, containerd store, logged in to Docker Hub). Stamps the tree hash into `.git/dinnerbell-preflight` |
 | `bump LEVEL` | `release.py`: updates `VERSION`; turns `[Unreleased]` into `[X.Y.Z] - date` with compare links; appends newly released migrations to `released.lock` |
-| `release-tag` | Refuses unless only `VERSION`, `CHANGELOG.md` and `released.lock` changed since the preflight stamp. Commits "Release vX.Y.Z", creates an annotated tag, and runs `git push --atomic origin main vX.Y.Z` |
+| `release-tag` | Refuses unless only `VERSION`, `CHANGELOG.md` and `released.lock` changed since the preflight stamp. Commits "Release vX.Y.Z", creates an annotated tag, and runs `git push --atomic origin main vX.Y.Z`. If only the push failed, running it again pushes the existing commit and tag; it never re-tags |
 | `smoke-image`, `image`, `image-verify` | §11.9 |
 | `release LEVEL` | The path without Claude: `preflight bump release-tag smoke-image image image-verify` |
 | `smoke-kroger`, `inspect-backup FILE`, `db-revision MSG`, `db-fixture`, `proxy-matrix` | Helpers |

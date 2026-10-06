@@ -143,7 +143,7 @@ frontend/src/
 1. If the working tree has changes the owner hasn't seen, summarize them and ask.
 2. Run `just preflight`: check → build → e2e → scan → smoke-test the image → Docker gate. Any failure stops the deploy.
 3. Bump the version: patch by default, minor for a user-visible feature, major only if asked. Write the CHANGELOG entry in plain English.
-4. `just release-tag`: commit, create the annotated tag `vX.Y.Z`, push the branch and tag atomically.
+4. `just release-tag "Co-Authored-By: …"`: commit, create the annotated tag `vX.Y.Z`, push the branch and tag atomically. If only the push fails, run it again: it resumes.
 5. `just smoke-image` then `just image`: a multi-arch build from `git archive` of the tag, pushed to `scopexl/dinner-bell` as `X.Y.Z`, `X.Y` and `latest`.
 6. `just image-verify`: both architectures are present, the tags agree, and the pulled image passes the smoke probes and the private scan.
 7. Report:
@@ -164,3 +164,4 @@ Add one line each time something surprising costs time: the symptom, the cause, 
 - `python3` on the build Mac is 3.9: repo scripts run through `uv run --no-project --python 3.14` (the justfile's `py`).
 - OrbStack's `docker` isn't always on PATH: the justfile and image scripts prepend `~/.orbstack/bin`.
 - `gitleaks dir` flagged `.env`: it ignores `.gitignore`. `just scan` copies only git-visible files to a temp folder and scans that.
+- The 0.1.0 push failed after tagging ("could not read Username"): the HTTPS remote had no saved login. The remote is now SSH, preflight dry-runs the push, and `release-tag` resumes. Auto mode blocks Claude from changing a git remote; that's the owner's step.

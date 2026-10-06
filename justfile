@@ -152,6 +152,10 @@ preflight:
     [ -z "$(git status --porcelain)" ] || { echo "Commit or discuss uncommitted changes first."; exit 1; }
     git fetch --quiet origin main
     [ "$(git rev-list --count HEAD..origin/main)" = 0 ] || { echo "main is behind origin/main."; exit 1; }
+    # The release pushes without a terminal, so prove that works before anything is tagged.
+    # A dry run sends nothing, so it skips the pre-push hook; `just scan` below covers those commits.
+    GIT_TERMINAL_PROMPT=0 git push --dry-run --no-verify --quiet origin main \
+      || { echo "The dry-run push to GitHub failed (above). See docs/RELEASING.md, Pushing to GitHub."; exit 1; }
     just check
     just e2e
     just scan
@@ -169,9 +173,9 @@ preflight:
 bump LEVEL:
     {{py}} scripts/release.py bump {{LEVEL}}
 
-# Commit the release files, tag vX.Y.Z and push branch + tag together
-release-tag *ARGS:
-    {{py}} scripts/release.py tag {{ARGS}}
+# Commit the release files, tag vX.Y.Z, push branch + tag together (run again to resume a push)
+release-tag TRAILER="":
+    {{py}} scripts/release.py tag --trailer {{quote(TRAILER)}}
 
 # Build and push the multi-arch image for the current VERSION's tag
 image:
