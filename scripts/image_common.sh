@@ -40,3 +40,16 @@ probe() {
   [ "$(curl -so /dev/null -w '%{http_code}' "$base/assets/missing-123.js")" = 404 ]
   curl -fsS -D - -o /dev/null "$base/" | grep -qi 'content-security-policy'
 }
+
+# timeout_wait NAME SECONDS: print the exit code once the container stops, or "running".
+timeout_wait() {
+  local name="$1" limit="$2"
+  for _ in $(seq 1 "$limit"); do
+    if [ "$(docker inspect -f '{{.State.Running}}' "$name")" = "false" ]; then
+      docker inspect -f '{{.State.ExitCode}}' "$name"
+      return 0
+    fi
+    sleep 1
+  done
+  echo running
+}
