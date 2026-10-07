@@ -6,6 +6,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-06
+
 ### Added
 
 - Plan the week: add Mains with their Sides, set a day or leave it for any day, and make a
@@ -23,6 +25,11 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 - Start a new week, with Undo. On a computer, see your meals, the plan and the list side by
   side, and print the list in aisle order.
 - Plan changes appear on every phone within seconds.
+
+### Behind the scenes
+
+- Hundreds of new checks that the list's amounts and total are right, and that upgrading keeps
+  every meal and item you've made.
 
 ## [0.2.0] - 2026-10-06
 
@@ -62,5 +69,7 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 [0.1.0]: https://github.com/ScopeXL/grocery-app/releases/tag/v0.1.0
 
-[Unreleased]: https://github.com/ScopeXL/grocery-app/compare/v0.2.0...HEAD
 [0.2.0]: https://github.com/ScopeXL/grocery-app/compare/v0.1.0...v0.2.0
+
+[Unreleased]: https://github.com/ScopeXL/grocery-app/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/ScopeXL/grocery-app/compare/v0.2.0...v0.3.0
