@@ -53,7 +53,15 @@ export function Sheet({
               Close
             </Button>
           </header>
-          <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
+          {/* Focusable, so a keyboard can scroll it even when nothing inside takes focus. */}
+          <div
+            role="region"
+            aria-labelledby={titleId}
+            tabIndex={0}
+            className="flex-1 overflow-y-auto px-4 py-4"
+          >
+            {children}
+          </div>
           {footer ? <footer className="border-t border-rule px-4 py-3">{footer}</footer> : null}
         </div>
       ) : null}
