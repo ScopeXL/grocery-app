@@ -17,7 +17,6 @@ from dinnerbell.meals.schemas import (
     DishOut,
     DishUpdate,
     LinesIn,
-    Occasion,
     PhotoOut,
     Role,
 )
@@ -33,13 +32,10 @@ async def list_dishes(
     session: SessionDep,
     role: Role | None = None,
     q: Annotated[str | None, Query(max_length=80)] = None,
-    occasion: Occasion | None = None,
     favorite: bool | None = None,
     archived: bool = False,
 ) -> list[DishCard]:
-    return await service.cards(
-        state, role=role, query=q, occasion=occasion, favorite=favorite, archived=archived
-    )
+    return await service.cards(state, role=role, query=q, favorite=favorite, archived=archived)
 
 
 @router.post("/dishes", status_code=201)
@@ -50,7 +46,6 @@ async def create_dish(body: DishCreate, state: StateDep, session: SessionDep) ->
         dish = Dish(
             name=body.name,
             role=body.role,
-            occasions=list(dict.fromkeys(body.occasions)),
             servings=body.servings,
             notes=body.notes or None,
             recipe_url=body.recipe_url,
@@ -81,8 +76,6 @@ async def update_dish(
             dish.name = body.name
         if body.role is not None:
             dish.role = body.role
-        if body.occasions is not None:
-            dish.occasions = list(dict.fromkeys(body.occasions))
         if "servings" in sent:
             dish.servings = body.servings
         if "notes" in sent:

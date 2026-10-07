@@ -73,7 +73,7 @@ def jpeg(width: int, height: int, *, orientation: int | None = None, gps: bool =
 
 async def test_a_new_main_with_lines_amounts_and_cost(cook: httpx.AsyncClient) -> None:
     dish = await tacos(cook)
-    assert (dish["name"], dish["role"], dish["occasions"]) == ("Tacos", "main", ["dinner"])
+    assert (dish["name"], dish["role"], dish["default_occasion"]) == ("Tacos", "main", "dinner")
     texts = [(ln["item"]["name"], ln["amount"]["text"]) for ln in dish["lines"]]
     assert texts == [
         ("Shredded cheddar", "1/2 bag"),
@@ -144,13 +144,32 @@ async def test_favorite_archive_restore_duplicate(cook: httpx.AsyncClient) -> No
     assert [ln["amount"] for ln in copy.json()["lines"]] == [ln["amount"] for ln in taco["lines"]]
 
 
+async def test_meals_carry_no_occasion(cook: httpx.AsyncClient) -> None:
+    """ADR 0026. A 0.6.0 phone still sends occasions and filters by them: what it sends is
+    ignored, and every meal answers with all four, so it sees every meal under any chip."""
+    every = ["breakfast", "lunch", "dinner", "snack"]
+    made = await cook.post(
+        "/api/dishes",
+        json={"name": "Pancakes", "role": "main", "occasions": ["breakfast"]},
+        headers=CSRF,
+    )
+    assert made.status_code == 201
+    assert made.json()["occasions"] == every
+    changed = await cook.patch(
+        f"/api/dishes/{made.json()['id']}", json={"occasions": ["snack"]}, headers=CSRF
+    )
+    assert changed.json()["occasions"] == every
+    cards = (await cook.get("/api/dishes", params={"role": "main", "occasion": "snack"})).json()
+    assert [card["name"] for card in cards] == ["Pancakes"]
+    assert cards[0]["occasions"] == every
+
+
 async def test_editing_fields_and_replacing_lines(cook: httpx.AsyncClient) -> None:
     taco = await tacos(cook)
     edited = await cook.patch(
         f"/api/dishes/{taco['id']}",
         json={
             "name": "Taco night",
-            "occasions": ["dinner", "lunch", "dinner"],
             "servings": 4,
             "notes": "Warm the shells.",
             "recipe_url": "https://example.com/tacos",
@@ -158,11 +177,7 @@ async def test_editing_fields_and_replacing_lines(cook: httpx.AsyncClient) -> No
         headers=CSRF,
     )
     body = edited.json()
-    assert (body["name"], body["occasions"], body["servings"]) == (
-        "Taco night",
-        ["dinner", "lunch"],
-        4,
-    )
+    assert (body["name"], body["servings"]) == ("Taco night", 4)
     lime = await item(cook, "Lime", LIME)
     replaced = await cook.put(
         f"/api/dishes/{taco['id']}/lines", json={"lines": [line(lime, "count", "2")]}, headers=CSRF

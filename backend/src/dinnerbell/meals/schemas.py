@@ -16,6 +16,17 @@ RecipeUrl = Annotated[
 ]
 Role = Literal["main", "side"]
 Occasion = Literal["breakfast", "lunch", "dinner", "snack"]
+ALL_OCCASIONS: tuple[Occasion, ...] = ("breakfast", "lunch", "dinner", "snack")
+
+
+def _every_occasion() -> list[Occasion]:
+    return list(ALL_OCCASIONS)
+
+
+# ADR 0026: a meal carries no occasion. For one release, responses still list all four, so a
+# phone still running 0.6.0 (it keeps its build until someone taps Refresh) sees every meal
+# under any occasion and doesn't break. Remove in 0.8 (PLAN §15).
+OCCASIONS_NOTE = "Unused since ADR 0026 (always all four, for 0.6.0 phones); removed in 0.8."
 
 
 class CostOut(BaseModel):
@@ -30,7 +41,11 @@ class DishCard(BaseModel):
     id: str
     name: str
     role: Role
-    occasions: list[Occasion]
+    occasions: list[Occasion] = Field(
+        default_factory=_every_occasion,
+        description=OCCASIONS_NOTE,
+        json_schema_extra={"deprecated": True},
+    )
     default_occasion: Occasion  # what Add a meal starts with: its last planned occasion (ADR 0026)
     favorite: bool
     photo_url: str | None  # the household's photo (thumbnail), cropped 4:3 on cards
@@ -59,7 +74,11 @@ class DishOut(BaseModel):
     id: str
     name: str
     role: Role
-    occasions: list[Occasion]
+    occasions: list[Occasion] = Field(
+        default_factory=_every_occasion,
+        description=OCCASIONS_NOTE,
+        json_schema_extra={"deprecated": True},
+    )
     default_occasion: Occasion  # what Add a meal starts with: its last planned occasion (ADR 0026)
     servings: int | None
     notes: str | None
@@ -75,7 +94,6 @@ class DishOut(BaseModel):
 class DishCreate(BaseModel):
     name: DishName
     role: Role
-    occasions: list[Occasion] = Field(default_factory=lambda: ["dinner"], max_length=4)
     servings: Annotated[int, Field(ge=1, le=50)] | None = None
     notes: Notes | None = None
     recipe_url: RecipeUrl | None = None
@@ -89,7 +107,6 @@ class DishUpdate(BaseModel):
 
     name: DishName | None = None
     role: Role | None = None
-    occasions: list[Occasion] | None = Field(default=None, max_length=4)
     servings: Annotated[int, Field(ge=1, le=50)] | None = None
     notes: Notes | None = None
     recipe_url: RecipeUrl | None = None

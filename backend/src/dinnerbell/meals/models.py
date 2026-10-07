@@ -33,7 +33,9 @@ class Dish(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
     name: Mapped[str] = mapped_column(String(80))
     role: Mapped[str] = mapped_column(String(8))  # main | side
-    occasions: Mapped[list[str]] = mapped_column(JSON, default=list)
+    # Unused since ADR 0026 (the occasion is chosen when planning). Kept, unmigrated, so an older
+    # image rolled back onto this database still finds new meals under Dinner.
+    occasions: Mapped[list[str]] = mapped_column(JSON, default=lambda: ["dinner"])
     servings: Mapped[int | None] = mapped_column(Integer, default=None)
     photo_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("photos.id", ondelete="SET NULL"), default=None

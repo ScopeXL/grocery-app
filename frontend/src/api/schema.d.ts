@@ -1396,8 +1396,12 @@ export interface components {
             item_images: string[];
             /** Name */
             name: string;
-            /** Occasions */
-            occasions: ("breakfast" | "lunch" | "dinner" | "snack")[];
+            /**
+             * Occasions
+             * @deprecated
+             * @description Unused since ADR 0026 (always all four, for 0.6.0 phones); removed in 0.8.
+             */
+            occasions?: ("breakfast" | "lunch" | "dinner" | "snack")[];
             /** On Sale */
             on_sale: boolean;
             /** Photo Url */
@@ -1423,8 +1427,6 @@ export interface components {
             name: string;
             /** Notes */
             notes?: string | null;
-            /** Occasions */
-            occasions?: ("breakfast" | "lunch" | "dinner" | "snack")[];
             /** Photo Id */
             photo_id?: string | null;
             /** Recipe Url */
@@ -1470,8 +1472,12 @@ export interface components {
             name: string;
             /** Notes */
             notes: string | null;
-            /** Occasions */
-            occasions: ("breakfast" | "lunch" | "dinner" | "snack")[];
+            /**
+             * Occasions
+             * @deprecated
+             * @description Unused since ADR 0026 (always all four, for 0.6.0 phones); removed in 0.8.
+             */
+            occasions?: ("breakfast" | "lunch" | "dinner" | "snack")[];
             /** Photo Id */
             photo_id: string | null;
             /** Photo Url */
@@ -1510,8 +1516,6 @@ export interface components {
             name?: string | null;
             /** Notes */
             notes?: string | null;
-            /** Occasions */
-            occasions?: ("breakfast" | "lunch" | "dinner" | "snack")[] | null;
             /** Photo Id */
             photo_id?: string | null;
             /** Recipe Url */
@@ -2801,7 +2805,6 @@ export interface operations {
             query?: {
                 role?: ("main" | "side") | null;
                 q?: string | null;
-                occasion?: ("breakfast" | "lunch" | "dinner" | "snack") | null;
                 favorite?: boolean | null;
                 archived?: boolean;
             };

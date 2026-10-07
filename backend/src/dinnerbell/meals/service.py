@@ -173,7 +173,6 @@ async def dish_out(state: AppState, dish_id: str) -> DishOut:
         id=dish.id,
         name=dish.name,
         role="side" if dish.role == "side" else "main",
-        occasions=dish.occasions,  # pyright: ignore[reportArgumentType]
         default_occasion=defaults[dish.id],  # pyright: ignore[reportArgumentType]
         servings=dish.servings,
         notes=dish.notes,
@@ -192,7 +191,6 @@ async def cards(
     *,
     role: str | None,
     query: str | None,
-    occasion: str | None,
     favorite: bool | None,
     archived: bool,
 ) -> list[DishCard]:
@@ -208,8 +206,6 @@ async def cards(
         if query:
             needle = query.casefold().strip()
             found = [dish for dish in found if needle in dish.name.casefold()]
-        if occasion:
-            found = [dish for dish in found if occasion in dish.occasions]
         found.sort(key=lambda dish: (not dish.favorite, dish.name.casefold(), dish.id))
         loaded = await load(db, found)
         defaults = await default_occasions(db, [dish.id for dish in found])
@@ -228,7 +224,6 @@ async def cards(
                 id=dish.id,
                 name=dish.name,
                 role="side" if dish.role == "side" else "main",
-                occasions=dish.occasions,  # pyright: ignore[reportArgumentType]
                 default_occasion=defaults[dish.id],  # pyright: ignore[reportArgumentType]
                 favorite=dish.favorite,
                 photo_url=photo_url(dish.photo_id, thumb=True),
@@ -298,7 +293,6 @@ async def duplicate(session: AsyncSession, dish: Dish) -> Dish:
     copy = Dish(
         name=f"{dish.name} (copy)"[:80],
         role=dish.role,
-        occasions=list(dish.occasions),
         servings=dish.servings,
         photo_id=dish.photo_id,
         notes=dish.notes,

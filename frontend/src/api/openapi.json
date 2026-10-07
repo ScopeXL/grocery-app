@@ -733,6 +733,8 @@
             "type": "string"
           },
           "occasions": {
+            "deprecated": true,
+            "description": "Unused since ADR 0026 (always all four, for 0.6.0 phones); removed in 0.8.",
             "items": {
               "enum": [
                 "breakfast",
@@ -785,7 +787,6 @@
           "id",
           "name",
           "role",
-          "occasions",
           "default_occasion",
           "favorite",
           "photo_url",
@@ -830,20 +831,6 @@
               }
             ],
             "title": "Notes"
-          },
-          "occasions": {
-            "items": {
-              "enum": [
-                "breakfast",
-                "lunch",
-                "dinner",
-                "snack"
-              ],
-              "type": "string"
-            },
-            "maxItems": 4,
-            "title": "Occasions",
-            "type": "array"
           },
           "photo_id": {
             "anyOf": [
@@ -1005,6 +992,8 @@
             "title": "Notes"
           },
           "occasions": {
+            "deprecated": true,
+            "description": "Unused since ADR 0026 (always all four, for 0.6.0 phones); removed in 0.8.",
             "items": {
               "enum": [
                 "breakfast",
@@ -1074,7 +1063,6 @@
           "id",
           "name",
           "role",
-          "occasions",
           "default_occasion",
           "servings",
           "notes",
@@ -1170,27 +1158,6 @@
               }
             ],
             "title": "Notes"
-          },
-          "occasions": {
-            "anyOf": [
-              {
-                "items": {
-                  "enum": [
-                    "breakfast",
-                    "lunch",
-                    "dinner",
-                    "snack"
-                  ],
-                  "type": "string"
-                },
-                "maxItems": 4,
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Occasions"
           },
           "photo_id": {
             "anyOf": [
@@ -4810,28 +4777,6 @@
                 }
               ],
               "title": "Q"
-            }
-          },
-          {
-            "in": "query",
-            "name": "occasion",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "breakfast",
-                    "lunch",
-                    "dinner",
-                    "snack"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Occasion"
             }
           },
           {
