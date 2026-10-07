@@ -9,7 +9,8 @@ import { Printer } from "lucide-react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
-import { rememberTrip } from "../../lib/trips";
+import { warmTripImages } from "../../lib/images";
+import { photoUrls, rememberTrip, tripStore } from "../../lib/trips";
 import { enable as enableWakeLock } from "../../lib/wakeLock";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
@@ -24,6 +25,9 @@ export function ListActions({ plan }: { plan: PlanOut }) {
     mutationFn: async () => unwrap(await api.POST("/api/trips")),
     onSuccess: async (saved) => {
       await rememberTrip(saved);
+      // Save its photos now, while there's signal, so the store finds them on the phone.
+      const local = tripStore.get(saved.id);
+      if (local) void warmTripImages(saved.id, photoUrls(local));
       showToast(trip ? "Saved list updated" : "List saved");
       await queryClient.invalidateQueries({ queryKey: qk.plan() });
       void queryClient.invalidateQueries({ queryKey: qk.trips() });

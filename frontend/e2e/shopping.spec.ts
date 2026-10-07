@@ -396,3 +396,20 @@ test("trying again puts a couldn't-find item back and keeps its note", async ({ 
     })
     .toEqual(["todo", "Brown is fine too"]);
 });
+
+test("saved with signal, opened without: still ready for the store", async ({ page, context }) => {
+  await signIn(page);
+  const seeded = await seedTacoNight(page);
+  await api(page, "POST", "/api/plan/meals", { main_id: seeded.tacos });
+  await page.getByRole("link", { name: "List", exact: true }).click();
+  await page.getByRole("button", { name: "Save list" }).click();
+  await expect(page.getByRole("button", { name: "Start shopping" })).toBeVisible();
+
+  await context.setOffline(true);
+  await page.getByRole("button", { name: "Start shopping" }).click();
+  const ready = page.getByRole("region", { name: "Get ready for the store" });
+  await expect(ready).toContainText("Ready for the store");
+  await expect(ready).toContainText("Saved on this phone");
+  await checkOff(page, "Ground beef");
+  await expect(page.getByTestId("progress")).toHaveText("1 of 3");
+});

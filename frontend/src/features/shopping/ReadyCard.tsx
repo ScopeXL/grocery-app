@@ -62,6 +62,7 @@ export function ReadyCard({
 }) {
   const [hidden, setHidden] = useState(() => seen(tripId));
   const [photos, setPhotos] = useState<{ saved: number; total: number } | null>(null);
+  const [photosTried, setPhotosTried] = useState(false); // every photo tried, saved or not
   const [offline, setOffline] = useState<boolean | null>(null);
   const wake = useStore(wakeLockState);
   const key = [...photoUrls(view.trip)].sort().join(" ");
@@ -73,7 +74,9 @@ export function ReadyCard({
     void warmTripImages(tripId, wanted, (done, total) => {
       if (!cancelled) setPhotos({ saved: done, total });
     }).then((result) => {
-      if (!cancelled) setPhotos(result);
+      if (cancelled) return;
+      setPhotos(result);
+      setPhotosTried(true);
     });
     void worksOffline().then((ok) => {
       if (!cancelled) setOffline(ok);
@@ -86,21 +89,25 @@ export function ReadyCard({
 
   if (hidden) return null;
   const saved = downloaded !== "pending";
-  const photosDone = photos !== null && photos.saved >= photos.total;
-  const ready = saved && photosDone && offline !== null;
-  const checks: [string, boolean][] = [
-    [downloaded === "failed" ? "Saved on this phone earlier" : "Saved on this phone", saved],
+  const allPhotos = photos !== null && photos.saved >= photos.total;
+  // Ready once everything was tried: photos that couldn't be saved show when there's signal.
+  const ready = saved && photosTried && offline !== null;
+  const checks: [string, "done" | "waiting" | "partly"][] = [
+    [
+      downloaded === "failed" ? "Saved on this phone earlier" : "Saved on this phone",
+      saved ? "done" : "waiting",
+    ],
     [
       photos === null
         ? "Saving photos"
         : photos.total === 0
           ? "No photos to save"
           : `${String(photos.saved)} of ${String(photos.total)} photos saved`,
-      photosDone,
+      allPhotos ? "done" : photosTried ? "partly" : "waiting",
     ],
     [
       offline === false ? "Opens without signal once installed" : "Opens without signal",
-      offline !== null,
+      offline !== null ? "done" : "waiting",
     ],
   ];
   return (
@@ -112,10 +119,12 @@ export function ReadyCard({
         {ready ? "Ready for the store" : "Getting ready for the store"}
       </h2>
       <ul className="mb-3 flex flex-col gap-1">
-        {checks.map(([label, done]) => (
+        {checks.map(([label, state]) => (
           <li key={label} className="flex items-center gap-2 text-secondary">
-            {done ? (
+            {state === "done" ? (
               <Check aria-hidden="true" className="size-5 text-basil" />
+            ) : state === "partly" ? (
+              <Info aria-hidden="true" className="size-5 text-ink-soft" />
             ) : (
               <Loader aria-hidden="true" className="size-5 text-ink-soft" />
             )}
