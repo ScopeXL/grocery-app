@@ -373,7 +373,7 @@ Trips · Settings · Who's using this · Install the app · About and privacy. E
 ### 5.1 First visit on a phone
 
 **iPhone, normal Safari tab**
-1. The app opens on the **Install the app** guide, three numbered steps, each beside a small line drawing of the phone with the spot to tap circled in a basil marker loop:
+1. The app opens on the **Install the app** guide, three numbered steps, each beside a small line drawing of the phone with the spot to tap circled in a green marker loop:
    1. Tap **Share**; on newer iPhones, tap ••• next to the address first.
    2. Tap **Add to Home Screen** (scroll down, or tap View More, if it isn't showing), then **Add**.
    3. Open Dinner Bell from the home screen.
@@ -475,12 +475,13 @@ Defined once in `frontend/src/styles/tokens.css` (Tailwind v4 `@theme`). Compone
 | `paper` | `#FFFFFF` | `#241A29` | Lists, sheets |
 | `ink` | `#2B1D30` | `#F3ECF4` | Text (aubergine ink, not black) |
 | `ink-soft` | `#5E5163` | `#BFB2C4` | Secondary text |
-| `basil` | `#1E6B45` | `#6BCB95` | Primary actions, progress, focus |
+| `accent` | = `ink` | = `ink` | Primary actions, selected pills, links, progress, focus (ADR 0027). Text on it is `on-accent`: white in light, `#1A121E` in dark |
 | `lemon` | `#FFDB3D` | `#FFDB3D` | Sale tags and highlights; text on lemon is always `ink` (light) |
 | `tomato` | `#C2381E` | `#FF8266` | Couldn't find, destructive, warnings |
 | `rule` | `#DDE1DA` | `#3A2E40` | The ruled lines between list rows |
 
-- **Member marker set:** basil, tomato, carrot, eggplant, beet, olive, cocoa, plum. Each has a light and a dark variant that passes AA as text on `paper`.
+- **Color comes only from** lemon (the bell and sale tags), tomato (missed, errors, destructive) and the family's marker colors. Actions are ink, so standalone text links and quiet buttons are underlined, and the active tab's icon sits in a filled ink pill.
+- **Member marker set:** basil, tomato, carrot, eggplant, beet, olive, cocoa, plum. Each has a light and a dark variant that passes AA as text on `paper`. (Basil the marker is a person's color; actions no longer use green.)
 - **Color is never the only signal.** Markers always come with the member's initial or name.
 - **No blue anywhere in the identity:** it reads as Kroger's brand color.
 - **Contrast is enforced:** a unit test asserts every text/background token pair meets WCAG AA in both themes, and fails the build if not.
@@ -516,7 +517,7 @@ Defined once in `frontend/src/styles/tokens.css` (Tailwind v4 `@theme`). Compone
   | Photo tiles | 10 px |
   | Chips | fully rounded |
 
-- **Focus:** visible on every control, as a 3 px `basil` outline with a 2 px offset.
+- **Focus:** visible on every control, as a 3 px `accent` (ink) outline with a 2 px offset; on inverse surfaces (toasts, prompts) the ring is the `counter` color.
 
 ### 7.5 Images
 

@@ -198,7 +198,7 @@ function KindSection({
               onClick={() => {
                 onChoose({ kind: preset.kind, value: preset.value, unit: preset.unit });
               }}
-              className="min-h-12 rounded-full border-2 border-rule bg-paper px-4 text-body font-semibold aria-pressed:border-basil aria-pressed:bg-basil aria-pressed:text-on-basil"
+              className="min-h-12 rounded-full border-2 border-rule bg-paper px-4 text-body font-semibold aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent"
             >
               {preset.text}
             </button>
@@ -312,7 +312,7 @@ function EachWeight({ picker }: { picker: PickerOut }) {
             onClick={() => {
               save.mutate(pounds);
             }}
-            className="min-h-12 rounded-full border-2 border-rule bg-paper px-4 text-secondary font-semibold aria-pressed:border-basil aria-pressed:bg-basil aria-pressed:text-on-basil"
+            className="min-h-12 rounded-full border-2 border-rule bg-paper px-4 text-secondary font-semibold aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent"
           >
             {EACH_WEIGHT_NAMES[pounds] ?? `${pounds} lb`}
           </button>

@@ -4,7 +4,7 @@ import { BellMark } from "../../ui/BellMark";
 
 /*
  * Line drawings for the install guide (docs/UX.md §3 "Installed app", §7 "Fridge door"): a phone
- * in ink on paper, with the spot to tap circled by a basil marker loop.
+ * in ink on paper, with the spot to tap circled by a green marker loop (the basil marker color).
  * - They are decorative (the step text carries the meaning), so every drawing is aria-hidden.
  * - Colors come only from token classes, so both themes work; there is no inline style.
  * - Every drawing shares one 96×160 box drawn at 1:1, so a stroke width is in CSS pixels.
@@ -97,7 +97,7 @@ function Phone({
       <path d="M39 150h18" className="stroke-ink" strokeWidth="2" strokeLinecap="round" />
       <path
         d={markerLoop(loop)}
-        className="stroke-basil"
+        className="marker-basil stroke-[var(--marker)]"
         strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"

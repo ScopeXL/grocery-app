@@ -93,7 +93,7 @@ export function KrogerAccountSection() {
       {data.status === "connected" ? (
         <>
           <Row>
-            <ShoppingCart aria-hidden="true" className="shrink-0 text-basil" />
+            <ShoppingCart aria-hidden="true" className="shrink-0 text-accent" />
             <div className="flex min-w-0 flex-1 flex-col">
               <span className="text-body font-semibold">Connected</span>
               {data.connected_by || data.connected_at ? (

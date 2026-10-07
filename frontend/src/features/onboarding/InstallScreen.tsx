@@ -29,7 +29,7 @@ function Step({ number, art, children }: { number: number; art: ReactNode; child
     <li className="flex items-center gap-4 border-b border-rule p-4 last:border-b-0">
       {art}
       <div className="min-w-0 text-body">
-        <p className="text-row font-extrabold text-basil">{number}</p>
+        <p className="text-row font-extrabold text-accent">{number}</p>
         <p className="mt-1">{children}</p>
       </div>
     </li>

@@ -10,6 +10,7 @@ import { cents } from "../../lib/money";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
+import { underlined } from "../../ui/styles";
 
 type TripItem = components["schemas"]["TripItemOut"];
 type ItemState = TripItem["state"];
@@ -172,7 +173,7 @@ function Choices({
             href={item.product_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-12 items-center justify-center gap-2 text-body font-semibold text-basil"
+            className={`inline-flex min-h-12 items-center justify-center gap-2 text-body font-semibold text-accent ${underlined}`}
           >
             Open in Kroger
             <ExternalLink aria-hidden="true" className="size-5" />

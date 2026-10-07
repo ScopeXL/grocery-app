@@ -13,8 +13,10 @@
   --paper: #ffffff;
   --ink: #2b1d30;
   --ink-soft: #5e5163;
-  --basil: #1e6b45;
-  --on-basil: #ffffff;
+  /* ADR 0027: actions use the ink. Named by role, so a later change is one line. */
+  --accent: var(--ink);
+  --on-accent: #ffffff;
+  --focus-ring: var(--accent);
   --lemon: #ffdb3d;
   --on-lemon: #2b1d30;
   --tomato: #c2381e;
@@ -42,8 +44,7 @@
     --paper: #241a29;
     --ink: #f3ecf4;
     --ink-soft: #bfb2c4;
-    --basil: #6bcb95;
-    --on-basil: #1a121e;
+    --on-accent: #1a121e;
     --lemon: #ffdb3d;
     --on-lemon: #2b1d30;
     --tomato: #ff8266;
@@ -65,8 +66,8 @@
   --color-paper: var(--paper);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
-  --color-basil: var(--basil);
-  --color-on-basil: var(--on-basil);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
   --color-lemon: var(--lemon);
   --color-on-lemon: var(--on-lemon);
   --color-tomato: var(--tomato);
@@ -114,7 +115,8 @@
   }
 
   :focus-visible {
-    outline: 3px solid var(--basil);
+    /* Inverse surfaces (toasts, prompts) set --focus-ring to the counter color. */
+    outline: 3px solid var(--focus-ring);
     outline-offset: 2px;
   }
 
@@ -197,7 +199,7 @@
   }
 }
 
-/* Shopping progress ("18 of 31"): a thin basil bar on the counter color. */
+/* Shopping progress ("18 of 31"): a thin ink bar on a ruled track. */
 progress.trip-progress {
   appearance: none;
   display: block;
@@ -205,17 +207,17 @@ progress.trip-progress {
   height: 8px;
   border: none;
   border-radius: 9999px;
-  background: var(--counter);
+  background: var(--rule);
   overflow: hidden;
 }
 progress.trip-progress::-webkit-progress-bar {
-  background: var(--counter);
+  background: var(--rule);
 }
 progress.trip-progress::-webkit-progress-value {
-  background: var(--basil);
+  background: var(--accent);
   border-radius: 9999px;
 }
 progress.trip-progress::-moz-progress-bar {
-  background: var(--basil);
+  background: var(--accent);
   border-radius: 9999px;
 }

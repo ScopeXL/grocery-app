@@ -22,6 +22,7 @@ import { useTripView, type Grouping, type TripView } from "../../lib/tripView";
 import { useKeepAwake, wakeLockState } from "../../lib/wakeLock";
 import { Button } from "../../ui/Button";
 import { ToastAnchor } from "../../ui/StatusLayer";
+import { underlined } from "../../ui/styles";
 import { FinishedElsewhere } from "./FinishedElsewhere";
 import { FinishSheet } from "./FinishSheet";
 import { ItemSheet } from "./ItemSheet";
@@ -166,7 +167,7 @@ export function ShoppingScreen({ tripId }: { tripId: string }) {
                     // A private window may refuse storage; the choice just isn't remembered.
                   }
                 }}
-                className="min-h-11 rounded-button px-3 text-secondary font-semibold aria-pressed:bg-basil aria-pressed:text-on-basil"
+                className="min-h-11 rounded-button px-3 text-secondary font-semibold aria-pressed:bg-accent aria-pressed:text-on-accent"
               >
                 {value === "aisle" ? "By aisle" : "By meal"}
               </button>
@@ -348,7 +349,7 @@ function StatusNote() {
     note = (
       <Link
         to="/sign-in"
-        className="inline-flex min-h-11 items-center font-semibold text-basil underline"
+        className={`inline-flex min-h-11 items-center font-semibold text-accent ${underlined}`}
       >
         Sign in to sync
       </Link>

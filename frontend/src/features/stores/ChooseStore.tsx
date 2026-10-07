@@ -101,7 +101,7 @@ export function ChooseStore({ onChosen }: { onChosen: (store: StoreOut) => void 
                   }}
                   className="flex min-h-16 w-full items-start gap-3 px-4 py-3 text-left disabled:opacity-60"
                 >
-                  <MapPin aria-hidden="true" className="mt-1 size-6 shrink-0 text-basil" />
+                  <MapPin aria-hidden="true" className="mt-1 size-6 shrink-0 text-accent" />
                   <span className="flex flex-col">
                     <span className="text-row font-semibold">{store.name}</span>
                     {store.address_lines.map((line) => (
@@ -109,7 +109,7 @@ export function ChooseStore({ onChosen }: { onChosen: (store: StoreOut) => void 
                         {line}
                       </span>
                     ))}
-                    {saving ? <span className="text-secondary text-basil">Saving…</span> : null}
+                    {saving ? <span className="text-secondary text-accent">Saving…</span> : null}
                   </span>
                 </button>
               </li>

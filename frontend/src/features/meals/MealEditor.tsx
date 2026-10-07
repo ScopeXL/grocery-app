@@ -14,6 +14,7 @@ import { clearDraft, loadDraft, saveDraft } from "../../lib/drafts";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
+import { underlined } from "../../ui/styles";
 import { AddItemSheet } from "./AddItemSheet";
 import { AmountPicker } from "./AmountPicker";
 import { uploadPhoto } from "./photos";
@@ -226,7 +227,7 @@ function MealEditor({
       <Link
         to={editing ? "/meals/$dishId" : "/meals"}
         params={editing ? { dishId } : {}}
-        className="mb-2 inline-flex min-h-12 items-center gap-1 text-body font-semibold text-basil"
+        className="mb-2 inline-flex min-h-12 items-center gap-1 text-body font-semibold text-accent"
       >
         <ChevronLeft aria-hidden="true" />
         {editing ? "Back to the meal" : "Meals"}
@@ -244,7 +245,7 @@ function MealEditor({
           Picking up where you left off.{" "}
           <button
             type="button"
-            className="font-semibold text-basil underline"
+            className={`font-semibold text-accent ${underlined}`}
             onClick={() => {
               clearDraft(draftKey);
               setDraft(initial());
@@ -283,7 +284,7 @@ function MealEditor({
                 onClick={() => {
                   update({ role: value, step: editing ? draft.step : 2 });
                 }}
-                className="flex min-h-20 flex-col items-start justify-center rounded-button border-2 border-rule bg-paper px-4 py-3 text-left aria-pressed:border-basil"
+                className="flex min-h-20 flex-col items-start justify-center rounded-button border-2 border-rule bg-paper px-4 py-3 text-left aria-pressed:border-accent"
               >
                 <span className="text-row font-bold">{label}</span>
                 <span className="text-secondary text-ink-soft">{hint}</span>
@@ -309,7 +310,7 @@ function MealEditor({
                       : [...draft.occasions, occasion.value];
                     update({ occasions: occasions.length ? occasions : draft.occasions });
                   }}
-                  className="min-h-12 rounded-full border-2 border-rule bg-paper px-4 text-body font-semibold aria-pressed:border-basil aria-pressed:bg-basil aria-pressed:text-on-basil"
+                  className="min-h-12 rounded-full border-2 border-rule bg-paper px-4 text-body font-semibold aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent"
                 >
                   {occasion.label}
                 </button>

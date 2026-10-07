@@ -183,7 +183,7 @@ function TonightCard({
       <MealPicture dish={meal.main} />
       <div className="flex flex-wrap items-end gap-3 p-4">
         <div className="flex min-w-0 flex-1 flex-col">
-          <span className="text-secondary font-bold text-basil">
+          <span className="text-secondary font-bold text-accent">
             {meal.occasion === "dinner"
               ? "Tonight"
               : `Today's ${occasionLabel(meal.occasion).toLowerCase()}`}

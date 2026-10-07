@@ -14,6 +14,7 @@ import { about, costLine } from "../../lib/money";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
+import { underlined } from "../../ui/styles";
 import { AddMealSheet } from "../plan/AddMealSheet";
 import { usePlan } from "../plan/usePlan";
 import { UsualSides } from "../plan/UsualSides";
@@ -75,7 +76,7 @@ export function MealDetailScreen({ dishId }: { dishId: string }) {
       <Link
         to="/meals"
         search={{ role: meal.role }}
-        className="mb-2 inline-flex min-h-12 items-center gap-1 text-body font-semibold text-basil"
+        className="mb-2 inline-flex min-h-12 items-center gap-1 text-body font-semibold text-accent"
       >
         <ChevronLeft aria-hidden="true" />
         {meal.role === "main" ? "Meals" : "Sides"}
@@ -121,7 +122,7 @@ export function MealDetailScreen({ dishId }: { dishId: string }) {
           href={meal.recipe_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mb-5 inline-flex min-h-12 items-center gap-2 text-body font-semibold text-basil"
+          className={`mb-5 inline-flex min-h-12 items-center gap-2 text-body font-semibold text-accent ${underlined}`}
         >
           Open the recipe
           <ExternalLink aria-hidden="true" className="size-5" />

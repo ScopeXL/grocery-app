@@ -113,7 +113,7 @@ export function ReadyCard({
   return (
     <section
       aria-label="Get ready for the store"
-      className="mb-6 rounded-tile border-2 border-basil bg-paper p-4"
+      className="mb-6 rounded-tile border-2 border-accent bg-paper p-4"
     >
       <h2 className="mb-2 text-row font-bold">
         {ready ? "Ready for the store" : "Getting ready for the store"}
@@ -122,7 +122,7 @@ export function ReadyCard({
         {checks.map(([label, state]) => (
           <li key={label} className="flex items-center gap-2 text-secondary">
             {state === "done" ? (
-              <Check aria-hidden="true" className="size-5 text-basil" />
+              <Check aria-hidden="true" className="size-5 text-accent" />
             ) : state === "partly" ? (
               <Info aria-hidden="true" className="size-5 text-ink-soft" />
             ) : (
@@ -133,7 +133,7 @@ export function ReadyCard({
         ))}
         <li className="flex items-start gap-2 text-secondary">
           {wake.active ? (
-            <Check aria-hidden="true" className="size-5 shrink-0 text-basil" />
+            <Check aria-hidden="true" className="size-5 shrink-0 text-accent" />
           ) : (
             <Info aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-ink-soft" />
           )}

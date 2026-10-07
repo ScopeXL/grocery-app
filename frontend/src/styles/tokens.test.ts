@@ -1,6 +1,7 @@
 /**
  * Every text/background token pair must meet WCAG AA (4.5:1) in both themes
  * (docs/UX.md §7.2). Reads the real tokens.css, so a color change can't slip through.
+ * Aliases (`--accent: var(--ink)`) are resolved after the dark theme is merged in.
  */
 import { describe, expect, it } from "vitest";
 
@@ -19,16 +20,30 @@ function block(source: string, start: number): string {
 
 function tokens(source: string): Record<string, string> {
   const out: Record<string, string> = {};
-  for (const match of source.matchAll(/--([a-z-]+):\s*(#[0-9a-f]{6})\s*;/gi)) {
+  for (const match of source.matchAll(/--([a-z-]+):\s*(#[0-9a-f]{6}|var\(--[a-z-]+\))\s*;/gi)) {
     const [, name, value] = match;
     if (name && value) out[name] = value;
   }
   return out;
 }
 
-const light = tokens(block(css, css.indexOf(":root")));
+/** Follow `var(--x)` aliases to a hex value (a few hops at most). */
+function resolve(theme: Record<string, string>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const name of Object.keys(theme)) {
+    let value = theme[name];
+    for (let hops = 0; value?.startsWith("var(") && hops < 10; hops++) {
+      value = theme[value.slice("var(--".length, -1)];
+    }
+    if (value?.startsWith("#")) out[name] = value;
+  }
+  return out;
+}
+
+const lightRaw = tokens(block(css, css.indexOf(":root")));
 const darkMedia = block(css, css.indexOf("(prefers-color-scheme: dark)"));
-const dark = { ...light, ...tokens(block(darkMedia, darkMedia.indexOf(":root"))) };
+const light = resolve(lightRaw);
+const dark = resolve({ ...lightRaw, ...tokens(block(darkMedia, darkMedia.indexOf(":root"))) });
 
 function luminance(hex: string): number {
   const channels = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
@@ -41,7 +56,7 @@ function contrast(a: string, b: string): number {
   return ((hi ?? 0) + 0.05) / ((lo ?? 0) + 0.05);
 }
 
-const TEXT = ["ink", "ink-soft", "basil", "tomato"];
+const TEXT = ["ink", "ink-soft", "accent", "tomato"];
 const SURFACES = ["paper", "counter"];
 const MARKERS = ["basil", "tomato", "carrot", "eggplant", "beet", "olive", "cocoa", "plum"];
 
@@ -69,8 +84,13 @@ describe.each([
     },
   );
 
+  it("actions use the ink (ADR 0027)", () => {
+    expect(color("accent")).toBe(color("ink"));
+    expect(color("focus-ring")).toBe(color("ink"));
+  });
+
   it("button and tag text pass AA", () => {
-    expect(contrast(color("on-basil"), color("basil"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(color("on-accent"), color("accent"))).toBeGreaterThanOrEqual(4.5);
     expect(contrast(color("on-lemon"), color("lemon"))).toBeGreaterThanOrEqual(4.5);
   });
 

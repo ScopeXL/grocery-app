@@ -9,6 +9,7 @@ import { useState } from "react";
 import { Button } from "../../ui/Button";
 import { EmptyState } from "../../ui/EmptyState";
 import { Screen } from "../../ui/Screen";
+import { underlined } from "../../ui/styles";
 import type { Line, PlanOut } from "../plan/types";
 import { usePlan } from "../plan/usePlan";
 import { ExtrasSection } from "./ExtrasSection";
@@ -120,7 +121,7 @@ export function ListScreen({ show }: { show?: "unpriced" | undefined }) {
                     setGrouping(value);
                     saveGrouping(value);
                   }}
-                  className="flex min-h-12 items-center justify-center rounded-button text-body font-semibold aria-pressed:bg-basil aria-pressed:text-on-basil"
+                  className="flex min-h-12 items-center justify-center rounded-button text-body font-semibold aria-pressed:bg-accent aria-pressed:text-on-accent"
                 >
                   {value === "aisle" ? "By aisle" : "By meal"}
                 </button>
@@ -130,7 +131,10 @@ export function ListScreen({ show }: { show?: "unpriced" | undefined }) {
             {show === "unpriced" ? (
               <div className="mb-5 flex flex-wrap items-center gap-3 rounded-tile bg-paper p-3">
                 <p className="flex-1 text-body">Showing items with no price.</p>
-                <Link to="/list" className="min-h-12 content-center font-semibold text-basil">
+                <Link
+                  to="/list"
+                  className={`min-h-12 content-center font-semibold text-accent ${underlined}`}
+                >
                   Show everything
                 </Link>
               </div>

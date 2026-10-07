@@ -11,6 +11,7 @@ import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
 import { about, costLine } from "../../lib/money";
 import { Button } from "../../ui/Button";
+import { underlined } from "../../ui/styles";
 import { byAisle } from "../list/ListScreen";
 import type { DishCard } from "../meals/types";
 import type { PlanOut } from "./types";
@@ -85,7 +86,10 @@ export function ListPane({ plan }: { plan: PlanOut }) {
     <section aria-label="List summary" className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-row font-bold">The list</h2>
-        <Link to="/list" className="min-h-12 content-center font-semibold text-basil">
+        <Link
+          to="/list"
+          className={`min-h-12 content-center font-semibold text-accent ${underlined}`}
+        >
           Open the list
         </Link>
       </div>

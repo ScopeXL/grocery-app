@@ -4,6 +4,7 @@
  */
 import { Link } from "@tanstack/react-router";
 
+import { underlined } from "../../ui/styles";
 import type { PlanOut } from "./types";
 
 export function TotalFooter({ plan, compact = false }: { plan: PlanOut; compact?: boolean }) {
@@ -44,7 +45,7 @@ export function TotalFooter({ plan, compact = false }: { plan: PlanOut; compact?
           <Link
             to="/list"
             search={{ show: "unpriced" }}
-            className="inline-flex min-h-12 shrink-0 items-center text-right text-secondary font-semibold text-basil underline underline-offset-4"
+            className={`inline-flex min-h-12 shrink-0 items-center text-right text-secondary font-semibold text-accent ${underlined}`}
           >
             {totals.not_priced_text}
           </Link>

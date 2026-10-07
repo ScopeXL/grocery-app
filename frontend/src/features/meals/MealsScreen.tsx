@@ -69,7 +69,7 @@ export function MealsScreen({ role }: { role: Role }) {
             to="/meals"
             search={{ role: value }}
             aria-current={role === value ? "page" : undefined}
-            className="flex min-h-12 items-center justify-center rounded-button text-body font-semibold aria-[current=page]:bg-basil aria-[current=page]:text-on-basil"
+            className="flex min-h-12 items-center justify-center rounded-button text-body font-semibold aria-[current=page]:bg-accent aria-[current=page]:text-on-accent"
           >
             {value === "main" ? "Mains" : "Sides"}
           </Link>

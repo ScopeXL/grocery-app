@@ -13,6 +13,7 @@ import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { MemberBadge } from "../../ui/MemberBadge";
 import { Screen, Section } from "../../ui/Screen";
+import { underlined } from "../../ui/styles";
 import { CONNECT_RESULTS, type ConnectResult } from "../kroger/account";
 import { ChooseStore } from "../stores/ChooseStore";
 import { AddPhoneSheet } from "./AddPhoneSheet";
@@ -72,7 +73,7 @@ function StoreSettings() {
         <Row>
           <Link
             to="/settings/walking-order"
-            className="flex min-h-12 flex-1 items-center justify-between text-body font-semibold text-basil"
+            className="flex min-h-12 flex-1 items-center justify-between text-body font-semibold text-accent"
           >
             Store walking order
             <ChevronRight aria-hidden="true" />
@@ -125,7 +126,10 @@ function ThisPhone() {
         <span className="flex-1 text-body">
           {member ? `Used by ${member.name}` : "No name picked for this phone yet"}
         </span>
-        <Link to="/who" className="min-h-12 content-center px-2 text-body font-semibold text-basil">
+        <Link
+          to="/who"
+          className={`min-h-12 content-center px-2 text-body font-semibold text-accent ${underlined}`}
+        >
           Change
         </Link>
       </Row>
@@ -321,7 +325,7 @@ function Data() {
         <a
           href="/api/export"
           download="dinner-bell-export.json"
-          className="inline-flex min-h-12 items-center gap-2 text-body font-semibold text-basil"
+          className={`inline-flex min-h-12 items-center gap-2 text-body font-semibold text-accent ${underlined}`}
         >
           <Download aria-hidden="true" />
           Export all data
@@ -396,7 +400,7 @@ function About() {
         </span>
         <Link
           to="/about"
-          className="min-h-12 content-center px-2 text-body font-semibold text-basil"
+          className={`min-h-12 content-center px-2 text-body font-semibold text-accent ${underlined}`}
         >
           About & privacy
         </Link>

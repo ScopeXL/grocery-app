@@ -18,12 +18,12 @@ export function ToggleRow({
       aria-pressed={on}
       disabled={disabled}
       onClick={onClick}
-      className="flex min-h-14 w-full items-center gap-3 rounded-button border-2 border-rule bg-paper px-3 text-left text-body font-semibold disabled:opacity-60 aria-pressed:border-basil"
+      className="flex min-h-14 w-full items-center gap-3 rounded-button border-2 border-rule bg-paper px-3 text-left text-body font-semibold disabled:opacity-60 aria-pressed:border-accent"
     >
       <span
         aria-hidden="true"
         className={`flex size-8 shrink-0 items-center justify-center rounded-lg border-2 ${
-          on ? "border-basil bg-basil text-on-basil" : "border-rule"
+          on ? "border-accent bg-accent text-on-accent" : "border-rule"
         }`}
       >
         {on ? <Check className="size-5" strokeWidth={3} /> : null}

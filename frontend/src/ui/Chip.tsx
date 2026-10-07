@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-/** A toggle chip (occasions, days, filters): a 48 px target; pressed state in basil. */
+/** A toggle chip (occasions, days, filters); pressed, it fills with the accent (ink, ADR 0027). */
 export function Chip({
   on,
   onClick,
@@ -18,7 +18,7 @@ export function Chip({
       aria-pressed={on}
       disabled={disabled}
       onClick={onClick}
-      className="inline-flex min-h-12 items-center gap-1 rounded-full border-2 border-rule bg-paper px-4 text-secondary font-semibold disabled:opacity-60 aria-pressed:border-basil aria-pressed:bg-basil aria-pressed:text-on-basil"
+      className="inline-flex min-h-12 items-center gap-1 rounded-full border-2 border-rule bg-paper px-4 text-secondary font-semibold disabled:opacity-60 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent"
     >
       {children}
     </button>

@@ -14,6 +14,7 @@ import { about } from "../../lib/money";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
+import { underlined } from "../../ui/styles";
 import { ProductFacts } from "../meals/AddItemSheet";
 import type { Line } from "../plan/types";
 import { usePlanChange, useRemoveExtra } from "../plan/usePlan";
@@ -240,7 +241,7 @@ function LineDetails({ line, onSwap }: { line: Line; onSwap: () => void }) {
               href={line.product_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-12 items-center justify-center gap-2 text-body font-semibold text-basil"
+              className={`inline-flex min-h-12 items-center justify-center gap-2 text-body font-semibold text-accent ${underlined}`}
             >
               Open in Kroger
               <ExternalLink aria-hidden="true" className="size-5" />
@@ -302,7 +303,7 @@ function Alternatives({ itemId, onDone }: { itemId: string; onDone: () => void }
                 </span>
               </div>
               {option.current ? (
-                <span className="text-secondary font-semibold text-basil">On your list now</span>
+                <span className="text-secondary font-semibold text-accent">On your list now</span>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   <Button

@@ -57,7 +57,7 @@ export function WalkingOrderScreen() {
     <Screen title="Store walking order">
       <Link
         to="/settings"
-        className="-mt-4 mb-4 inline-flex min-h-12 items-center gap-1 text-body font-semibold text-basil"
+        className="-mt-4 mb-4 inline-flex min-h-12 items-center gap-1 text-body font-semibold text-accent"
       >
         <ChevronLeft aria-hidden="true" />
         Settings

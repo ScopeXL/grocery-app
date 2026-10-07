@@ -37,7 +37,7 @@ export function MoreScreen() {
               {...(search ? { search } : {})}
               className="flex min-h-16 items-center gap-4 px-4 text-body font-semibold"
             >
-              <Icon aria-hidden="true" className="text-basil" />
+              <Icon aria-hidden="true" className="text-accent" />
               <span className="flex-1">{label}</span>
               <ChevronRight aria-hidden="true" className="text-ink-soft" />
             </Link>

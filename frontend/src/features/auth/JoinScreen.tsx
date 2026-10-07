@@ -12,6 +12,7 @@ import { codeFromHash, displayCode, spokenCode } from "../../lib/joinCode";
 import { isIOS, isStandalone } from "../../lib/platform";
 import { BellMark } from "../../ui/BellMark";
 import { Button } from "../../ui/Button";
+import { underlined } from "../../ui/styles";
 import { useJoinWithCode } from "./useJoin";
 
 function Code({ code }: { code: string }) {
@@ -43,7 +44,7 @@ export function JoinScreen() {
         </p>
         <Link
           to="/sign-in"
-          className="inline-flex min-h-12 items-center text-body font-semibold text-basil"
+          className={`inline-flex min-h-12 items-center text-body font-semibold text-accent ${underlined}`}
         >
           Go to sign in
         </Link>
@@ -112,7 +113,7 @@ export function JoinScreen() {
       {join.isError ? (
         <Link
           to="/sign-in"
-          className="inline-flex min-h-12 items-center text-body font-semibold text-basil"
+          className={`inline-flex min-h-12 items-center text-body font-semibold text-accent ${underlined}`}
         >
           Sign in with the password instead
         </Link>

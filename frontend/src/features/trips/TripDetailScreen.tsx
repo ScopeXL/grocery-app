@@ -82,7 +82,7 @@ export function TripDetailScreen({ tripId }: { tripId: string }) {
     <Screen title={finished ? tripDate(data.finished_at ?? data.created_at) : title}>
       <Link
         to="/trips"
-        className="-mt-4 mb-3 inline-flex min-h-12 items-center gap-1 text-body font-semibold text-basil"
+        className="-mt-4 mb-3 inline-flex min-h-12 items-center gap-1 text-body font-semibold text-accent"
       >
         <ChevronLeft aria-hidden="true" />
         Trips

@@ -58,7 +58,7 @@ export function LineRow({
           ) : null}
           <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
             {had ? (
-              <span className="rounded-full border-2 border-basil px-2 text-caption font-bold text-basil">
+              <span className="rounded-full border-2 border-ink-soft px-2 text-caption font-bold text-ink-soft">
                 Have it
               </span>
             ) : line.cost_cents !== null ? (

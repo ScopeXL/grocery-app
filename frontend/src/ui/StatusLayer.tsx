@@ -30,7 +30,7 @@ export function OfflinePill() {
     pill = (
       <Link
         to="/sign-in"
-        className="pointer-events-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-ink px-4 py-2 text-secondary font-semibold text-counter"
+        className="pointer-events-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-ink px-4 py-2 text-secondary font-semibold text-counter [--focus-ring:var(--counter)]"
       >
         Sign in to sync
       </Link>
@@ -94,7 +94,7 @@ export function UpdatePrompt() {
   if (!needRefresh || shopping || pending > 0) return null;
   return (
     <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+var(--tabbar-h)+12px)] z-30 flex justify-center px-4 print:hidden lg:bottom-6">
-      <div className="flex items-center gap-3 rounded-button bg-ink py-2 pr-2 pl-4 text-counter">
+      <div className="flex items-center gap-3 rounded-button bg-ink py-2 pr-2 pl-4 text-counter [--focus-ring:var(--counter)]">
         <span className="text-secondary font-semibold">A new version is ready.</span>
         <button
           type="button"
@@ -117,7 +117,7 @@ export function ToastRegion() {
   const items = list.map((toast) => (
     <div
       key={toast.id}
-      className="pointer-events-auto flex w-full max-w-md items-center justify-between gap-3 rounded-button bg-ink py-2 pr-2 pl-4 text-counter"
+      className="pointer-events-auto flex w-full max-w-md items-center justify-between gap-3 rounded-button bg-ink py-2 pr-2 pl-4 text-counter [--focus-ring:var(--counter)]"
     >
       <span className="text-secondary font-semibold">{toast.message}</span>
       {toast.actionLabel ? (

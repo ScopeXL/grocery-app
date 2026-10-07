@@ -61,7 +61,7 @@ export function ShopRow({
       >
         <span
           className={`flex size-14 items-center justify-center rounded-button border-[3px] ${
-            done ? "border-basil bg-basil text-on-basil" : "border-ink-soft bg-paper"
+            done ? "border-accent bg-accent text-on-accent" : "border-ink-soft bg-paper"
           }`}
         >
           {done ? <Check aria-hidden="true" className="size-8" strokeWidth={3} /> : null}

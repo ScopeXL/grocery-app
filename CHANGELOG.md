@@ -9,6 +9,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 ### Changed
 
 - Text is smaller and crisper, and screens fit more.
+- The green is gone: buttons, links and selected choices are a dark ink, so sale tags and each
+  person's color stand out.
 
 ### Fixed
 
