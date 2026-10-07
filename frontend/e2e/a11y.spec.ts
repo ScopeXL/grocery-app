@@ -11,6 +11,11 @@ import { api, seedTacoNight } from "./seed";
 
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
+// The screens at rest: with Reduce Motion nothing is ever caught halfway (a row fading out as it
+// folds into Done, a toast easing in), which axe would read as low contrast. motion.spec covers
+// the motion itself.
+test.use({ reducedMotion: "reduce" });
+
 /** iPhones zoom into any typing field under 16 px (ADR 0027): none may be smaller. */
 async function typingFieldsAtLeast16px(page: Page, where: string): Promise<void> {
   const small = await page.evaluate(() =>
@@ -181,6 +186,7 @@ for (const scheme of ["light", "dark"] as const) {
         .first()
         .click();
       await expect(page.getByRole("button", { name: "Undo" })).toBeVisible();
+      await expect(page.getByText("Done (1)")).toBeVisible(); // the row has folded into Done
       await check(page, "shopping, with a toast");
       await page.getByRole("button", { name: "Finish trip" }).click();
       await expect(page.getByRole("dialog", { name: "Finish trip" })).toBeVisible();
