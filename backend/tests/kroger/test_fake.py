@@ -28,7 +28,7 @@ async def test_search_matches_every_word_in_any_order(kroger: FakeKroger) -> Non
     assert [p.description for p in (await kroger.search_products("CHEDDAR shredded", STORE)).data]
     assert (await kroger.search_products("xyz", STORE)).data == ()
     assert (await kroger.search_products("   ", STORE)).data == ()
-    assert cheese.cache.storable
+    assert not cheese.cache.storable  # like Kroger: no freshness headers, nothing kept
 
 
 async def test_search_pages_with_limit_and_start(kroger: FakeKroger) -> None:

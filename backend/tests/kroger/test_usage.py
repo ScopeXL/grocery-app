@@ -79,3 +79,14 @@ async def test_a_429_after_the_window_ended_is_treated_as_unknown(
     clock.advance(hours=25)
     until = await guard.record(Bucket.PRODUCTS, 429)
     assert until == clock.now() + timedelta(hours=1)
+
+
+async def test_krogers_own_reset_countdown_wins(guard: UsageGuard, clock: FakeClock) -> None:
+    await guard.record(Bucket.LOCATIONS, 200)
+    until = await guard.record(Bucket.LOCATIONS, 429, reset_after=timedelta(minutes=95))
+    assert until is not None
+    assert until == clock.now() + timedelta(minutes=95)
+    # A countdown longer than a day isn't believable; fall back to our own estimate.
+    clock.set(until)
+    later = await guard.record(Bucket.LOCATIONS, 429, reset_after=timedelta(days=3))
+    assert later == clock.now() + timedelta(hours=1)

@@ -25,10 +25,12 @@ class Bucket(StrEnum):
     CHAINS = "chains"
 
 
+# Products: Kroger's docs (its responses carry no rate headers). Locations and chains: the
+# `ratelimit-limit` header the smoke test saw (docs/KROGER.md), not the 1,600 the docs state.
 DAILY_LIMITS: dict[Bucket, int] = {
     Bucket.PRODUCTS: 10_000,
-    Bucket.LOCATIONS: 1_600,
-    Bucket.CHAINS: 1_600,
+    Bucket.LOCATIONS: 5_000,
+    Bucket.CHAINS: 5_000,
 }
 WINDOW = timedelta(hours=24)
 FIRST_PROBE = timedelta(hours=1)
@@ -75,8 +77,14 @@ class UsageGuard:
         if usage.blocked_until is not None and self._clock.now() < usage.blocked_until:
             raise KrogerDailyLimitError(usage.blocked_until)
 
-    async def record(self, bucket: Bucket, status: int) -> datetime | None:
-        """Count one call that reached Kroger. Returns `blocked_until` when it was a 429."""
+    async def record(
+        self, bucket: Bucket, status: int, *, reset_after: timedelta | None = None
+    ) -> datetime | None:
+        """Count one call that reached Kroger. Returns `blocked_until` when it was a 429.
+
+        `reset_after` is Kroger's own `ratelimit-reset` countdown, when it sends one; it beats
+        any estimate of ours.
+        """
         now = self._clock.now()
         usage = await self._store.load(bucket)
         # The first call after a block, or after 24 h, starts Kroger's next window.
@@ -92,7 +100,9 @@ class UsageGuard:
             usage = replace(usage, blocked_until=None, probe_backoff=None)
             await self._store.save(usage)
             return None
-        if usage.probe_backoff is None and not new_window and usage.window_started_at:
+        if reset_after is not None and timedelta(0) < reset_after <= WINDOW:
+            usage = replace(usage, blocked_until=now + reset_after, probe_backoff=None)
+        elif usage.probe_backoff is None and not new_window and usage.window_started_at:
             # We saw this window start, so Kroger resets 24 h after it.
             usage = replace(usage, blocked_until=usage.window_started_at + WINDOW)
         else:

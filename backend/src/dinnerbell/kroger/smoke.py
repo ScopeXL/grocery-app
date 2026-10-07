@@ -119,6 +119,7 @@ async def run(
         )
         raw_products = _list(_obj(_body(seen.get("products"))).get("data"))
         say(_product_counts(found.data))
+        say(f"promo dates: {_date_report(raw_products, found.data)}")
         say(f"product fields: {_shape(raw_products[0] if raw_products else None)}")
         prefixes = sorted({_image_prefix(url) for p in found.data for url in _image_urls(p)})
         say(f"image URL prefixes: {', '.join(prefixes) or 'none'}")
@@ -224,6 +225,32 @@ def _product_counts(products: tuple[Product, ...]) -> str:
         f"results: {len(products)}; with a price: {priced}; with a promo: {promo}; "
         f"with an aisle: {aisle}; placeholder aisles only: {placeholder}; "
         f"soldBy values: {', '.join(sold_by) or 'none'}"
+    )
+
+
+def _date_report(raw_products: list[Any], parsed: tuple[Product, ...]) -> str:
+    """How Kroger writes promo dates (digits shown as 9) and whether the parser read them."""
+    formats: set[str] = set()
+    zones: set[str] = set()
+    sent = 0
+    for raw in raw_products:
+        price = _obj(_obj(next(iter(_list(_obj(raw).get("items"))), None)).get("price"))
+        for key in ("effectiveDate", "expirationDate"):
+            value = price.get(key)
+            text = _obj(value).get("value") if isinstance(value, dict) else value
+            if isinstance(text, str) and text:
+                sent += 1
+                formats.add(re.sub(r"\d", "9", text))
+                zone = _obj(value).get("timezone")
+                zones.add("UTC" if zone == "UTC" else "a named zone" if zone else "none")
+    read = sum(
+        (p.price.effective is not None) + (p.price.expires is not None) for p in parsed if p.price
+    )
+    if not sent:
+        return "none sent"
+    return (
+        f"{read} of {sent} read; formats: {', '.join(sorted(formats))}; "
+        f"time zones: {', '.join(sorted(zones))}"
     )
 
 

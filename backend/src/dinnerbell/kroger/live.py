@@ -185,7 +185,9 @@ class LiveKroger:
                 continue
             self._observe(bucket, response)
             status = response.status_code
-            blocked_until = await self._usage.record(bucket, status)
+            blocked_until = await self._usage.record(
+                bucket, status, reset_after=_reset_after(response.headers.get("ratelimit-reset"))
+            )
             log.info("kroger.call", api=bucket, status=status, attempt=attempt)
             if status == 429:
                 raise KrogerDailyLimitError(blocked_until or self._clock.now() + timedelta(hours=1))
@@ -315,6 +317,13 @@ def _retry_after_seconds(value: str | None, now: datetime) -> float | None:
     if when.tzinfo is None:
         return None
     return max(0.0, (when - now).total_seconds())
+
+
+def _reset_after(value: str | None) -> timedelta | None:
+    """Kroger's `ratelimit-reset`: seconds until the daily window resets (seen on Locations)."""
+    if value is None or not value.strip().isdigit():
+        return None
+    return timedelta(seconds=int(value.strip()))
 
 
 def _under_pytest() -> bool:

@@ -50,6 +50,20 @@ class CountingKroger(FakeKroger):
         self.lookups += 1
         return await super().get_product(product_id, location_id)
 
+    async def get_products(
+        self, product_ids: Sequence[str], location_id: str
+    ) -> Fetched[tuple[Product, ...]]:
+        self.lookups += 1  # one call to Kroger, however many IDs
+        return await super().get_products(product_ids, location_id)
+
+
+@pytest.fixture(params=[True, False], ids=["batched", "one-by-one"])
+def batched(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) -> bool:
+    """Run each test with Kroger batches (what M1 verified) and with per-ID lookups."""
+    value: bool = request.param
+    monkeypatch.setattr("dinnerbell.kroger.catalog.BATCH_INCLUDES_PRICES", value)
+    return value
+
 
 @pytest.fixture
 async def db(data_dir: Path) -> AsyncIterator[Database]:
@@ -104,7 +118,7 @@ async def test_a_caller_giving_up_doesnt_cancel_the_shared_search(
 
 
 async def test_no_store_means_nothing_is_kept_anywhere(
-    catalog: ProductCatalog, kroger: CountingKroger, db: Database
+    catalog: ProductCatalog, kroger: CountingKroger, db: Database, batched: bool
 ) -> None:
     kroger.lifetime = None
     await catalog.search("milk", STORE)
@@ -117,25 +131,30 @@ async def test_no_store_means_nothing_is_kept_anywhere(
 
 
 async def test_linked_products_are_cached_until_their_headers_expire(
-    catalog: ProductCatalog, kroger: CountingKroger, clock: FakeClock, db: Database
+    catalog: ProductCatalog,
+    kroger: CountingKroger,
+    clock: FakeClock,
+    db: Database,
+    batched: bool,
 ) -> None:
     found = await catalog.products(["0000000000001", "0000000000005", "0000000009999"], STORE)
     assert sorted(found) == ["0000000000001", "0000000000005"]
-    assert kroger.lookups == 3
+    first = 1 if batched else 3  # one batch call, or one call per ID
+    assert kroger.lookups == first
     assert await cached_rows(db) == 2
     clock.advance(minutes=5)  # memory is gone, the database copy is still fresh
     again = await catalog.products(["0000000000001"], STORE)
     assert again["0000000000001"] == found["0000000000001"]
-    assert kroger.lookups == 3
+    assert kroger.lookups == first
     clock.advance(hours=1)
     assert await catalog.purge_expired() == 2
     assert await cached_rows(db) == 0
     await catalog.products(["0000000000001"], STORE)
-    assert kroger.lookups == 4
+    assert kroger.lookups == first + 1
 
 
 async def test_a_cached_product_comes_back_identical(
-    catalog: ProductCatalog, clock: FakeClock
+    catalog: ProductCatalog, clock: FakeClock, batched: bool
 ) -> None:
     ids: Sequence[str] = ("0000000000001", "0000000000004", "0000000000008", "0000000000019")
     fresh = await catalog.products(ids, STORE)

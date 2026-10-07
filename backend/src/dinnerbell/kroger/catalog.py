@@ -32,9 +32,9 @@ from dinnerbell.kroger.parse import Product, product_from_json, product_to_json
 MEMORY_TTL = timedelta(seconds=60)
 LOOKUP_CONCURRENCY = 4
 BATCH_SIZE = 50
-# Whether `filter.productId` batches come back with store prices: `just smoke-kroger` answers
-# this (docs/KROGER.md). Until it says yes, products are fetched one by one.
-BATCH_INCLUDES_PRICES = False
+# `filter.productId` batches come back with store prices and aisles: `just smoke-kroger`
+# verified it on 2026-10-06 (docs/KROGER.md). Set False to fetch products one by one.
+BATCH_INCLUDES_PRICES = True
 
 type SearchKey = tuple[str, str, int]
 

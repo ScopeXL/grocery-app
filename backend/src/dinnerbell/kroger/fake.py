@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from dinnerbell.core.clock import Clock
-from dinnerbell.kroger.cachepolicy import CachePolicy
+from dinnerbell.kroger.cachepolicy import NOT_STORABLE, CachePolicy
 from dinnerbell.kroger.client import Fetched, KrogerDailyLimitError
 from dinnerbell.kroger.parse import (
     Chain,
@@ -36,7 +36,6 @@ FIXTURES = Path(__file__).parent / "fixtures"
 IMAGE_BASE = "/api/kroger/fake-images"
 NO_STORES_ZIP = "00000"
 DAILY_LIMIT_TERM = "dailylimit"
-CACHE_SECONDS = 3600  # what the fake "sends"; the live headers are recorded in docs/KROGER.md
 
 
 class FakeKroger:
@@ -96,10 +95,8 @@ class FakeKroger:
         return replace(product, price=None, stock_level=None, in_store=None, aisles=())
 
     def _policy(self) -> CachePolicy:
-        return CachePolicy(
-            self._clock.now() + timedelta(seconds=CACHE_SECONDS),
-            f"cache-control: max-age={CACHE_SECONDS}",
-        )
+        """Like Kroger (smoke test, 2026-10-06): no freshness headers, so nothing is kept."""
+        return NOT_STORABLE
 
 
 def image_svg(name: str) -> str | None:

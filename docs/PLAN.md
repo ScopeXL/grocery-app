@@ -415,7 +415,8 @@ These were verified on 2026-10-06 against Kroger's developer docs, FAQ, Terms an
 - **Only linked products are cached.** Search results stay in memory; products enter `kroger_product_cache` only when an item links to them.
 - **Refreshing prices:**
   - Opening the plan or list refreshes the prices used there if they're older than `price_max_age_minutes` (default 120) or past `expires_at`.
-  - Refresh uses `filter.productId` batches of 50 if M1 confirms that batches return prices. Otherwise it fetches `GET /products/{id}?filter.locationId=` with concurrency 4; ~100 items is well within 10,000 a day.
+  - Refresh uses `filter.productId` batches of 50: M1's smoke test confirmed batches return store prices and aisles. (`BATCH_INCLUDES_PRICES = False` falls back to `GET /products/{id}?filter.locationId=` at concurrency 4.)
+  - Kroger sends no freshness headers on product data, so nothing is stored: every screen that shows prices fetches them live, in batches (docs/KROGER.md).
   - The total shows "prices as of" (§8).
 - **Trip snapshots:**
   - An active trip holds everything shopping mode needs, including product names, image references and aisles. That's temporary storage for the trip.
@@ -869,7 +870,7 @@ Strategies draw from a pool of about 5 items (so merging is forced), `st.fractio
 | Sold by weight (per lb) | Weight (½ lb, 1 lb presets) and count. For counts, ask "About how much does one weigh?" once: Small 4 oz / Medium 8 oz / Large 12 oz / 1 lb / Other, pre-filled from a sane Kroger estimate |
 | Unparseable size | Package parts only, plus "Fix size" |
 
-- **Live preview:** "about 3/8 of the 16 oz bag, about $0.94".
+- **Live preview:** "About 3/8 of the 16 oz package, about $0.94". Counts in packs of several read in pieces: "2 of the 12", "All 12", "15 (about 1 1/4 boxes of 12)".
 - **Size corrections:** if a correction changes a size's dimension, the affected dish lines get a "check amount" flag.
 - **On the list:** the stepper shows the final quantity, with a "you added 2" chip. Short and approximate lines get visible chips.
 
@@ -1986,20 +1987,18 @@ Shipped as 0.1.0 on 2026-10-06; the phone checklist passed on the owner's Portai
 
 ## 13. Risks and unknowns
 
-Item numbers stay fixed because other sections cite them, so settled items leave gaps. M0's deploy settled 12 (the reverse proxy), 13 (the Docker host) and 17 (tooling versions).
+Item numbers stay fixed because other sections cite them, so settled items leave gaps. M0's deploy settled 12 (the reverse proxy), 13 (the Docker host) and 17 (tooling versions); M1's smoke test settled 1 (batch pricing) and 2 (cache headers).
 
 | # | Risk or unknown | How it gets resolved |
 |---|---|---|
-| 1 | `filter.productId` batches may ignore `filter.locationId`, returning no price or aisle | M1 smoke test. If confirmed, refresh per ID with `GET /products/{id}?filter.locationId=` at concurrency 4 (well within 10,000/day) |
-| 2 | The real Cache-Control or Expires values on Products and Locations, which decide how long we may cache | Nothing is persisted until the M1 smoke test fills the "verified" table in `docs/KROGER.md`. After that, the TTL is whatever the header allows |
 | 3 | How strictly to read Kroger's terms (storing IDs, short caches, trip history, notice placement) | Conservative defaults in ADR 0016. An M1 read-through of the agreement; the owner accepts the approach or tightens it |
-| 4 | What a 429 returns (body, reset headers), and whether token calls count against limits | Observed in M1; the usage counter works either way |
+| 4 | What a 429's body says, and whether token calls count against limits | Not provoked on purpose. The reset header is known (`ratelimit-reset`, docs/KROGER.md) and used when sent; the usage counter works either way |
 | 5 | The refresh-token lifetime ("6 months" vs "24 h"), and occasional missing rotation | M5: single-flight refresh with atomic storage, keeping the old token if none comes back; a "Reconnect Kroger" banner; token age logged at each refresh |
 | 6 | Kroger app registration details: redirect-URI matching rules, whether localhost is allowed, production access to `cart.basic:write` | Checked in the developer portal when registering the dedicated app before M1; recorded in `docs/KROGER.md` |
 | 7 | The cart fills whichever store is selected in the Kroger account. Does adding an existing UPC add to the quantity or replace it? | The Send sheet says so. One-item manual test in M5 |
 | 8 | Aisle data quality for fresh departments | Section = aisle number, else category, else the household's override. Real data is captured locally in M1 and never committed |
 | 9 | Variety in size strings; pricing loose produce by weight | The parser plus "Fix size"; a household each-weight with presets; Kroger's estimate only when sane; otherwise "no price" |
-| 10 | The image host's CORS, `Vary`, hotlink rules and cache headers; opaque responses inflating storage quota | M3: a header probe with a synthetic product ID, plus device tests. Entry cap, `purgeOnQuotaError`, `persist()`, release on finish |
+| 10 | Product photos send no CORS headers (M1 probe), so the service worker's copies are opaque and may inflate storage quota; hotlink behaviour on phones | M3 device tests. Entry cap, `purgeOnQuotaError`, `persist()`, release on finish |
 | 11 | iOS PWA quirks: separate storage after install, wake lock only from iOS 18.4, eviction, no Background Sync, IndexedDB drops | Install guide before the password; `persist()`; outbox flush in the foreground; IndexedDB reopen wrapper; a wake-lock tip; real-device checklist every release |
 | 14 | Backups share a disk with the DB; `APP_SECRET_KEY` could be lost | The download endpoint, plus a host-level volume backup note in DEPLOY.md. The key lives in a password manager; losing it resets sessions and the Kroger link only |
 | 15 | The private-terms list is incomplete | `just setup` prompts for every category; preflight fails on a missing or empty list; the image scan |

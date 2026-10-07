@@ -292,3 +292,12 @@ def test_the_live_client_refuses_to_run_under_pytest_without_a_transport(
 ) -> None:
     with pytest.raises(RuntimeError, match="KROGER_LIVE"):
         LiveKroger("id", "secret", usage=UsageGuard(MemoryUsageStore(), clock), clock=clock)
+
+
+async def test_a_429_with_a_reset_header_blocks_until_then(
+    kroger: LiveKroger, kroger_site: SimulatedKroger, clock: FakeClock
+) -> None:
+    kroger_site.queue = [status(429, **{"ratelimit-reset": "3600"})]
+    with pytest.raises(KrogerDailyLimitError) as limit:
+        await kroger.locations("00001")
+    assert limit.value.retry_at == clock.now() + timedelta(hours=1)

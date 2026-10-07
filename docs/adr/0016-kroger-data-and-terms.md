@@ -1,6 +1,6 @@
 # ADR 0016: Kroger data is an expiring cache; only household data is durable
 
-- **Status:** Accepted (pending an M1 read-through of the agreement and the real cache headers)
+- **Status:** Accepted. M1's smoke test found no freshness headers on product or location data, so nothing from Kroger is stored, even briefly. The owner's read-through of the agreement is still open
 - **Date:** 2026-10-06
 
 ## Context
