@@ -16,9 +16,9 @@ from dinnerbell.stores.schemas import (
     ActiveStoreOut,
     ChooseStore,
     SectionOrderIn,
-    SectionOut,
     StoreOption,
     StoreOut,
+    StoreSectionOut,
     ZipCode,
 )
 
@@ -49,7 +49,7 @@ async def choose_store(body: ChooseStore, state: StateDep, session: SessionDep) 
 
 
 @router.get("/active/sections")
-async def get_sections(state: StateDep, session: SessionDep) -> list[SectionOut]:
+async def get_sections(state: StateDep, session: SessionDep) -> list[StoreSectionOut]:
     """The store's walking order (UX §4.16)."""
     store = await require_store(state)
     async with state.db.read() as db:
@@ -59,7 +59,7 @@ async def get_sections(state: StateDep, session: SessionDep) -> list[SectionOut]
 @router.put("/active/sections")
 async def put_sections(
     body: SectionOrderIn, state: StateDep, session: SessionDep
-) -> list[SectionOut]:
+) -> list[StoreSectionOut]:
     """Save a new walking order. Lists being shopped re-sort to match, on every phone."""
     found = await require_store(state)
     async with state.db.write() as tx:
@@ -73,5 +73,5 @@ async def put_sections(
         return _sections_out(await service.sections(tx.session, store))
 
 
-def _sections_out(found: list[StoreSection]) -> list[SectionOut]:
-    return [SectionOut(id=s.id, key=s.key, label=s.label) for s in found]
+def _sections_out(found: list[StoreSection]) -> list[StoreSectionOut]:
+    return [StoreSectionOut(id=s.id, key=s.key, label=s.label) for s in found]

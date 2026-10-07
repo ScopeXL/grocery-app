@@ -1477,7 +1477,7 @@ export interface components {
             /** Regular Cents */
             regular_cents: number | null;
             sale: components["schemas"]["SaleOut"] | null;
-            section: components["schemas"]["dinnerbell__planning__schemas__SectionOut"];
+            section: components["schemas"]["SectionOut"];
             /** Size Text */
             size_text: string | null;
             /** Staple */
@@ -1834,6 +1834,15 @@ export interface components {
             /** Ids */
             ids: string[];
         };
+        /** SectionOut */
+        SectionOut: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Order */
+            order: number;
+        };
         /** SessionOut */
         SessionOut: {
             /** Device Id */
@@ -1877,6 +1886,18 @@ export interface components {
             address_lines: string[];
             /** Name */
             name: string;
+        };
+        /**
+         * StoreSectionOut
+         * @description One stop on the walk through the store (`aisle:12`, `cat:produce`).
+         */
+        StoreSectionOut: {
+            /** Id */
+            id: string;
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
         };
         /** TotalsOut */
         TotalsOut: {
@@ -2142,27 +2163,6 @@ export interface components {
             revision: string;
             /** Version */
             version: string;
-        };
-        /** SectionOut */
-        dinnerbell__planning__schemas__SectionOut: {
-            /** Key */
-            key: string;
-            /** Label */
-            label: string;
-            /** Order */
-            order: number;
-        };
-        /**
-         * SectionOut
-         * @description One stop on the walk through the store (`aisle:12`, `cat:produce`).
-         */
-        dinnerbell__stores__schemas__SectionOut: {
-            /** Id */
-            id: string;
-            /** Key */
-            key: string;
-            /** Label */
-            label: string;
         };
     };
     responses: never;
@@ -3892,7 +3892,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["dinnerbell__stores__schemas__SectionOut"][];
+                    "application/json": components["schemas"]["StoreSectionOut"][];
                 };
             };
         };
@@ -3916,7 +3916,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["dinnerbell__stores__schemas__SectionOut"][];
+                    "application/json": components["schemas"]["StoreSectionOut"][];
                 };
             };
             /** @description Validation Error */

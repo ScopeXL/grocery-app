@@ -31,7 +31,7 @@ class ChooseStore(BaseModel):
     location_id: LocationId
 
 
-class SectionOut(BaseModel):
+class StoreSectionOut(BaseModel):
     """One stop on the walk through the store (`aisle:12`, `cat:produce`)."""
 
     id: str

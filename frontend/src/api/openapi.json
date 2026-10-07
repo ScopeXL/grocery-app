@@ -1692,7 +1692,7 @@
             ]
           },
           "section": {
-            "$ref": "#/components/schemas/dinnerbell__planning__schemas__SectionOut"
+            "$ref": "#/components/schemas/SectionOut"
           },
           "size_text": {
             "anyOf": [
@@ -2843,6 +2843,29 @@
         "title": "SectionOrderIn",
         "type": "object"
       },
+      "SectionOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "order": {
+            "title": "Order",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "order"
+        ],
+        "title": "SectionOut",
+        "type": "object"
+      },
       "SessionOut": {
         "properties": {
           "device_id": {
@@ -2975,6 +2998,30 @@
           "address_lines"
         ],
         "title": "StoreOut",
+        "type": "object"
+      },
+      "StoreSectionOut": {
+        "description": "One stop on the walk through the store (`aisle:12`, `cat:produce`).",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "label"
+        ],
+        "title": "StoreSectionOut",
         "type": "object"
       },
       "TotalsOut": {
@@ -3902,53 +3949,6 @@
           "created"
         ],
         "title": "VersionOut",
-        "type": "object"
-      },
-      "dinnerbell__planning__schemas__SectionOut": {
-        "properties": {
-          "key": {
-            "title": "Key",
-            "type": "string"
-          },
-          "label": {
-            "title": "Label",
-            "type": "string"
-          },
-          "order": {
-            "title": "Order",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "key",
-          "label",
-          "order"
-        ],
-        "title": "SectionOut",
-        "type": "object"
-      },
-      "dinnerbell__stores__schemas__SectionOut": {
-        "description": "One stop on the walk through the store (`aisle:12`, `cat:produce`).",
-        "properties": {
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "key": {
-            "title": "Key",
-            "type": "string"
-          },
-          "label": {
-            "title": "Label",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "key",
-          "label"
-        ],
-        "title": "SectionOut",
         "type": "object"
       }
     }
@@ -6263,7 +6263,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/dinnerbell__stores__schemas__SectionOut"
+                    "$ref": "#/components/schemas/StoreSectionOut"
                   },
                   "title": "Response Get Sections Api Stores Active Sections Get",
                   "type": "array"
@@ -6297,7 +6297,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/dinnerbell__stores__schemas__SectionOut"
+                    "$ref": "#/components/schemas/StoreSectionOut"
                   },
                   "title": "Response Put Sections Api Stores Active Sections Put",
                   "type": "array"
