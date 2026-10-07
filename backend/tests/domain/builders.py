@@ -2,11 +2,25 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping
 from datetime import UTC, datetime
 from fractions import Fraction
 
 from dinnerbell.domain.amounts import AmountOptions
-from dinnerbell.domain.models import Amount, AmountKind, Item, Product, SoldBy
+from dinnerbell.domain.listbuild import Line, ShoppingList
+from dinnerbell.domain.models import (
+    Amount,
+    AmountKind,
+    Dish,
+    DishLine,
+    Extra,
+    Item,
+    Meal,
+    PlanInput,
+    Product,
+    QuantityOverride,
+    SoldBy,
+)
 from dinnerbell.domain.money import PriceInfo
 from dinnerbell.domain.rational import q
 from dinnerbell.domain.sizes import PackageSize
@@ -133,3 +147,43 @@ def offered_amounts(options: AmountOptions) -> list[Amount]:
                 Amount(option.kind, Fraction(5, 2), unit),
             ]
     return amounts
+
+
+# ---- plans (M2) ----------------------------------------------------------------------------------
+
+Stock = Mapping[str, tuple[Item, Product | None]]  # item id -> the item and its own product
+
+
+def dish(name: str, *lines: tuple[str, Amount], dish_id: str | None = None) -> Dish:
+    """A dish with (item id, amount) lines, in order."""
+    return Dish(dish_id or f"dish-{name.lower()}", name, tuple(DishLine(i, a) for i, a in lines))
+
+
+def meal(meal_id: str, main: Dish, *sides: Dish, scale: str = "1") -> Meal:
+    return Meal(meal_id, main, sides, q(scale))
+
+
+def plan_input(
+    meals: Iterable[Meal],
+    stock: Stock,
+    *,
+    have_it: Iterable[str] = (),
+    overrides: Mapping[str, QuantityOverride] | None = None,
+    swaps: Mapping[str, Product] | None = None,
+    extras: Iterable[Extra] = (),
+) -> PlanInput:
+    return PlanInput(
+        meals=tuple(meals),
+        items={key: item for key, (item, _) in stock.items()},
+        products={key: product for key, (_, product) in stock.items()},
+        have_it=frozenset(have_it),
+        overrides=overrides or {},
+        swaps=swaps or {},
+        extras=tuple(extras),
+    )
+
+
+def line_for(shopping_list: ShoppingList, key: str) -> Line:
+    line = shopping_list.line(key)
+    assert line is not None, key
+    return line

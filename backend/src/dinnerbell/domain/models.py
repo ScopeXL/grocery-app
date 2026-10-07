@@ -1,4 +1,4 @@
-"""Items, the store products they link to, and amounts (PLAN §8.2).
+"""Items, the store products they link to, amounts, and the plan the list is built from (PLAN §8.2).
 
 An ``Item`` is the household's own record. A ``Product`` is Kroger's data for it, which is only an
 expiring cache (ADR 0016), so the two are separate and are passed in side by side.
@@ -6,7 +6,8 @@ expiring cache (ADR 0016), so the two are separate and are passed in side by sid
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from collections.abc import Iterator, Mapping
+from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from fractions import Fraction
 from typing import cast
@@ -141,3 +142,161 @@ def effective_size(item: Item, product: Product | None) -> PackageSize | Unparse
     if item.size_override is not None:
         return item.size_override
     return parse_size(None if product is None else product.size_text)
+
+
+# ---- the plan the shopping list is built from (M2) ---------------------------------------------
+
+
+class PurchaseUnit(StrEnum):
+    """What a list line counts in."""
+
+    PACKAGE = "package"  # whole packages of something sold by the package (or unlinked)
+    EACH = "each"  # pieces: something sold by the pound, or an unlinked item counted in pieces
+    POUND = "pound"  # pounds of something sold by the pound
+
+
+@dataclass(frozen=True, slots=True)
+class DishLine:
+    item_id: str
+    amount: Amount
+
+
+@dataclass(frozen=True, slots=True)
+class Dish:
+    """A Main or a Side, with its item lines in order."""
+
+    id: str
+    name: str
+    lines: tuple[DishLine, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "lines", tuple(self.lines))
+
+
+@dataclass(frozen=True, slots=True)
+class Meal:
+    """One Main plus its Sides, planned at a scale (1/2, 1 or 2)."""
+
+    id: str
+    main: Dish
+    sides: tuple[Dish, ...] = ()
+    scale: Fraction = Fraction(1)
+
+    def __post_init__(self) -> None:
+        scale = q(self.scale)
+        if scale <= 0:
+            raise ValueError("a meal's scale must be more than zero")
+        object.__setattr__(self, "scale", scale)
+        object.__setattr__(self, "sides", tuple(self.sides))
+
+    @property
+    def dishes(self) -> tuple[Dish, ...]:
+        return (self.main, *self.sides)
+
+
+@dataclass(frozen=True, slots=True)
+class QuantityOverride:
+    """The household's change to a line: typed minus computed, in the line's unit at the time."""
+
+    delta: Fraction
+    unit: PurchaseUnit
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "delta", q(self.delta))
+        object.__setattr__(self, "unit", PurchaseUnit(self.unit))
+
+
+@dataclass(frozen=True, slots=True)
+class Extra:
+    """Something added to the list outside meals: an item (``item_id``) or plain ``text``.
+
+    ``quantity`` is in the item line's purchase unit (packages, pieces or pounds).
+    """
+
+    id: str
+    item_id: str | None
+    text: str | None
+    quantity: Fraction
+
+    def __post_init__(self) -> None:
+        quantity = q(self.quantity)
+        if quantity <= 0:
+            raise ValueError("an extra's quantity must be more than zero")
+        object.__setattr__(self, "quantity", quantity)
+        if self.item_id is None and not self.text:
+            raise ValueError("an extra needs an item or some text")
+
+
+class FrozenMap[K, V](Mapping[K, V]):
+    """A read-only copy of a mapping, so a plan can't change after it is built."""
+
+    __slots__ = ("_data",)
+
+    def __init__(self, data: Mapping[K, V] | None = None) -> None:
+        self._data: dict[K, V] = {} if data is None else dict(data)
+
+    def __getitem__(self, key: K) -> V:
+        return self._data[key]
+
+    def __iter__(self) -> Iterator[K]:
+        return iter(self._data)
+
+    def __len__(self) -> int:
+        return len(self._data)
+
+    def __hash__(self) -> int:
+        return hash(frozenset(self._data.items()))
+
+    def __repr__(self) -> str:
+        return f"FrozenMap({self._data!r})"
+
+
+@dataclass(frozen=True, slots=True)
+class PlanInput:
+    """Everything the list is built from. Immutable: mappings are copied into read-only ones.
+
+    ``products`` maps an item id to that item's own product (missing or None: unlinked).
+    ``swaps`` replaces an item's product for this trip only. ``overrides``, ``have_it`` and
+    ``swaps`` for items no longer in the plan are ignored.
+    """
+
+    meals: tuple[Meal, ...]
+    items: Mapping[str, Item]
+    products: Mapping[str, Product | None]
+    have_it: frozenset[str] = frozenset()
+    overrides: Mapping[str, QuantityOverride] = field(
+        default_factory=lambda: FrozenMap[str, QuantityOverride]()
+    )
+    swaps: Mapping[str, Product] = field(default_factory=lambda: FrozenMap[str, Product]())
+    extras: tuple[Extra, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "meals", tuple(self.meals))
+        object.__setattr__(self, "items", FrozenMap(self.items))
+        object.__setattr__(self, "products", FrozenMap(self.products))
+        object.__setattr__(self, "have_it", frozenset(self.have_it))
+        object.__setattr__(self, "overrides", FrozenMap(self.overrides))
+        object.__setattr__(self, "swaps", FrozenMap(self.swaps))
+        object.__setattr__(self, "extras", tuple(self.extras))
+        self._check()
+
+    def with_meal(self, m: Meal) -> PlanInput:
+        """The same plan with one more meal (for "what if we added this?")."""
+        return replace(self, meals=(*self.meals, m))
+
+    def _check(self) -> None:
+        for key, item in self.items.items():
+            if item.id != key:
+                raise ValueError(f"items[{key!r}] holds item {item.id!r}")
+        if len({meal.id for meal in self.meals}) != len(self.meals):
+            raise ValueError("two meals share an id")
+        if len({extra.id for extra in self.extras}) != len(self.extras):
+            raise ValueError("two extras share an id")
+        for meal in self.meals:
+            for dish in meal.dishes:
+                for line in dish.lines:
+                    if line.item_id not in self.items:
+                        raise ValueError(f"dish {dish.id!r} uses unknown item {line.item_id!r}")
+        for extra in self.extras:
+            if extra.item_id is not None and extra.item_id not in self.items:
+                raise ValueError(f"extra {extra.id!r} is for unknown item {extra.item_id!r}")

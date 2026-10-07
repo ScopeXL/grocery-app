@@ -10,9 +10,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from fractions import Fraction
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from .rational import q, round_half_up
+
+if TYPE_CHECKING:  # totals imports this module, so only the type checker imports it back
+    from .totals import Totals
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -88,6 +91,59 @@ def about_dollars(cents: int) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError("cents must be an int")
     return round_half_up(Fraction(value, 100))
+
+
+SAVINGS_IN_DOLLARS = 1000  # from $10 the savings read in whole dollars; below, with cents
+
+
+@dataclass(frozen=True, slots=True)
+class Headline:
+    """The total's words for the screen, each on its own line (PLAN §8.4, UX §2)."""
+
+    total: str  # "About $142", or "Less than $1"
+    savings: str | None  # "$11 off on sale", "$1.50 off on sale"
+    prices_as_of: str | None  # "Prices as of 9:14 AM"
+    before_tax: str  # "Before tax, fees and tip"
+    not_priced: str | None  # "3 items have no price"
+
+    @property
+    def lines(self) -> tuple[str, ...]:
+        parts = (self.total, self.savings, self.prices_as_of, self.before_tax, self.not_priced)
+        return tuple(part for part in parts if part)
+
+
+def headline_parts(t: Totals, as_of_local: str) -> Headline:
+    """``as_of_local`` is ``t.prices_as_of`` already written in the household's time."""
+    total = about_dollars(t.total)
+    savings = None
+    if t.savings >= SAVINGS_IN_DOLLARS:
+        savings = f"${about_dollars(t.savings):,} off on sale"
+    elif t.savings:
+        savings = f"${t.savings // 100}.{t.savings % 100:02d} off on sale"
+    not_priced = None
+    if t.not_priced:
+        noun = "item has" if t.not_priced == 1 else "items have"
+        not_priced = f"{t.not_priced} {noun} no price"
+    return Headline(
+        total="Less than $1" if t.total and not total else f"About ${total:,}",
+        savings=savings,
+        prices_as_of=(
+            f"Prices as of {as_of_local}" if t.prices_as_of is not None and as_of_local else None
+        ),
+        before_tax="Before tax, fees and tip",
+        not_priced=not_priced,
+    )
+
+
+def headline_lines(t: Totals, as_of_local: str) -> tuple[str, ...]:
+    """The total as separate lines, never joined with dots: for example "About $142", "$11 off
+    on sale", "Prices as of 9:14 AM", "Before tax, fees and tip", "3 items have no price"."""
+    return headline_parts(t, as_of_local).lines
+
+
+def headline(t: Totals, as_of_local: str) -> str:
+    """The total's lines for the screen, one per line (``headline_lines`` joined by newlines)."""
+    return "\n".join(headline_lines(t, as_of_local))
 
 
 def require_aware(when: datetime, name: str = "now") -> datetime:
