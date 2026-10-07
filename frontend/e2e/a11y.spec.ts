@@ -148,6 +148,16 @@ for (const scheme of ["light", "dark"] as const) {
         .click();
       await expect(page.getByRole("dialog")).toBeVisible();
       await check(page, "list line");
+      await page.getByRole("dialog").getByRole("button", { name: "Close" }).click();
+
+      await page.getByRole("button", { name: "Add something else" }).click();
+      const adding = page.getByRole("dialog", { name: "Add something else" });
+      await adding.getByLabel("What do you need?").fill("cheese");
+      await expect(adding.getByText("In your items as Shredded cheddar")).toBeVisible();
+      await check(page, "add an item");
+      await adding.getByRole("button", { name: /Sample Aged Gouda Cheese/ }).click();
+      await expect(adding.getByLabel("What do you call it?")).toHaveValue("Cheese");
+      await check(page, "name an item");
     });
 
     test("shopping and trips", async ({ page }) => {

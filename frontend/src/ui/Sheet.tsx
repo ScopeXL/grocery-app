@@ -13,15 +13,30 @@ export function Sheet({
   onClose,
   children,
   footer,
+  step,
 }: {
   open: boolean;
   title: string;
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
+  /** For a sheet with steps: when it changes, the new step starts at the top, with focus. */
+  step?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const shownStep = useRef(step);
   const titleId = useId();
+
+  useEffect(() => {
+    if (step === shownStep.current) return;
+    shownStep.current = step;
+    const body = bodyRef.current;
+    if (!body) return;
+    // What had focus (the choice just tapped) is gone with the old step.
+    body.scrollTop = 0;
+    body.focus({ preventScroll: true });
+  }, [step]);
 
   useEffect(() => {
     const dialog = ref.current;
@@ -55,6 +70,7 @@ export function Sheet({
           </header>
           {/* Focusable, so a keyboard can scroll it even when nothing inside takes focus. */}
           <div
+            ref={bodyRef}
             role="region"
             aria-labelledby={titleId}
             tabIndex={0}

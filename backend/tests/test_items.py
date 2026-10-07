@@ -176,6 +176,13 @@ async def test_each_weight_for_produce_sold_by_the_pound(shopper: httpx.AsyncCli
     assert three["cost_cents"] == 224  # 1.5 lb at $1.49 (PLAN §8.5 W3)
 
 
+async def test_item_names_are_single_spaced(shopper: httpx.AsyncClient) -> None:
+    item = await new_item(shopper, "  Shredded \t  cheese\n", CHEDDAR)
+    assert item["name"] == "Shredded cheese"
+    blank = await shopper.post("/api/items", json={"name": " \n "}, headers=CSRF)
+    assert blank.status_code == 422
+
+
 async def test_archive_and_restore_an_item(shopper: httpx.AsyncClient) -> None:
     item = await new_item(shopper, "Shredded cheddar", CHEDDAR)
     archived = await shopper.post(f"/api/items/{item['id']}/archive", headers=CSRF)

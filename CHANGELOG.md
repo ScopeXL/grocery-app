@@ -23,6 +23,10 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ### Fixed
 
+- Picking a store product before you finish typing no longer names the item with half a word
+  ("Shredd"). You now name it first: the name starts with your last word finished ("Shredded"),
+  and you can change it. Picking a product you already use adds that item again instead of a
+  copy.
 - In dark mode, Undo and Refresh on the messages at the bottom of the screen are readable again.
 - The bar above the tabs no longer tucks slightly under them.
 

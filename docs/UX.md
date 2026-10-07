@@ -61,7 +61,7 @@ This document covers every screen at phone size, the main flows step by step, em
 **Phone (under 1024 px)**
 - **Bottom tab bar** with four tabs, each with an icon and a text label: **Plan** (home), **Meals**, **List**, **More**.
 - **Shopping mode** is a full-screen mode opened from a big **Start shopping** button. It is not a tab, and it hides the tab bar.
-- **Sheets** rise from the bottom for focused tasks: add a meal, amount picker, item details, finish trip. They close with a visible "Done" or "Close" button; swiping down is only a shortcut.
+- **Sheets** rise from the bottom for focused tasks: add a meal, amount picker, item details, finish trip. They close with a visible "Done" or "Close" button; swiping down is only a shortcut. A sheet with steps (Add a meal, Add an item) starts each new step at its top, with focus there, so a screen reader doesn't lose its place when the tapped choice goes away.
 - **Layout:** 16 px side gutters; safe-area insets respected; no horizontal scrolling.
 
 **Desktop (1024 px and up)** is the same app, responsive; never a separate codebase.
@@ -211,7 +211,10 @@ Then **Save meal** → toast "Meal saved". There's no "When do you eat it?": tha
    - the size;
    - the price, with a Sale tag beside it when there is one;
    - "Not sold at your store", "Low stock" or "No price" when they apply.
-3. Pick one. The link is remembered for every future meal, and the amount picker opens.
+3. Pick one.
+   - **A product the household already uses** says "In your items as Shredded cheddar". Picking it is that item again: no copy, so the list never shows twins.
+   - **A new product** first asks "What do you call it?", above its photo and facts. The name starts as what was typed, with the last word finished from the product's name ("Shredd" becomes "Shredded"; a trailing space means the word was done). It's editable, and the help line says "This name shows on your list and in your meals." Kroger's description never becomes the name (ADR 0016). "Choose another product" goes back to the results.
+   - **Next** (in Extras, **Add to list**) saves the item. The link is remembered for every future meal, and the amount picker opens.
 4. **Nothing at your store matches** shows "Add as plain text": an item without a photo or price, labeled "no price".
 
 ### 4.10 Amount picker (sheet)

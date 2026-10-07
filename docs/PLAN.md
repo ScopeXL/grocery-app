@@ -910,7 +910,7 @@ The owner can overrule any of these.
 6. Recommendations: show 3; require ≥ $1 of leftover value; only name items worth ≥ 25¢; rank by the displayed dollars so favorites can break ties; meals with unpriced items go last.
 7. Swap fallback: when sizes can't be compared, buy the same share and flag "check amount".
 8. "oz" always means weight, and "pt" a liquid pint. The household corrects juice sold as "64 oz" and berries sold by the dry pint.
-9. If two items link to the same product, flag it; don't auto-merge.
+9. If two items link to the same product, flag it; don't auto-merge. Add an item avoids making twins: a product already linked shows "In your items as …", and picking it reuses that item (UX §4.9). The server still accepts a second link, and the list flags it.
 
 ---
 

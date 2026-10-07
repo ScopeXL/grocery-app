@@ -104,6 +104,7 @@ export function AddMealSheet({
     <Sheet
       open={open}
       title={main ? `Add ${main.name}` : "Add a meal"}
+      step={main ? "details" : "main"}
       onClose={close}
       footer={
         main ? (

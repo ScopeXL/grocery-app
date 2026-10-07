@@ -90,6 +90,7 @@ export function ExtrasSection({
       <AddItemSheet
         open={adding}
         title="Add something else"
+        confirmLabel="Add to list"
         onClose={() => {
           setAdding(false);
         }}

@@ -1,13 +1,18 @@
 /**
- * Add an item to a meal (docs/UX.md §4.9): the household's own items first, then Kroger's
- * products at the chosen store, and "Add as plain text" when nothing fits. Product data is
- * shown exactly as Kroger returns it; photos only through ProductImage.
+ * Add an item (docs/UX.md §4.9): the household's own items first, then Kroger's products at the
+ * chosen store, and "Add as plain text" when nothing fits. Product data is shown exactly as
+ * Kroger returns it; photos only through ProductImage.
+ *
+ * A product the household already uses is that item again: no copy. A new one gets a name
+ * first ("What do you call it?"), suggested from what was typed with its last word finished
+ * ("Shredd" → "Shredded"), so a half-typed search never becomes an item's name.
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useId, useState } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
+import { suggestItemName, tidyName } from "../../lib/itemName";
 import { cents } from "../../lib/money";
 import { useDebounced } from "../../lib/useDebounced";
 import { Button } from "../../ui/Button";
@@ -16,11 +21,6 @@ import { Sheet } from "../../ui/Sheet";
 import type { ItemOut, ProductResult } from "./types";
 
 const MINE_SHOWN = 6;
-
-function tidyName(text: string): string {
-  const trimmed = text.trim().replace(/\s+/g, " ");
-  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
-}
 
 function searchable(term: string): boolean {
   return term.replace(/\s/g, "").length >= 3;
@@ -31,15 +31,20 @@ export function AddItemSheet({
   onClose,
   onPicked,
   title = "Add an item",
+  confirmLabel = "Next",
 }: {
   open: boolean;
   onClose: () => void;
   onPicked: (item: ItemOut) => void;
   title?: string;
+  /** The Name step's button: "Next" (on to the amount), or "Add to list" for an extra. */
+  confirmLabel?: string;
 }) {
   const queryClient = useQueryClient();
   const inputId = useId();
+  const nameId = useId();
   const [text, setText] = useState("");
+  const [picked, setPicked] = useState<{ product: ProductResult; name: string } | null>(null);
   const term = useDebounced(text.trim(), 300);
 
   const items = useQuery({
@@ -61,9 +66,14 @@ export function AddItemSheet({
     onSuccess: (item) => {
       void queryClient.invalidateQueries({ queryKey: qk.items() });
       setText("");
+      setPicked(null);
       onPicked(item);
     },
   });
+  // Products the household already linked to an item: picking one again is that item.
+  const linked = new Map(
+    (items.data ?? []).flatMap((item) => (item.product_id ? [[item.product_id, item]] : [])),
+  );
 
   const needle = text.trim().toLowerCase();
   const mine = (items.data ?? [])
@@ -75,110 +85,177 @@ export function AddItemSheet({
     <Sheet
       open={open}
       title={title}
+      step={picked ? "name" : "search"}
       onClose={() => {
         setText("");
+        setPicked(null);
         onClose();
       }}
     >
-      <label htmlFor={inputId} className="text-body font-semibold">
-        What do you need?
-      </label>
-      <input
-        id={inputId}
-        value={text}
-        autoComplete="off"
-        enterKeyHint="search"
-        placeholder="For example, cheddar"
-        onChange={(event) => {
-          setText(event.target.value.slice(0, 80));
-        }}
-        className="mt-2 mb-4 min-h-12 w-full rounded-button border-2 border-rule bg-paper px-4 text-body"
-      />
-
-      {mine.length > 0 ? (
-        <section className="mb-5">
-          <h3 className="mb-2 text-body font-bold">Items you already use</h3>
-          <ul className="overflow-hidden rounded-tile border border-rule">
-            {mine.map((item) => (
-              <li key={item.id} className="border-b border-rule last:border-b-0">
-                <button
-                  type="button"
-                  className="flex min-h-14 w-full items-center gap-3 px-3 py-2 text-left"
-                  onClick={() => {
-                    setText("");
-                    onPicked(item);
-                  }}
-                >
-                  <ProductImage src={item.image_url} alt="" size={48} />
-                  <span className="flex flex-col">
-                    <span className="text-body font-semibold">{item.name}</span>
-                    {item.size_text ? (
-                      <span className="text-secondary text-ink-soft">{item.size_text}</span>
-                    ) : null}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {searchable(term) ? (
-        <section className="mb-5" aria-busy={results.isFetching}>
-          <h3 className="mb-2 text-body font-bold">At your store</h3>
-          {results.isError ? (
-            <p className="text-secondary text-ink-soft">{errorMessage(results.error)}</p>
-          ) : results.isPending ? (
-            <p className="text-secondary text-ink-soft">Searching…</p>
-          ) : found.length === 0 ? (
-            <p className="text-body">
-              Nothing at your store matches “{term}”. Try a shorter name, or add it as plain text.
-            </p>
-          ) : (
-            <ul className="overflow-hidden rounded-tile border border-rule">
-              {found.map((product) => (
-                <li key={product.product_id} className="border-b border-rule last:border-b-0">
-                  <button
-                    type="button"
-                    disabled={create.isPending}
-                    className="flex min-h-16 w-full items-start gap-3 px-3 py-3 text-left disabled:opacity-60"
-                    onClick={() => {
-                      create.mutate({
-                        name: tidyName(text || term),
-                        product_id: product.product_id,
-                      });
-                    }}
-                  >
-                    <ProductImage src={product.image_url} alt="" size={64} />
-                    <ProductFacts product={product} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      ) : text.trim() ? (
-        <p className="mb-5 text-secondary text-ink-soft">
-          Type at least 3 letters to search your store.
-        </p>
-      ) : null}
-
-      <p role="alert" className="min-h-7 text-secondary font-semibold text-tomato">
-        {create.isError ? errorMessage(create.error) : null}
-      </p>
-
-      {text.trim() ? (
-        <Button
-          variant="secondary"
-          block
-          disabled={create.isPending}
-          onClick={() => {
-            create.mutate({ name: tidyName(text) });
+      {picked ? (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            const name = tidyName(picked.name);
+            if (name) create.mutate({ name, product_id: picked.product.product_id });
           }}
         >
-          Add “{tidyName(text)}” as plain text
-        </Button>
-      ) : null}
+          <Button
+            variant="quiet"
+            className="mb-2 -ml-5"
+            onClick={() => {
+              setPicked(null);
+            }}
+          >
+            Choose another product
+          </Button>
+          <div className="mb-5 flex items-start gap-3">
+            <ProductImage src={picked.product.image_url} alt="" size={64} />
+            <ProductFacts product={picked.product} />
+          </div>
+          <label htmlFor={nameId} className="text-body font-semibold">
+            What do you call it?
+          </label>
+          <input
+            id={nameId}
+            value={picked.name}
+            maxLength={80}
+            autoComplete="off"
+            aria-describedby={`${nameId}-help`}
+            onChange={(event) => {
+              setPicked({ ...picked, name: event.target.value });
+            }}
+            className="mt-2 min-h-12 w-full rounded-button border-2 border-rule bg-paper px-4 text-body"
+          />
+          <p id={`${nameId}-help`} className="mt-1 mb-4 text-secondary text-ink-soft">
+            This name shows on your list and in your meals.
+          </p>
+          <p role="alert" className="min-h-7 text-secondary font-semibold text-tomato">
+            {create.isError ? errorMessage(create.error) : null}
+          </p>
+          <Button type="submit" block disabled={create.isPending || !picked.name.trim()}>
+            {confirmLabel}
+          </Button>
+        </form>
+      ) : (
+        <>
+          <label htmlFor={inputId} className="text-body font-semibold">
+            What do you need?
+          </label>
+          <input
+            id={inputId}
+            value={text}
+            autoComplete="off"
+            enterKeyHint="search"
+            placeholder="For example, cheddar"
+            onChange={(event) => {
+              setText(event.target.value.slice(0, 80));
+            }}
+            className="mt-2 mb-4 min-h-12 w-full rounded-button border-2 border-rule bg-paper px-4 text-body"
+          />
+
+          {mine.length > 0 ? (
+            <section className="mb-5">
+              <h3 className="mb-2 text-body font-bold">Items you already use</h3>
+              <ul className="overflow-hidden rounded-tile border border-rule">
+                {mine.map((item) => (
+                  <li key={item.id} className="border-b border-rule last:border-b-0">
+                    <button
+                      type="button"
+                      className="flex min-h-14 w-full items-center gap-3 px-3 py-2 text-left"
+                      onClick={() => {
+                        setText("");
+                        onPicked(item);
+                      }}
+                    >
+                      <ProductImage src={item.image_url} alt="" size={48} />
+                      <span className="flex flex-col">
+                        <span className="text-body font-semibold">{item.name}</span>
+                        {item.size_text ? (
+                          <span className="text-secondary text-ink-soft">{item.size_text}</span>
+                        ) : null}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          {searchable(term) ? (
+            <section className="mb-5" aria-busy={results.isFetching}>
+              <h3 className="mb-2 text-body font-bold">At your store</h3>
+              {results.isError ? (
+                <p className="text-secondary text-ink-soft">{errorMessage(results.error)}</p>
+              ) : results.isPending ? (
+                <p className="text-secondary text-ink-soft">Searching…</p>
+              ) : found.length === 0 ? (
+                <p className="text-body">
+                  Nothing at your store matches “{term}”. Try a shorter name, or add it as plain
+                  text.
+                </p>
+              ) : (
+                <ul className="overflow-hidden rounded-tile border border-rule">
+                  {found.map((product) => {
+                    const mineAlready = linked.get(product.product_id);
+                    return (
+                      <li key={product.product_id} className="border-b border-rule last:border-b-0">
+                        <button
+                          type="button"
+                          disabled={create.isPending}
+                          className="flex min-h-16 w-full items-start gap-3 px-3 py-3 text-left disabled:opacity-60"
+                          onClick={() => {
+                            if (mineAlready) {
+                              setText("");
+                              onPicked(mineAlready);
+                              return;
+                            }
+                            setPicked({
+                              product,
+                              name: suggestItemName(text || term, product.description),
+                            });
+                          }}
+                        >
+                          <ProductImage src={product.image_url} alt="" size={64} />
+                          <span className="flex min-w-0 flex-col gap-0.5">
+                            <ProductFacts product={product} />
+                            {mineAlready ? (
+                              <span className="text-secondary font-semibold">
+                                In your items as {mineAlready.name}
+                              </span>
+                            ) : null}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+          ) : text.trim() ? (
+            <p className="mb-5 text-secondary text-ink-soft">
+              Type at least 3 letters to search your store.
+            </p>
+          ) : null}
+
+          <p role="alert" className="min-h-7 text-secondary font-semibold text-tomato">
+            {create.isError ? errorMessage(create.error) : null}
+          </p>
+
+          {text.trim() ? (
+            <Button
+              variant="secondary"
+              block
+              disabled={create.isPending}
+              onClick={() => {
+                create.mutate({ name: tidyName(text) });
+              }}
+            >
+              Add “{tidyName(text)}” as plain text
+            </Button>
+          ) : null}
+        </>
+      )}
     </Sheet>
   );
 }

@@ -204,6 +204,12 @@ for (const scheme of ["light", "dark"] as const) {
     await expect(sheet.getByText("Sample Aged Gouda Cheese")).toBeVisible();
     await settle(page);
     await page.screenshot({ path: `${dir}/add-item-${scheme}.png`, caret: "initial" });
+    // A new product is named first; one already in use (the cheddar) is that item again.
+    await sheet.getByRole("button", { name: /Sample Aged Gouda Cheese/ }).click();
+    await expect(sheet.getByLabel("What do you call it?")).toBeVisible();
+    await settle(page);
+    await page.screenshot({ path: `${dir}/add-item-name-${scheme}.png`, caret: "initial" });
+    await sheet.getByRole("button", { name: "Choose another product" }).click();
     await sheet.getByRole("button", { name: /Sample Shredded Cheddar Cheese/ }).click();
     const picker = page.getByRole("dialog", { name: "How much?" });
     await picker.getByRole("button", { name: "1/2 bag" }).click();

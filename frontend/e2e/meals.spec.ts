@@ -12,11 +12,14 @@ const PHOTO = Buffer.from(
   "base64",
 );
 
+/** Picks a new store product, keeps the suggested name, and goes on to the amount. */
 async function addItem(page: Page, search: string, product: string): Promise<void> {
   await page.getByRole("button", { name: "Add an item" }).click();
   const sheet = page.getByRole("dialog", { name: "Add an item" });
   await sheet.getByLabel("What do you need?").fill(search);
   await sheet.getByRole("button", { name: new RegExp(product) }).click();
+  await expect(sheet.getByLabel("What do you call it?")).not.toHaveValue("");
+  await sheet.getByRole("button", { name: "Next" }).click();
   await expect(page.getByRole("dialog", { name: "How much?" })).toBeVisible();
 }
 
@@ -47,8 +50,17 @@ test("first run: choose a store, add Tacos with four items and a photo, archive 
   await page.getByRole("button", { name: "Next" }).click();
   await page.getByRole("button", { name: /^Main/ }).click(); // straight on to its items
 
+  // A half-typed search names the item with its last word finished; the name stays editable.
+  await page.getByRole("button", { name: "Add an item" }).click();
+  const sheet = page.getByRole("dialog", { name: "Add an item" });
+  await sheet.getByLabel("What do you need?").fill("shredd");
+  await sheet.getByRole("button", { name: /Sample Shredded Cheddar Cheese/ }).click();
+  const called = sheet.getByLabel("What do you call it?");
+  await expect(called).toHaveValue("Shredded");
+  await called.fill("Shredded cheese");
+  await sheet.getByRole("button", { name: "Next" }).click();
+
   // Part of a package, with a live preview of the share and its cost.
-  await addItem(page, "cheddar", "Sample Shredded Cheddar Cheese");
   const picker = page.getByRole("dialog", { name: "How much?" });
   await picker.getByRole("button", { name: "1/2 bag" }).click();
   await expect(picker).toContainText("About half the 8 oz bag");
@@ -74,7 +86,7 @@ test("first run: choose a store, add Tacos with four items and a photo, archive 
   await picker.getByRole("button", { name: "1/2 package" }).click();
   await done(page);
 
-  const lines = page.locator("ul").filter({ hasText: "Cheddar" });
+  const lines = page.locator("ul").filter({ hasText: "Shredded cheese" });
   for (const amount of ["1/2 bag", "1 lb", "4", "1/2 package"]) {
     await expect(lines).toContainText(amount);
   }

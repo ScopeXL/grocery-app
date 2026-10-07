@@ -9,9 +9,19 @@ from __future__ import annotations
 from datetime import date
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, StringConstraints
+from pydantic import BaseModel, BeforeValidator, StringConstraints
 
-ItemName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=80)]
+
+def _single_spaced(value: object) -> object:
+    """Runs of spaces, tabs or line breaks inside a name become one space."""
+    return " ".join(value.split()) if isinstance(value, str) else value
+
+
+ItemName = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, min_length=1, max_length=80),
+    BeforeValidator(_single_spaced),
+]
 NumberText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=24)]
 SizeText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=80)]
 ProductId = Annotated[str, StringConstraints(strip_whitespace=True, pattern=r"^[0-9A-Za-z]{1,16}$")]
