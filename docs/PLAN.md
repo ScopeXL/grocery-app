@@ -2,7 +2,7 @@
 
 This is the current plan for Dinner Bell, a household meal-planning and grocery-list PWA. It is the single source for what we are building and how. Decisions and their reasoning live in [`adr/`](adr/README.md). Screens, flows and visual design live in [`UX.md`](UX.md). Working rules for AI sessions live in [`../CLAUDE.md`](../CLAUDE.md).
 
-**Status:** M0 (foundation) shipped as 0.1.0 on 2026-10-06. M1 (store, items and meals) is next; it starts once the owner has registered a Kroger production app for Dinner Bell (§12).
+**Status:** M0 (foundation) shipped as 0.1.0 and M1 (store, items and meals) as 0.2.0, both on 2026-10-06. M2 (plan and list) is next.
 
 **Maintenance rule:** when a milestone ships, shrink its section to a one-line summary that points to the CHANGELOG. Keep this file about what is true now and what is left to do.
 
@@ -1858,32 +1858,7 @@ Shipped as 0.1.0 on 2026-10-06; the phone checklist passed on the owner's Portai
 
 ### M1 Store, items and meals → 0.2.0
 
-**Owner setup:** register a Kroger production app just for Dinner Bell, named without "Kroger", with the GitHub URL of `PRIVACY.md` as its privacy policy (registered 2026-10-06). Put the keys in the local `.env` and in Portainer. `KROGER_MODE` stays `fake` locally; Portainer switches to `live` at the M1 deploy.
-
-**Scope**
-- **Kroger:** the client (token cache, retries, usage counters, the 429 state), the fake client and synthetic fixtures, and `just smoke-kroger`. Its results go into `docs/KROGER.md` (§13 items 1–4).
-- **Store:** search by ZIP and choose the store (fuel centers filtered out); seed the sections.
-- **Product search** with uncropped photos (300 ms debounce, 3+ characters, 8 words maximum).
-- **Domain:** rational, units, sizes and amounts, with the U, A and parser tests and properties 1–2.
-- **Items library:** link products; correct a size ("Fix size"); set an each-weight.
-- **Mains and Sides:** a guided create and edit flow with autosaved drafts; the amount picker with live preview; meal photos (WebP in SQLite); favorites; duplicate; archive with Undo; cards with estimated cost.
-- **First run:** steps 1–2 (choose the store, add a first dinner).
-
-**Acceptance**
-- Phone-size e2e:
-  1. Choose a store (fake).
-  2. Create a Main with 4 items, one by weight and one by count.
-  3. Add a photo.
-  4. Archive it and undo.
-- Domain tests are green.
-- The smoke test has run locally, and `docs/KROGER.md` records the verified headers and behaviours (no private values).
-
-**Phone checklist**
-- [ ] Choose your store by ZIP; its name and address show in Settings.
-- [ ] Create "Tacos" with 5 items; product photos are uncropped.
-- [ ] Take a meal photo for Tacos.
-- [ ] Create a side, "Rice".
-- [ ] Star Tacos; archive it and tap Undo.
+Shipped as 0.2.0 on 2026-10-06; the phone checklist passed with live Kroger data. What it delivered is in the [CHANGELOG](../CHANGELOG.md), and what Kroger's API actually does is in [KROGER.md](KROGER.md).
 
 ### M2 Plan and list → 0.3.0
 
