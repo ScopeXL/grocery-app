@@ -2,7 +2,7 @@
 
 This is the current plan for Dinner Bell, a household meal-planning and grocery-list PWA. It is the single source for what we are building and how. Decisions and their reasoning live in [`adr/`](adr/README.md). Screens, flows and visual design live in [`UX.md`](UX.md). Working rules for AI sessions live in [`../CLAUDE.md`](../CLAUDE.md).
 
-**Status:** every planned milestone has shipped. M0 (foundation) as 0.1.0, M1 (store, items and meals) as 0.2.0, M2 (plan and list) as 0.3.0 and M3 (shopping mode) as 0.4.0, all on 2026-10-06; M4 (savings) as 0.5.0 and M5 (polish and online ordering) as 0.6.0 on 2026-10-07. 1.0.0 is the owner's call; ideas beyond v1 are in §15.
+**Status:** every planned milestone has shipped. M0 (foundation) as 0.1.0, M1 (store, items and meals) as 0.2.0, M2 (plan and list) as 0.3.0 and M3 (shopping mode) as 0.4.0, all on 2026-10-06; M4 (savings) as 0.5.0 and M5 (polish and online ordering) as 0.6.0 on 2026-10-07. M6 (polish from the first week of use, §12) is built and ships as 0.7.0 when the owner says deploy. 1.0.0 is the owner's call; ideas beyond v1 are in §15.
 
 **Maintenance rule:** when a milestone ships, shrink its section to a one-line summary that points to the CHANGELOG. Keep this file about what is true now and what is left to do.
 
@@ -1902,6 +1902,33 @@ Shipped as 0.5.0 on 2026-10-07; the phone checklist passed with live Kroger pric
 ### M5 Polish and online ordering → 0.6.0
 
 Shipped as 0.6.0 on 2026-10-07; the phone checklist passed, with Connect Kroger and Send to Kroger cart on the production API. What it delivered is in the [CHANGELOG](../CHANGELOG.md); the cart is §7.5 and ADR 0024, adding a phone is §10.2 and ADR 0025. 1.0.0 is the owner's call.
+
+### M6 Polish from the first week of use → 0.7.0
+
+The owner's notes after a week on a phone, plus friendliness found along the way. No new tables: the database doesn't change.
+
+**Scope**
+- **Look** (ADR 0027): a 16 px type scale; an ink accent instead of green; buttons, chips and rows that are compact but never under 40 px; Undo readable in dark mode; the action bar clear of the tabs.
+- **Planning** (ADR 0026): tap a Plan meal anywhere to change it, with its price in the corner; Add a meal lists every meal with a search on top; what a meal is for (breakfast, lunch, dinner, snack) is chosen when planning and remembered per meal; a meal's day is a Sunday-to-Saturday pill.
+- **Items:** a store product is named before it's saved, starting from what was typed with its last word finished; a product already in use is that item again; any item can be renamed from its amount picker or its list line, with Undo.
+- **People:** "Who's using this phone?" shows who's using it and goes back where it was opened; Settings changes a person's name and color.
+- **Feel** (ADR 0027, CSS only): loading placeholders; press feedback and a spinner on buttons waiting for the server; sheets slide; toasts ease in and out, and sit inside an open sheet so Undo stays reachable; a checked shopping item folds into Done; new rows ease in; a changed total pops. Reduce Motion makes all of it instant.
+
+**Acceptance**
+- Zero serious axe findings in light and dark at both sizes; typing fields at 16 px or more; every tap target at 40 px or more.
+- `motion.spec`: focus goes back to what opened a sheet; Send again? takes over and hands back; with Reduce Motion nothing waits.
+- `items.spec`: naming, reuse and rename with Undo. `plan.spec`: day pills and the remembered occasion.
+- Unit tests: color contrast and the ink accent, the design rules (no green classes, no inline styles), day pills, item names, toasts' life.
+
+**Phone checklist**
+- [ ] Text and buttons look crisp, and the green is gone. In dark mode, Undo on a message is readable.
+- [ ] Tap a meal on the Plan anywhere: Change opens; its price sits in the card's corner.
+- [ ] Add a meal: every meal is listed with a search; pick Lunch and a day pill. Next time, that meal starts on Lunch.
+- [ ] Add an item to a meal by typing "shredd" and picking a cheese: the name starts as "Shredded" and can be changed. Rename it later from its amount picker.
+- [ ] More → Who's using this shows your name, checked, and Back returns to More.
+- [ ] Settings → Household → Change: rename someone or change their color.
+- [ ] Sheets slide up and away; checked-off items fold into Done.
+- [ ] With Reduce Motion on (Settings → Accessibility → Motion → Reduce Motion), everything is instant.
 
 ---
 

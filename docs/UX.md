@@ -583,4 +583,5 @@ Run `just screenshots` after every UI change. It captures the key screens in fak
 - [ ] Contrast holds in dark mode, and the tokens are used (no stray colors).
 - [ ] Touch targets are at least 40 px (buttons 44–48 px, the shopping checkbox 48 px).
 - [ ] Desktop uses the width (panes), with nothing stretched across 1440 px.
+- [ ] Motion, by hand in `just dev` (the screenshots switch animations off): a sheet slides up and away, Undo's toast eases out, a checked shopping item folds into Done, a pressed button dips. With Reduce Motion on, all of it is instant.
 - [ ] Nothing in the screenshots comes from real household data. Fake mode only; screenshots stay in `.screenshots/`, which is gitignored.

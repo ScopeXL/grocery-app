@@ -7,7 +7,7 @@ Dinner Bell is a household meal-planning and grocery-list PWA:
 
 It is built and maintained entirely by AI sessions. Most of its users aren't technical and use it on a phone, often in a store aisle with weak signal.
 
-**Status:** M0 to M5 shipped (0.6.0: Send to Kroger cart, Add a phone, the illustrated install guide). Every planned milestone is done; 1.0.0 is the owner's call, and new work comes from the owner (docs/PLAN.md §15 lists ideas beyond v1). See docs/PLAN.md §12 for what each milestone delivered.
+**Status:** M0 to M5 shipped (0.6.0: Send to Kroger cart, Add a phone, the illustrated install guide). M6, the owner's polish from the first week of use (ADRs 0026 and 0027), is built and ships as 0.7.0 when the owner says deploy. 1.0.0 is the owner's call, and new work comes from the owner (docs/PLAN.md §15 lists ideas beyond v1). See docs/PLAN.md §12 for what each milestone delivered.
 
 **Read first:**
 - [`docs/PLAN.md`](docs/PLAN.md): what we're building and how, plus milestones. It's long, so start from its contents list and read only the sections your task touches.
@@ -169,4 +169,7 @@ Add one line each time something surprising costs time: the symptom, the cause, 
 - e2e totals drifted as the fake store's sales expired on the real clock: fixture sale dates now move with the clock (`kroger/fake.py`, `FIXTURE_DAY`).
 - WebKit e2e runs failed with page errors "… due to access control checks": a hard reload (`page.goto`) cut off a request still in flight. Move between screens with in-app links, or wait for the screen's data before reloading.
 - A test passed all morning, then failed at 14:00 UTC: rows took `created_at` from the wall clock (`default=utcnow`) while the test moved the fake `Clock`, so they matched only until real time passed the fake start. Stamp anything a time rule reads with `state.clock.now()`.
+- Reduce Motion "didn't apply" to the new motion: a `!important` rule inside `@layer base` beats an unlayered `!important` one. Motion rules, Reduce Motion included, live only in the unlayered `styles/motion.css`.
+- Toasts left an open sheet for the page behind it whenever the page re-rendered: an inline ref callback is a new function each render, and React 19 re-runs it, re-registering the bar's toast anchor on top. Ref callbacks that register something are module-level functions.
+- A WebKit screenshot meant to catch a loading state showed the loaded page: requests from a page the service worker controls can skip `page.route`. Hold requests only in Chromium runs.
 - The 0.1.0 push failed after tagging ("could not read Username"): the HTTPS remote had no saved login. The remote is now SSH, preflight dry-runs the push, and `release-tag` resumes. Auto mode blocks Claude from changing a git remote; that's the owner's step.
