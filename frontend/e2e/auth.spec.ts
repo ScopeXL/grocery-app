@@ -39,3 +39,30 @@ test("signing out returns to the sign-in screen", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/(sign-in|install)$/);
 });
+
+test("Who's using this shows this phone, and goes back where it was opened", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "More", exact: true }).click();
+  const who = page.getByRole("link", { name: /Who’s using this/ });
+  await expect(who).toContainText("Sample Parent");
+  await who.click();
+  const me = page.getByRole("button", { name: /Sample Parent/ });
+  await expect(me).toHaveAttribute("aria-pressed", "true");
+  await expect(me).toContainText("Using this phone");
+  await page.getByRole("button", { name: "Someone else" }).click();
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await page.getByRole("button", { name: "Back" }).click();
+  await expect(page.getByRole("heading", { name: "More" })).toBeVisible();
+
+  // From Settings, another person picks their name, and it's back to Settings.
+  await page.getByRole("link", { name: "Settings" }).click();
+  await page.getByLabel("Add a person").fill("Sample Kid");
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Remove Sample Kid" })).toBeVisible();
+  await page.getByRole("link", { name: "Change who’s using this phone" }).click();
+  const kid = page.getByRole("button", { name: /Sample Kid/ });
+  await expect(kid).toHaveAttribute("aria-pressed", "false");
+  await kid.click();
+  await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
+  await expect(page.getByText("Used by Sample Kid")).toBeVisible();
+});

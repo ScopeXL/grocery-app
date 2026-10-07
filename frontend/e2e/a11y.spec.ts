@@ -217,6 +217,10 @@ for (const scheme of ["light", "dark"] as const) {
 
       await tab(page, "More", "More");
       await check(page, "more");
+      await page.getByRole("link", { name: /Who’s using this/ }).click();
+      await expect(page.getByRole("button", { name: /Using this phone/ })).toBeVisible();
+      await check(page, "who's using this phone");
+      await page.getByRole("button", { name: "Back" }).click();
       await page.getByRole("link", { name: "Trips" }).click();
       await expect(page.getByRole("heading", { name: "Trips" })).toBeVisible();
       await check(page, "trips");

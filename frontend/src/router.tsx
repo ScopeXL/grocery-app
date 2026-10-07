@@ -12,7 +12,7 @@ import { api, ApiError, unwrap } from "./api/client";
 import { qk } from "./api/keys";
 import { JoinScreen } from "./features/auth/JoinScreen";
 import { SignInScreen } from "./features/auth/SignInScreen";
-import { WhoScreen } from "./features/auth/WhoScreen";
+import { WhoScreen, type WhoFrom } from "./features/auth/WhoScreen";
 import { ListScreen } from "./features/list/ListScreen";
 import { MealDetailScreen } from "./features/meals/MealDetailScreen";
 import { EditMealScreen, NewMealScreen } from "./features/meals/MealEditor";
@@ -212,7 +212,12 @@ const signedRoute = createRoute({
 const whoRoute = createRoute({
   getParentRoute: () => signedRoute,
   path: "/who",
-  component: WhoScreen,
+  validateSearch: (search: Record<string, unknown>): { from?: WhoFrom } =>
+    search.from === "more" || search.from === "settings" ? { from: search.from } : {},
+  component: function Who() {
+    const { from } = whoRoute.useSearch();
+    return <WhoScreen from={from} />;
+  },
 });
 const welcomeRoute = createRoute({
   getParentRoute: () => signedRoute,

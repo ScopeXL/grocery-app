@@ -128,9 +128,10 @@ function ThisPhone() {
         </span>
         <Link
           to="/who"
+          search={{ from: "settings" }}
           className={`min-h-11 content-center px-2 text-body font-semibold text-accent ${underlined}`}
         >
-          Change
+          Change<span className="sr-only"> who’s using this phone</span>
         </Link>
       </Row>
       <Row>

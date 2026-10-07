@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
 import { UserPlus } from "lucide-react";
 import { useId, useState } from "react";
 
@@ -7,11 +7,20 @@ import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
 import { fetchSession, type Session } from "../../lib/session";
 import { Button } from "../../ui/Button";
-import { MemberBadge } from "../../ui/MemberBadge";
+import { MemberButton } from "./MemberButton";
 
-/** "Who's using this phone?" — attribution for check-offs and extras (docs/UX.md §4.2). */
-export function WhoScreen() {
+/** Where Who's using this phone was opened from, so it can go back there. */
+export type WhoFrom = "more" | "settings";
+
+/**
+ * "Who's using this phone?" — attribution for check-offs and extras (docs/UX.md §4.2). Whoever
+ * uses this phone shows as "Using this phone". Opened from More or Settings, it goes back there
+ * after a choice (or Back); right after signing in, on to the plan (or Skip for now).
+ */
+export function WhoScreen({ from }: { from?: WhoFrom | undefined }) {
   const navigate = useNavigate();
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
   const queryClient = useQueryClient();
   const { data: session } = useQuery({ queryKey: qk.session(), queryFn: fetchSession });
   const [adding, setAdding] = useState(false);
@@ -19,10 +28,18 @@ export function WhoScreen() {
   const [error, setError] = useState<string | null>(null);
   const nameId = useId();
 
+  const leave = async () => {
+    if (from && canGoBack) {
+      router.history.back();
+      return;
+    }
+    await navigate({ to: from === "settings" ? "/settings" : from === "more" ? "/more" : "/" });
+  };
+
   const finish = async (updated: Session) => {
     queryClient.setQueryData(qk.session(), updated);
     await queryClient.invalidateQueries({ queryKey: qk.members() });
-    await navigate({ to: "/" });
+    await leave();
   };
 
   const choose = useMutation({
@@ -46,6 +63,7 @@ export function WhoScreen() {
   });
 
   const members = session?.members ?? [];
+  const current = session?.member ?? null;
   const showForm = adding || members.length === 0;
 
   return (
@@ -57,17 +75,15 @@ export function WhoScreen() {
       <ul className="flex flex-col gap-3">
         {members.map((member) => (
           <li key={member.id}>
-            <button
-              type="button"
+            <MemberButton
+              member={member}
+              chosen={member.id === current?.id}
               disabled={choose.isPending}
-              onClick={() => {
-                choose.mutate(member.id);
+              onChoose={() => {
+                if (member.id === current?.id) void leave();
+                else choose.mutate(member.id);
               }}
-              className="flex min-h-14 w-full items-center gap-4 rounded-button border-2 border-rule bg-paper px-4 text-left text-row font-semibold"
-            >
-              <MemberBadge name={member.name} color={member.marker_color} />
-              {member.name}
-            </button>
+            />
           </li>
         ))}
       </ul>
@@ -95,6 +111,18 @@ export function WhoScreen() {
           <Button type="submit" block disabled={addMe.isPending || !name.trim()}>
             Add me
           </Button>
+          {members.length > 0 ? (
+            <Button
+              variant="quiet"
+              block
+              onClick={() => {
+                setAdding(false);
+                setName("");
+              }}
+            >
+              Cancel
+            </Button>
+          ) : null}
         </form>
       ) : (
         <Button
@@ -112,15 +140,27 @@ export function WhoScreen() {
       <p role="alert" className="mt-3 min-h-7 text-secondary font-semibold text-tomato">
         {error}
       </p>
-      <Button
-        variant="quiet"
-        block
-        onClick={() => {
-          void navigate({ to: "/" });
-        }}
-      >
-        Skip for now
-      </Button>
+      {from || current ? (
+        <Button
+          variant="quiet"
+          block
+          onClick={() => {
+            void leave();
+          }}
+        >
+          Back
+        </Button>
+      ) : (
+        <Button
+          variant="quiet"
+          block
+          onClick={() => {
+            void navigate({ to: "/" });
+          }}
+        >
+          Skip for now
+        </Button>
+      )}
     </main>
   );
 }

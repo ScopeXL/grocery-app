@@ -25,6 +25,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
   meal is for is chosen when you plan it.
 - Plan's meals are tidier: tap anywhere on one to change it. Its price sits in the corner, and the
   Change sheet has a link to open the meal.
+- "Who's using this phone?" shows who's using it now, with a check, and goes back to where you
+  opened it. More shows the name too.
 
 ### Fixed
 

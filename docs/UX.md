@@ -109,9 +109,12 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
 
 ### 4.2 Who's using this?
 
-- Big name buttons, one per household member, each in that member's marker color with their initial, plus **Skip**.
+- Big name buttons, one per household member, each in that member's marker color with their initial.
+- Whoever uses this phone now is marked three ways: an ink border, a check, and "Using this phone" under the name.
+- **Someone else** adds a new person by name, with **Cancel**.
+- Right after signing in, a choice goes on to the plan, and **Skip for now** skips it. Opened from More or Settings, a choice (or **Back**) returns there.
 - Shopping mode asks again with one tap if the user chose Skip, since check-offs need a name.
-- The choice is stored on the server for this device. Change it later in More → Who's using this.
+- The choice is stored on the server for this device. Change it later in More → Who's using this (the row shows the current name) or Settings → This phone → Change.
 
 ### 4.3 First run (no store chosen yet)
 
@@ -353,7 +356,7 @@ A live preview line shows the share and the cost.
 
 ### 4.14 More
 
-Trips · Settings · Who's using this · Install the app · About and privacy. Each is a full-width row with an icon and a label.
+Trips · Settings · Who's using this · Install the app · About and privacy. Each is a full-width row with an icon and a label. The Who's using this row also shows who uses this phone.
 
 ### 4.15 Trips (history)
 
