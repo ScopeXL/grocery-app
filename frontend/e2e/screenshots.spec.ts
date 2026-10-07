@@ -133,14 +133,27 @@ for (const scheme of ["light", "dark"] as const) {
     const dir = `../.screenshots/${testInfo.project.name}`;
     await page.goto("/sign-in");
     await expect(page.getByLabel("Household password")).toBeVisible();
-    await page.screenshot({ path: `${dir}/sign-in-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/sign-in-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await page.getByRole("button", { name: "Use a code from another phone" }).click();
     await page.getByLabel("Code from another phone").fill("ABCD 2345");
-    await page.screenshot({ path: `${dir}/sign-in-code-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/sign-in-code-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     // A scanned Add-a-phone code (synthetic): WebKit shows the iPhone version.
     await page.goto("/join#ABCD2345");
     await expect(page.getByText("ABCD 2345")).toBeVisible();
-    await page.screenshot({ path: `${dir}/join-${scheme}.png`, fullPage: true, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/join-${scheme}.png`,
+      fullPage: true,
+      caret: "initial",
+      animations: "disabled",
+    });
     await page.goto("/install?from=more");
     await expect(
       page.getByRole("heading", { name: "Put Dinner Bell on your home screen" }),
@@ -149,11 +162,16 @@ for (const scheme of ["light", "dark"] as const) {
       path: `${dir}/install-${scheme}.png`,
       fullPage: true,
       caret: "initial",
+      animations: "disabled",
     });
     await signIn(page);
     await page.goto("/who");
     await expect(page.getByRole("heading", { name: "Who’s using this phone?" })).toBeVisible();
-    await page.screenshot({ path: `${dir}/who-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/who-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     for (const screen of SCREENS) {
       await page.goto(screen.path);
       await expect(page.getByRole("heading", { name: screen.heading, exact: true })).toBeVisible();
@@ -162,6 +180,7 @@ for (const scheme of ["light", "dark"] as const) {
         fullPage: true,
         // The default caret: "hide" injects an inline <style>, which our CSP rightly blocks.
         caret: "initial",
+        animations: "disabled",
       });
     }
 
@@ -171,6 +190,7 @@ for (const scheme of ["light", "dark"] as const) {
         path: `${dir}/${name}-${scheme}.png`,
         fullPage: true,
         caret: "initial",
+        animations: "disabled",
       });
     };
 
@@ -225,19 +245,31 @@ for (const scheme of ["light", "dark"] as const) {
     await sheet.getByLabel("What do you need?").fill("cheese");
     await expect(sheet.getByText("Sample Aged Gouda Cheese")).toBeVisible();
     await settle(page);
-    await page.screenshot({ path: `${dir}/add-item-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/add-item-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     // A new product is named first; one already in use (the cheddar) is that item again.
     await sheet.getByRole("button", { name: /Sample Aged Gouda Cheese/ }).click();
     await expect(sheet.getByLabel("What do you call it?")).toBeVisible();
     await settle(page);
-    await page.screenshot({ path: `${dir}/add-item-name-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/add-item-name-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await sheet.getByRole("button", { name: "Choose another product" }).click();
     await sheet.getByRole("button", { name: /Sample Shredded Cheddar Cheese/ }).click();
     const picker = page.getByRole("dialog", { name: "How much?" });
     await picker.getByRole("button", { name: "1/2 bag" }).click();
     await expect(picker).toContainText("About half the 8 oz bag");
     await settle(page);
-    await page.screenshot({ path: `${dir}/amount-picker-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/amount-picker-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
 
     // This week's plan, its sheets, and the list it builds.
     await seedPlan(page, meals);
@@ -248,20 +280,32 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByRole("button", { name: "Add a meal" }).click();
     await expect(page.getByRole("dialog", { name: "Add a meal" })).toContainText("Tacos");
     await settle(page);
-    await page.screenshot({ path: `${dir}/add-meal-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/add-meal-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await page
       .getByRole("dialog", { name: "Add a meal" })
       .getByRole("button", { name: /Tacos/ })
       .click();
     await expect(page.getByRole("dialog", { name: "Add Tacos" })).toContainText("Usual sides");
-    await page.screenshot({ path: `${dir}/add-meal-sides-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/add-meal-sides-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await page
       .getByRole("dialog", { name: "Add Tacos" })
       .getByRole("button", { name: "Close" })
       .click();
     await page.getByRole("button", { name: "Change Sheet-pan chicken" }).click();
     await expect(page.getByRole("dialog", { name: "Change Sheet-pan chicken" })).toBeVisible();
-    await page.screenshot({ path: `${dir}/change-meal-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/change-meal-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await page
       .getByRole("dialog", { name: "Change Sheet-pan chicken" })
       .getByRole("button", { name: "Close" })
@@ -279,12 +323,20 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByRole("button", { name: /Ground beef/ }).click();
     await expect(page.getByRole("dialog", { name: "Ground beef" })).toBeVisible();
     await settle(page);
-    await page.screenshot({ path: `${dir}/line-sheet-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/line-sheet-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     const beefSheet = page.getByRole("dialog", { name: "Ground beef" });
     await beefSheet.getByRole("button", { name: "Rename Ground beef" }).click();
     await expect(beefSheet.getByLabel("What do you call it?")).toBeFocused();
     await settle(page);
-    await page.screenshot({ path: `${dir}/rename-item-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/rename-item-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await beefSheet.getByRole("button", { name: "Cancel" }).click();
     await page
       .getByRole("dialog", { name: "Ground beef" })
@@ -292,7 +344,11 @@ for (const scheme of ["light", "dark"] as const) {
       .click();
     await expect(page.getByRole("dialog", { name: "Ground beef" })).toContainText("per");
     await settle(page);
-    await page.screenshot({ path: `${dir}/swap-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/swap-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await page
       .getByRole("dialog", { name: "Ground beef" })
       .getByRole("button", { name: "Close" })
@@ -308,7 +364,11 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByRole("button", { name: "Send to Kroger cart" }).click();
     const cart = page.getByRole("dialog", { name: "Send to Kroger cart" });
     await expect(cart).toContainText("Connect your Kroger account");
-    await page.screenshot({ path: `${dir}/cart-not-connected-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/cart-not-connected-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await cart.getByRole("button", { name: "Go to Settings" }).click();
     await expect(page.getByRole("heading", { name: "Kroger account" })).toBeVisible();
     await shot("settings-kroger");
@@ -319,7 +379,11 @@ for (const scheme of ["light", "dark"] as const) {
     await shot("settings-kroger-connected");
     await page.getByRole("button", { name: "Add a phone" }).click();
     await expect(page.getByTestId("join-code")).toBeVisible();
-    await page.screenshot({ path: `${dir}/add-phone-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/add-phone-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await page
       .getByRole("dialog", { name: "Add a phone" })
       .getByRole("button", { name: "Done" })
@@ -327,7 +391,11 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByRole("button", { name: "Change Sample Parent" }).click();
     await expect(page.getByRole("dialog", { name: "Change Sample Parent" })).toBeVisible();
     await settle(page);
-    await page.screenshot({ path: `${dir}/member-sheet-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/member-sheet-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await page
       .getByRole("dialog", { name: "Change Sample Parent" })
       .getByRole("button", { name: "Close" })
@@ -336,11 +404,19 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByRole("button", { name: "Send to Kroger cart" }).click();
     await expect(cart.getByRole("button", { name: /^Send \d+ items$/ })).toBeVisible();
     await settle(page);
-    await page.screenshot({ path: `${dir}/cart-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/cart-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await cart.getByRole("button", { name: /^Send \d+ items$/ }).click();
     await expect(cart.getByText(/^Added \d+ items to your Kroger cart\.$/)).toBeVisible();
     await settle(page);
-    await page.screenshot({ path: `${dir}/cart-sent-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/cart-sent-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await cart.getByRole("button", { name: "Close" }).click();
     await page.getByRole("button", { name: "Start shopping" }).click();
     await expect(page.getByRole("region", { name: "Get ready for the store" })).toBeVisible();
@@ -353,7 +429,11 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByRole("button", { name: /^Ground beef/ }).click();
     await expect(page.getByRole("dialog", { name: "Ground beef" })).toBeVisible();
     await settle(page);
-    await page.screenshot({ path: `${dir}/shopping-item-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/shopping-item-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await page
       .getByRole("dialog", { name: "Ground beef" })
       .getByRole("button", { name: "Close" })
@@ -361,7 +441,11 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByRole("button", { name: "Finish trip" }).click();
     const finish = page.getByRole("dialog", { name: "Finish trip" });
     await finish.getByLabel("What did you pay? (optional)").fill("41.20");
-    await page.screenshot({ path: `${dir}/finish-${scheme}.png`, caret: "initial" });
+    await page.screenshot({
+      path: `${dir}/finish-${scheme}.png`,
+      caret: "initial",
+      animations: "disabled",
+    });
     await finish.getByRole("button", { name: "Finish trip" }).click();
     await expect(page.getByRole("heading", { name: "Trips" })).toBeVisible();
     await shot("trips");

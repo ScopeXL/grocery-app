@@ -31,14 +31,74 @@
   background-color: var(--counter);
 }
 
+/*
+ * Sheets (ui/Sheet): on a phone they slide up from the bottom edge and back down; on a desktop,
+ * where they sit mid-screen, they rise a little and fade. The backdrop fades with them. Closing
+ * keeps the dialog open and modal, marked data-closing, until this animation ends.
+ */
+dialog.sheet[open] {
+  animation: sheet-up var(--motion-enter) var(--ease-arrive);
+}
+dialog.sheet[open]::backdrop {
+  animation: fade-in var(--motion-enter) var(--ease-standard);
+}
+dialog.sheet[data-closing] {
+  animation: sheet-down var(--motion-exit) var(--ease-leave) forwards;
+}
+dialog.sheet[data-closing]::backdrop {
+  animation: fade-out var(--motion-exit) var(--ease-leave) forwards;
+}
+@media (min-width: 1024px) {
+  dialog.sheet[open] {
+    animation-name: sheet-rise;
+  }
+  dialog.sheet[data-closing] {
+    animation-name: sheet-fall;
+  }
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-down {
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+@keyframes sheet-fall {
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Reduce Motion: everything instant. 0.01 ms rather than 0, so every animation still runs to
+   its end (and the sheets' close still sees one finish). */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after,
   ::backdrop {
-    animation-duration: 0s !important;
+    animation-duration: 0.01ms !important;
     animation-delay: 0s !important;
-    transition-duration: 0s !important;
+    transition-duration: 0.01ms !important;
     transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }

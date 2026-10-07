@@ -120,15 +120,6 @@
     outline: 3px solid var(--focus-ring);
     outline-offset: 2px;
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
 }
 
 /* Native <dialog> used as a bottom sheet (no style injection, so the strict CSP holds). */
@@ -142,6 +133,12 @@
     background: var(--paper);
     color: var(--ink);
     padding: 0 0 env(safe-area-inset-bottom);
+  }
+
+  /* The sheet itself takes focus when it opens (ui/Sheet), as a place to start from, not a
+     control: no ring around the whole sheet. Its buttons still show theirs. */
+  dialog.sheet:focus-visible {
+    outline: none;
   }
 
   dialog.sheet::backdrop {

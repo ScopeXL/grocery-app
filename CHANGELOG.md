@@ -33,6 +33,7 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
   or "Loading…". A quick load doesn't show them at all.
 - Buttons, chips and rows respond when you press them, and a button that's waiting on the server
   shows a small spinner. With Reduce Motion on, nothing moves.
+- Sheets slide up when they open and slide away when they close.
 
 ### Fixed
 

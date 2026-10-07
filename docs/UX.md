@@ -61,7 +61,7 @@ This document covers every screen at phone size, the main flows step by step, em
 **Phone (under 1024 px)**
 - **Bottom tab bar** with four tabs, each with an icon and a text label: **Plan** (home), **Meals**, **List**, **More**.
 - **Shopping mode** is a full-screen mode opened from a big **Start shopping** button. It is not a tab, and it hides the tab bar.
-- **Sheets** rise from the bottom for focused tasks: add a meal, amount picker, item details, finish trip. They close with a visible "Done" or "Close" button; swiping down is only a shortcut. A sheet with steps (Add a meal, Add an item) starts each new step at its top, with focus there, so a screen reader doesn't lose its place when the tapped choice goes away.
+- **Sheets** rise from the bottom for focused tasks: add a meal, amount picker, item details, finish trip. They close with a visible "Done" or "Close" button; swiping down is only a shortcut. They slide up when they open and back down when they close (on desktop they rise a little and fade), and the backdrop fades with them. The sheet itself takes focus when it opens, and focus goes back to what opened it. A sheet with steps (Add a meal, Add an item) starts each new step at its top, with focus there, so a screen reader doesn't lose its place when the tapped choice goes away.
 - **Layout:** 16 px side gutters; safe-area insets respected; no horizontal scrolling.
 
 **Desktop (1024 px and up)** is the same app, responsive; never a separate codebase.
