@@ -162,7 +162,11 @@ async def upload_photo(request: Request, state: StateDep, session: SessionDep) -
     encoded = await asyncio.to_thread(photos.encode, bytes(data))
     async with state.db.write() as tx:
         photo = Photo(
-            webp=encoded.webp, thumb=encoded.thumb, width=encoded.width, height=encoded.height
+            webp=encoded.webp,
+            thumb=encoded.thumb,
+            width=encoded.width,
+            height=encoded.height,
+            created_at=state.clock.now(),  # the week before an unused photo goes (PLAN §8.5)
         )
         tx.session.add(photo)
         await tx.session.flush()
