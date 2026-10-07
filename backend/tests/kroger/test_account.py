@@ -10,6 +10,7 @@ import asyncio
 import html
 import re
 from collections.abc import AsyncIterator
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -18,6 +19,7 @@ from fastapi import FastAPI
 from sqlalchemy import func, select
 from structlog.testing import capture_logs
 
+from dinnerbell.app import redirect_uri
 from dinnerbell.core.clock import FakeClock
 from dinnerbell.core.crypto import token_cipher
 from dinnerbell.kroger.account import AccountStatus, KrogerAccount, KrogerNotConnectedError
@@ -25,7 +27,7 @@ from dinnerbell.kroger.client import KrogerGrantError, KrogerUnavailableError, T
 from dinnerbell.kroger.fake import FakeKroger
 from dinnerbell.kroger.models import KrogerOAuthState, KrogerToken
 from dinnerbell.state import AppState
-from tests.support import BASE_URL, CSRF, SECRET, login
+from tests.support import BASE_URL, CSRF, SECRET, login, make_settings
 
 
 def app_state(app: FastAPI) -> AppState:
@@ -383,3 +385,16 @@ async def test_tokens_codes_and_states_never_reach_the_logs(
     for value in secrets_seen:
         assert value not in text
     assert "kroger.connected" in [entry["event"] for entry in logs]
+
+
+def test_an_empty_redirect_uri_means_not_set_up(tmp_path: Path) -> None:
+    """A Portainer stack can pass the variable through empty; that isn't a redirect URI."""
+    live = make_settings(
+        tmp_path,
+        kroger_mode="live",
+        kroger_client_id="sample-id",
+        kroger_client_secret="sample-secret",
+        kroger_redirect_uri="",
+    )
+    assert redirect_uri(live) is None
+    assert redirect_uri(make_settings(tmp_path)) == f"{BASE_URL}/api/kroger/callback"

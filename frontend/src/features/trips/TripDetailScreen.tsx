@@ -6,7 +6,8 @@
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ShoppingCart } from "lucide-react";
+import { useState } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
@@ -18,6 +19,8 @@ import { showToast } from "../../lib/toast";
 import { rememberTrip } from "../../lib/trips";
 import { Button } from "../../ui/Button";
 import { Screen } from "../../ui/Screen";
+import { SendToCartSheet } from "../cart/SendToCartSheet";
+import { useKrogerAccount } from "../kroger/account";
 import { tripDate } from "./TripsScreen";
 
 type TripItem = components["schemas"]["TripItemOut"];
@@ -25,6 +28,8 @@ type TripItem = components["schemas"]["TripItemOut"];
 export function TripDetailScreen({ tripId }: { tripId: string }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [sending, setSending] = useState(false);
+  const account = useKrogerAccount();
   const trip = useQuery({
     queryKey: qk.trip(tripId),
     queryFn: async () =>
@@ -124,9 +129,23 @@ export function TripDetailScreen({ tripId }: { tripId: string }) {
             </Button>
           </>
         ) : (
-          <Button onClick={() => void navigate({ to: "/shop/$tripId", params: { tripId } })}>
-            Start shopping
-          </Button>
+          <>
+            <Button onClick={() => void navigate({ to: "/shop/$tripId", params: { tripId } })}>
+              Start shopping
+            </Button>
+            {account.data &&
+            (account.data.status !== "disconnected" || account.data.can_connect) ? (
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setSending(true);
+                }}
+              >
+                <ShoppingCart aria-hidden="true" />
+                Send to Kroger cart
+              </Button>
+            ) : null}
+          </>
         )}
         <Button
           variant="quiet"
@@ -140,6 +159,15 @@ export function TripDetailScreen({ tripId }: { tripId: string }) {
         </Button>
       </div>
 
+      {!finished ? (
+        <SendToCartSheet
+          tripId={tripId}
+          open={sending}
+          onClose={() => {
+            setSending(false);
+          }}
+        />
+      ) : null}
       {groups.map(([label, group]) =>
         group.length > 0 ? (
           <section key={label} aria-label={label} className="mb-6">

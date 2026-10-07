@@ -1,11 +1,13 @@
 /**
  * The List's bottom bar (UX §4.11): Save list freezes the list into a saved list; then Start
- * shopping. When the plan changes after saving, Update saved list brings the saved list up to
- * date (what's checked off stays). On a computer, Print sits beside them.
+ * shopping, or Send to Kroger cart to order it online (UX §5.5). When the plan changes after
+ * saving, Update saved list brings the saved list up to date (what's checked off stays). On a
+ * computer, Print sits beside them.
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { Printer } from "lucide-react";
+import { Printer, ShoppingCart } from "lucide-react";
+import { useState } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
@@ -14,13 +16,21 @@ import { photoUrls, rememberTrip, tripStore } from "../../lib/trips";
 import { enable as enableWakeLock } from "../../lib/wakeLock";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
+import { SendToCartSheet } from "../cart/SendToCartSheet";
+import { useKrogerAccount } from "../kroger/account";
 import { TotalFooter } from "../plan/TotalFooter";
 import type { PlanOut } from "../plan/types";
 
 export function ListActions({ plan }: { plan: PlanOut }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [sending, setSending] = useState(false);
+  const account = useKrogerAccount();
   const trip = plan.trip;
+  // Offered once a Kroger account is connected, or can be (the sheet explains connecting).
+  const canSend = account.data
+    ? account.data.status !== "disconnected" || account.data.can_connect
+    : false;
   const save = useMutation({
     mutationFn: async () => unwrap(await api.POST("/api/trips")),
     onSuccess: async (saved) => {
@@ -92,6 +102,27 @@ export function ListActions({ plan }: { plan: PlanOut }) {
         )}
         {print}
       </div>
+      {trip && canSend ? (
+        <>
+          <Button
+            variant="quiet"
+            className="-mx-5 self-start"
+            onClick={() => {
+              setSending(true);
+            }}
+          >
+            <ShoppingCart aria-hidden="true" />
+            Send to Kroger cart
+          </Button>
+          <SendToCartSheet
+            tripId={trip.id}
+            open={sending}
+            onClose={() => {
+              setSending(false);
+            }}
+          />
+        </>
+      ) : null}
     </div>
   );
 }

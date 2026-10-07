@@ -21,4 +21,6 @@ export const qk = {
   trips: () => ["trips"] as const,
   tripHistory: (before: string | null) => ["trips", "history", before] as const,
   trip: (id: string) => ["trips", "detail", id] as const,
+  cart: (tripId: string) => ["trips", "cart", tripId] as const,
+  krogerAccount: () => ["kroger", "account"] as const,
 };

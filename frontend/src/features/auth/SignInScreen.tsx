@@ -5,12 +5,14 @@ import { useId, useState } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
+import { normalizeCode } from "../../lib/joinCode";
 import { outbox } from "../../lib/outbox";
 import { rememberSignedIn } from "../../lib/session";
 import { BellMark } from "../../ui/BellMark";
 import { Button } from "../../ui/Button";
+import { useJoinWithCode } from "./useJoin";
 
-export function SignInScreen() {
+function PasswordForm({ onUseCode }: { onUseCode: () => void }) {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,59 +36,131 @@ export function SignInScreen() {
   });
 
   return (
+    <form
+      className="flex flex-col gap-3"
+      onSubmit={(event) => {
+        event.preventDefault();
+        setError(null);
+        signIn.mutate(password);
+      }}
+    >
+      <label htmlFor={inputId} className="text-body font-semibold">
+        Household password
+      </label>
+      <div className="flex gap-2">
+        <input
+          id={inputId}
+          type={visible ? "text" : "password"}
+          autoComplete="current-password"
+          autoCapitalize="none"
+          spellCheck={false}
+          value={password}
+          onChange={(event) => {
+            setPassword(event.target.value);
+          }}
+          aria-describedby={errorId}
+          aria-invalid={error ? true : undefined}
+          className="min-h-14 min-w-0 flex-1 rounded-button border-2 border-rule bg-paper px-4 text-body"
+        />
+        <Button
+          variant="secondary"
+          aria-label={visible ? "Hide password" : "Show password"}
+          aria-pressed={visible}
+          onClick={() => {
+            setVisible((v) => !v);
+          }}
+          className="min-h-14 w-14 px-0"
+        >
+          {visible ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+        </Button>
+      </div>
+      <p id={errorId} role="alert" className="min-h-7 text-secondary font-semibold text-tomato">
+        {error}
+      </p>
+      <Button type="submit" block disabled={signIn.isPending || password.length === 0}>
+        {signIn.isPending ? "Signing in…" : "Sign in"}
+      </Button>
+      <p className="mt-2 text-secondary text-ink-soft">
+        Ask whoever set up Dinner Bell for the password.
+      </p>
+      <Button variant="quiet" className="-ml-5 self-start" onClick={onUseCode}>
+        Use a code from another phone
+      </Button>
+    </form>
+  );
+}
+
+function CodeForm({ onUsePassword }: { onUsePassword: () => void }) {
+  const [code, setCode] = useState("");
+  const join = useJoinWithCode();
+  const inputId = useId();
+  const errorId = useId();
+  const hintId = useId();
+  const valid = normalizeCode(code);
+
+  return (
+    <form
+      className="flex flex-col gap-3"
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (valid) join.mutate(valid);
+      }}
+    >
+      <label htmlFor={inputId} className="text-body font-semibold">
+        Code from another phone
+      </label>
+      <input
+        id={inputId}
+        value={code}
+        maxLength={12}
+        autoComplete="one-time-code"
+        autoCapitalize="characters"
+        autoCorrect="off"
+        spellCheck={false}
+        onChange={(event) => {
+          setCode(event.target.value);
+        }}
+        aria-describedby={`${hintId} ${errorId}`}
+        aria-invalid={join.isError ? true : undefined}
+        className="min-h-14 rounded-button border-2 border-rule bg-paper px-4 text-title font-extrabold tracking-widest uppercase"
+      />
+      <p id={hintId} className="text-secondary text-ink-soft">
+        On a phone that’s already signed in, open More, then Settings, then Add a phone.
+      </p>
+      <p id={errorId} role="alert" className="min-h-7 text-secondary font-semibold text-tomato">
+        {join.isError ? errorMessage(join.error) : null}
+      </p>
+      <Button type="submit" block disabled={join.isPending || !valid}>
+        {join.isPending ? "Signing in…" : "Sign in"}
+      </Button>
+      <Button variant="quiet" className="-ml-5 self-start" onClick={onUsePassword}>
+        Use the password instead
+      </Button>
+    </form>
+  );
+}
+
+export function SignInScreen() {
+  const [mode, setMode] = useState<"password" | "code">("password");
+  return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-4 py-10">
       <div className="mb-10 flex flex-col items-center gap-4">
         <BellMark className="size-24" />
-        <p className="text-title font-extrabold">Dinner Bell</p>
+        <h1 className="text-title font-extrabold">Dinner Bell</h1>
       </div>
-      <form
-        className="flex flex-col gap-3"
-        onSubmit={(event) => {
-          event.preventDefault();
-          setError(null);
-          signIn.mutate(password);
-        }}
-      >
-        <label htmlFor={inputId} className="text-body font-semibold">
-          Household password
-        </label>
-        <div className="flex gap-2">
-          <input
-            id={inputId}
-            type={visible ? "text" : "password"}
-            autoComplete="current-password"
-            autoCapitalize="none"
-            spellCheck={false}
-            value={password}
-            onChange={(event) => {
-              setPassword(event.target.value);
-            }}
-            aria-describedby={errorId}
-            aria-invalid={error ? true : undefined}
-            className="min-h-14 min-w-0 flex-1 rounded-button border-2 border-rule bg-paper px-4 text-body"
-          />
-          <Button
-            variant="secondary"
-            aria-label={visible ? "Hide password" : "Show password"}
-            aria-pressed={visible}
-            onClick={() => {
-              setVisible((v) => !v);
-            }}
-            className="min-h-14 w-14 px-0"
-          >
-            {visible ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
-          </Button>
-        </div>
-        <p id={errorId} role="alert" className="min-h-7 text-secondary font-semibold text-tomato">
-          {error}
-        </p>
-        <Button type="submit" block disabled={signIn.isPending || password.length === 0}>
-          {signIn.isPending ? "Signing in…" : "Sign in"}
-        </Button>
-        <p className="mt-2 text-secondary text-ink-soft">
-          Ask whoever set up Dinner Bell for the password.
-        </p>
-      </form>
+      {mode === "password" ? (
+        <PasswordForm
+          onUseCode={() => {
+            setMode("code");
+          }}
+        />
+      ) : (
+        <CodeForm
+          onUsePassword={() => {
+            setMode("password");
+          }}
+        />
+      )}
     </main>
   );
 }

@@ -10,6 +10,7 @@ import { useEffect } from "react";
 
 import { api, ApiError, unwrap } from "./api/client";
 import { qk } from "./api/keys";
+import { JoinScreen } from "./features/auth/JoinScreen";
 import { SignInScreen } from "./features/auth/SignInScreen";
 import { WhoScreen } from "./features/auth/WhoScreen";
 import { ListScreen } from "./features/list/ListScreen";
@@ -17,6 +18,8 @@ import { MealDetailScreen } from "./features/meals/MealDetailScreen";
 import { EditMealScreen, NewMealScreen } from "./features/meals/MealEditor";
 import { MealsScreen } from "./features/meals/MealsScreen";
 import type { Role } from "./features/meals/types";
+import { connectResult, type ConnectResult } from "./features/kroger/account";
+import { KrogerDoneScreen } from "./features/kroger/KrogerDoneScreen";
 import { MoreScreen } from "./features/more/MoreScreen";
 import { FirstRunScreen, type FirstRunStep } from "./features/onboarding/FirstRunScreen";
 import { InstallScreen } from "./features/onboarding/InstallScreen";
@@ -152,6 +155,30 @@ const installRoute = createRoute({
   validateSearch: (search: Record<string, unknown>): { from?: "more" } =>
     search.from === "more" ? { from: "more" } : {},
   component: InstallScreen,
+});
+
+/** Connect Kroger finished in another browser (an iPhone's home-screen app can do that). */
+const krogerDoneRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/kroger-done",
+  validateSearch: (search: Record<string, unknown>): { result: ConnectResult } => ({
+    result: connectResult(search.result) ?? "failed",
+  }),
+  component: function KrogerDone() {
+    const { result } = krogerDoneRoute.useSearch();
+    return <KrogerDoneScreen result={result} />;
+  },
+});
+
+/** A scanned Add-a-phone QR code: `/join#<code>` (Settings → Add a phone). */
+const joinRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/join",
+  beforeLoad: async ({ context }) => {
+    const session = await currentSession(context.queryClient);
+    if (session && session !== "offline") throw redirect({ to: "/" });
+  },
+  component: JoinScreen,
 });
 
 const signInRoute = createRoute({
@@ -296,7 +323,14 @@ const moreRoute = createRoute({
 const settingsRoute = createRoute({
   getParentRoute: () => tabsRoute,
   path: "/settings",
-  component: SettingsScreen,
+  validateSearch: (search: Record<string, unknown>): { kroger?: ConnectResult } => {
+    const result = connectResult(search.kroger);
+    return result ? { kroger: result } : {};
+  },
+  component: function Settings() {
+    const { kroger } = settingsRoute.useSearch();
+    return <SettingsScreen kroger={kroger} />;
+  },
 });
 const tripsRoute = createRoute({
   getParentRoute: () => tabsRoute,
@@ -324,6 +358,8 @@ const aboutRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   installRoute,
+  krogerDoneRoute,
+  joinRoute,
   signInRoute,
   signedRoute.addChildren([
     whoRoute,

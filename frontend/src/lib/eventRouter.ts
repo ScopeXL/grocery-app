@@ -63,6 +63,11 @@ export function createEventHandler(queryClient: QueryClient, onSignedOut: () => 
         invalidate(qk.settings());
         invalidate(qk.session());
         invalidate(qk.activeStore());
+        invalidate(qk.krogerAccount()); // connected, disconnected, or "reconnect"
+        break;
+      case "cart.changed":
+        // Items going to the Kroger cart, from this phone or another.
+        if (typeof event.trip_id === "string") invalidate(qk.cart(event.trip_id));
         break;
       case "dishes.changed":
         // A dish's lines feed the list.

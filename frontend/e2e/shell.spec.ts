@@ -1,4 +1,4 @@
-import { expect, signIn, test } from "./fixtures";
+import { expect, openSettings, signIn, test } from "./fixtures";
 
 test("every tab teaches what goes there", async ({ page }) => {
   await signIn(page);
@@ -39,7 +39,7 @@ test("nothing scrolls sideways at phone width", async ({ page, isMobile }) => {
 
 test("settings shows the version and a live connection", async ({ page }) => {
   await signIn(page);
-  await page.goto("/settings");
+  await openSettings(page);
   await expect(page.getByTestId("version")).toContainText("Version");
   await expect(page.getByTestId("live-status")).toHaveText("Live updates: connected");
 });
@@ -49,9 +49,9 @@ test("a change on one phone appears on another without refreshing", async ({ pag
   const other = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const otherPage = await other.newPage();
   await signIn(otherPage, "Sample Kid");
-  await page.goto("/settings");
+  await openSettings(page);
   await expect(page.getByTestId("live-status")).toHaveText("Live updates: connected");
-  await otherPage.goto("/settings");
+  await openSettings(otherPage);
   await otherPage.getByLabel("Add a person").fill("Mia");
   await otherPage.getByRole("button", { name: "Add", exact: true }).click();
   await expect(page.getByText("Mia", { exact: true })).toBeVisible({ timeout: 3000 });
@@ -60,7 +60,7 @@ test("a change on one phone appears on another without refreshing", async ({ pag
 
 test("removing a person can be undone", async ({ page }) => {
   await signIn(page);
-  await page.goto("/settings");
+  await openSettings(page);
   await page.getByLabel("Add a person").fill("Mia");
   await page.getByRole("button", { name: "Add", exact: true }).click();
   await page.getByRole("button", { name: "Remove Mia" }).click();

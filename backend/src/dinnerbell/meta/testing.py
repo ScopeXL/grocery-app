@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 from fastapi import APIRouter
+from pydantic import BaseModel
 from sqlalchemy import delete, update
 
 from dinnerbell.auth.models import Device, JoinCode
 from dinnerbell.catalog.models import Item
 from dinnerbell.household.models import AppMeta, Household, Member
+from dinnerbell.kroger.client import KrogerCartUnknownError, KrogerRequestError
+from dinnerbell.kroger.fake import FakeKroger
 from dinnerbell.kroger.models import (
     KrogerApiUsage,
     KrogerOAuthState,
@@ -82,6 +85,8 @@ async def reset(state: StateDep) -> None:
     state.auth.last_seen_written.clear()
     state.limiter.reset()
     state.catalog.forget()
+    if isinstance(state.kroger, FakeKroger):
+        state.kroger.reset_account()
     state.hub.drop_all()
 
 
@@ -97,3 +102,36 @@ async def revoke_sessions(state: StateDep) -> None:
         meta = await tx.session.get(AppMeta, 1)
         epoch = meta.auth_epoch if meta else state.auth.epoch + 1
     state.auth.epoch = epoch
+
+
+class FakeCartIn(BaseModel):
+    reject_upcs: list[str] = []  # Kroger says no (400)
+    no_answer_upcs: list[str] = []  # no clear answer (a timeout)
+
+
+class FakeCartItem(BaseModel):
+    upc: str
+    quantity: int
+    modality: str
+
+
+@router.put("/fake-cart", status_code=204)
+async def set_fake_cart(body: FakeCartIn, state: StateDep) -> None:
+    """How the sample cart answers each product from now on."""
+    assert isinstance(state.kroger, FakeKroger)
+    failures: dict[str, KrogerRequestError | KrogerCartUnknownError] = {
+        upc: KrogerRequestError(400) for upc in body.reject_upcs
+    }
+    failures |= {upc: KrogerCartUnknownError("timeout") for upc in body.no_answer_upcs}
+    state.kroger.cart_failures.clear()
+    state.kroger.cart_failures.update(failures)
+
+
+@router.get("/fake-cart")
+async def get_fake_cart(state: StateDep) -> list[FakeCartItem]:
+    """What has landed in the sample cart."""
+    assert isinstance(state.kroger, FakeKroger)
+    return [
+        FakeCartItem(upc=item.upc, quantity=item.quantity, modality=item.modality.value)
+        for item in state.kroger.cart
+    ]

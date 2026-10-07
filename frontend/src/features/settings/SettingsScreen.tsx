@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ChevronRight, Download, LogOut } from "lucide-react";
-import { useId, useState, type ReactNode } from "react";
+import { ChevronRight, Download, LogOut, Smartphone } from "lucide-react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
@@ -13,7 +13,10 @@ import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { MemberBadge } from "../../ui/MemberBadge";
 import { Screen, Section } from "../../ui/Screen";
+import { CONNECT_RESULTS, type ConnectResult } from "../kroger/account";
 import { ChooseStore } from "../stores/ChooseStore";
+import { AddPhoneSheet } from "./AddPhoneSheet";
+import { KrogerAccountSection } from "./KrogerAccountSection";
 
 const LIVE_TEXT: Record<LiveStatus, string> = {
   live: "Live updates: connected",
@@ -238,6 +241,7 @@ function Devices() {
     queryFn: async () => unwrap(await api.GET("/api/auth/devices")),
   });
   const others = (devices.data ?? []).filter((device) => !device.is_current).length;
+  const [adding, setAdding] = useState(false);
   const signOutOthers = useMutation({
     mutationFn: async () => {
       unwrap(await api.POST("/api/auth/devices/sign-out-others"));
@@ -264,18 +268,34 @@ function Devices() {
           </div>
         </Row>
       ))}
-      {others > 0 ? (
-        <Row>
+      <Row>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            setAdding(true);
+          }}
+        >
+          <Smartphone aria-hidden="true" />
+          Add a phone
+        </Button>
+        {others > 0 ? (
           <Button
-            variant="secondary"
+            variant="quiet"
             onClick={() => {
               signOutOthers.mutate();
             }}
           >
             Sign out other devices
           </Button>
-        </Row>
-      ) : null}
+        ) : null}
+      </Row>
+      <AddPhoneSheet
+        open={adding}
+        onClose={() => {
+          setAdding(false);
+          void queryClient.invalidateQueries({ queryKey: qk.devices() });
+        }}
+      />
     </Section>
   );
 }
@@ -385,12 +405,20 @@ function About() {
   );
 }
 
-export function SettingsScreen() {
+export function SettingsScreen({ kroger }: { kroger?: ConnectResult | undefined }) {
+  const navigate = useNavigate();
+  useEffect(() => {
+    // Back from Kroger's sign-in page: say how it went, once.
+    if (!kroger) return;
+    showToast(CONNECT_RESULTS[kroger]);
+    void navigate({ to: "/settings", search: {}, replace: true });
+  }, [kroger, navigate]);
   return (
     <Screen title="Settings">
       <StoreSettings />
       <ThisPhone />
       <Household />
+      <KrogerAccountSection />
       <Devices />
       <Data />
       <Connection />

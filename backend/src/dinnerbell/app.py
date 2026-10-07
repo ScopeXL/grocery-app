@@ -76,7 +76,7 @@ def redirect_uri(settings: Settings) -> str | None:
     registered on the Kroger app); the demo sign-in always comes back to this server."""
     if settings.kroger_mode is KrogerMode.FAKE:
         return settings.kroger_redirect_uri or settings.expected_redirect_uri
-    return settings.kroger_redirect_uri
+    return settings.kroger_redirect_uri or None  # a stack may pass it through empty
 
 
 async def load_auth_state(db: Database) -> AuthState:

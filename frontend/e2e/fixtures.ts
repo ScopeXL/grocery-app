@@ -84,3 +84,10 @@ export async function chooseStore(page: Page): Promise<void> {
   });
   expect(response.status()).toBe(200);
 }
+
+/** More → Settings with in-app links: a page.goto mid-request is a page error on WebKit. */
+export async function openSettings(page: Page): Promise<void> {
+  await page.getByRole("link", { name: "More", exact: true }).click();
+  await page.getByRole("link", { name: "Settings" }).click();
+  await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
+}

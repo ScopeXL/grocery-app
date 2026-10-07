@@ -1,4 +1,4 @@
-import { expect, signIn, test } from "./fixtures";
+import { expect, openSettings, signIn, test } from "./fixtures";
 
 test("iPhone in Safari sees the install guide before signing in", async ({
   page,
@@ -33,7 +33,7 @@ test("sign in, pick your name, and stay signed in", async ({ page }) => {
 
 test("signing out returns to the sign-in screen", async ({ page }) => {
   await signIn(page);
-  await page.goto("/settings");
+  await openSettings(page);
   await page.getByRole("button", { name: "Sign out of this phone" }).click();
   await expect(page).toHaveURL(/\/sign-in$/);
   await page.goto("/");
