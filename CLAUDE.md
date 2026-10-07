@@ -167,4 +167,5 @@ Add one line each time something surprising costs time: the symptom, the cause, 
 - A list printed from dark mode was near-white on white paper: the dark tokens applied to print too. The dark theme is `@media screen and (prefers-color-scheme: dark)`.
 - e2e totals drifted as the fake store's sales expired on the real clock: fixture sale dates now move with the clock (`kroger/fake.py`, `FIXTURE_DAY`).
 - WebKit e2e runs failed with page errors "… due to access control checks": a hard reload (`page.goto`) cut off a request still in flight. Move between screens with in-app links, or wait for the screen's data before reloading.
+- A test passed all morning, then failed at 14:00 UTC: rows took `created_at` from the wall clock (`default=utcnow`) while the test moved the fake `Clock`, so they matched only until real time passed the fake start. Stamp anything a time rule reads with `state.clock.now()`.
 - The 0.1.0 push failed after tagging ("could not read Username"): the HTTPS remote had no saved login. The remote is now SSH, preflight dry-runs the push, and `release-tag` resumes. Auto mode blocks Claude from changing a git remote; that's the owner's step.
