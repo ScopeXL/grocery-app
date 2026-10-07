@@ -7,7 +7,7 @@ Dinner Bell is a household meal-planning and grocery-list PWA:
 
 It is built and maintained entirely by AI sessions. Most of its users aren't technical and use it on a phone, often in a store aisle with weak signal.
 
-**Status:** M0 to M5 shipped (0.6.0: Send to Kroger cart, Add a phone, the illustrated install guide). M6, the owner's polish from the first week of use (ADRs 0026 and 0027), is built and ships as 0.7.0 when the owner says deploy. 1.0.0 is the owner's call, and new work comes from the owner (docs/PLAN.md §15 lists ideas beyond v1). See docs/PLAN.md §12 for what each milestone delivered.
+**Status:** M0 to M6 shipped (0.7.0: the owner's polish from the first week of use, ADRs 0026 and 0027). Every planned milestone is done; 1.0.0 is the owner's call, and new work comes from the owner (docs/PLAN.md §15 lists ideas beyond v1). See docs/PLAN.md §12 for what each milestone delivered.
 
 **Read first:**
 - [`docs/PLAN.md`](docs/PLAN.md): what we're building and how, plus milestones. It's long, so start from its contents list and read only the sections your task touches.
