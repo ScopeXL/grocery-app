@@ -1,7 +1,4 @@
-"""Property tests (PLAN §8.6): 1 to 12 and 14, the picker promise, and a naive cross-check.
-
-Property 13 (recommendations) arrives with recommend.py in M4.
-"""
+"""Property tests (PLAN §8.6): 1 to 14, the picker promise, and a naive cross-check."""
 
 from __future__ import annotations
 
@@ -50,6 +47,13 @@ from dinnerbell.domain.money import (
     promo_valid,
 )
 from dinnerbell.domain.rational import ceil_to, q, round_half_up, to_text
+from dinnerbell.domain.recommend import (
+    Candidate,
+    Recommendation,
+    marginal_cost,
+    meal_for,
+    recommend,
+)
 from dinnerbell.domain.sizes import PackageSize, Unparseable, format_size, parse_size
 from dinnerbell.domain.totals import Totals
 from dinnerbell.domain.units import DimensionMismatch, Quantity, Unit, convert
@@ -57,6 +61,7 @@ from tests.domain.builders import NOW, dish, meal, offered_amounts, packages, pl
 from tests.domain.strategies import (
     ITEM_IDS,
     amounts,
+    candidate_dishes,
     items,
     new_meals,
     package_sizes,
@@ -65,6 +70,7 @@ from tests.domain.strategies import (
     prices,
     products,
     quantities,
+    recommendation_cases,
     size_texts,
 )
 
@@ -107,13 +113,11 @@ def test_2_converting_there_and_back_is_identical(x: Quantity, unit: Unit) -> No
 
 # ---- 14: every public constructor rejects floats ------------------------------------------------
 
-BASE_LINE = build_list(
-    plan_input(
-        [meal("meal-1", dish("Tacos", ("cheese", packages("1/2"))))],
-        {"cheese": (Item("cheese", "Sample Shredded Cheddar"), product("16 oz"))},
-    ),
-    NOW,
-).lines[0]
+BASE_PLAN = plan_input(
+    [meal("meal-1", dish("Tacos", ("cheese", packages("1/2"))))],
+    {"cheese": (Item("cheese", "Sample Shredded Cheddar"), product("16 oz"))},
+)
+BASE_LINE = build_list(BASE_PLAN, NOW).lines[0]
 
 FLOAT_TAKERS: dict[str, Callable[[Any], object]] = {
     "q": q,
@@ -144,6 +148,9 @@ FLOAT_TAKERS: dict[str, Callable[[Any], object]] = {
     "Line.quantity": lambda f: replace(BASE_LINE, quantity=f),
     "Line.cost_cents": lambda f: replace(BASE_LINE, cost_cents=f),
     "quantity_words": lambda f: quantity_words(PurchaseUnit.POUND, f, None),
+    "Candidate.last_made": lambda f: Candidate(Dish("dish-1", "Tacos"), "main", last_made=f),
+    "Recommendation": lambda f: Recommendation("dish-1", "Tacos", f, 0, 100, ("Cheese",), 0, ""),
+    "recommend(limit)": lambda f: recommend(BASE_PLAN, [], NOW, limit=f),
 }
 
 
@@ -285,12 +292,24 @@ def test_6_adding_a_meal_never_lowers_anything(plan: PlanInput, more: Meal) -> N
     assert after.totals.not_priced >= before.totals.not_priced
 
 
+def _total(plan: PlanInput) -> int:
+    return build_list(plan, NOW).totals.total
+
+
 @settings(max_examples=100)
-@given(plans(), new_meals())
-def test_7_a_meal_never_costs_less_than_nothing(plan: PlanInput, more: Meal) -> None:
+@given(plans(), candidate_dishes())
+def test_7_marginal_cost_is_what_the_dish_adds(plan: PlanInput, d: Dish) -> None:
     plan = _without_negative_pound_overrides(plan)
-    added = build_list(plan.with_meal(more), NOW).totals.total - build_list(plan, NOW).totals.total
-    assert added >= 0  # marginal_cost itself comes with recommend.py (M4)
+    added, unpriced = marginal_cost(plan, d, NOW)
+    assert 0 <= added == _total(plan.with_meal(meal_for(d))) - _total(plan)
+    assert unpriced >= 0
+
+
+@settings(max_examples=100)
+@given(plans(), candidate_dishes())
+def test_7_marginal_cost_is_never_below_zero(plan: PlanInput, d: Dish) -> None:
+    added, _ = marginal_cost(plan, d, NOW)  # any overrides: a negative difference is clamped
+    assert added == max(0, _total(plan.with_meal(meal_for(d))) - _total(plan))
 
 
 # ---- 8: need scales with the meal ----------------------------------------------------------------
@@ -466,3 +485,24 @@ def test_the_list_agrees_with_a_naive_reference(plan: PlanInput) -> None:
         assert line.cost_cents == cost
         expected_total += cost or 0
     assert shopping.totals.total == expected_total
+
+
+# ---- 13: recommendations -------------------------------------------------------------------------
+
+
+@settings(max_examples=150)
+@given(recommendation_cases(), st.integers(min_value=0, max_value=4), st.randoms())
+def test_13_recommendations_are_deterministic_limited_and_worth_naming(
+    case: tuple[PlanInput, list[Candidate]], limit: int, rnd: random.Random
+) -> None:
+    plan, candidates = case
+    pool = [*candidates, *(Candidate(m.main, "main") for m in plan.meals)]  # planned: left out
+    found = recommend(plan, pool, NOW, limit=limit)
+    assert recommend(plan, rnd.sample(pool, len(pool)), NOW, limit=limit) == found
+    assert len(found) <= limit
+    left_out = {c.dish.id for c in pool if c.role != "main" or c.archived}
+    left_out |= {m.main.id for m in plan.meals}
+    for r in found:
+        assert r.named and r.value_cents >= 100
+        assert r.dish_id not in left_out
+        assert r.text.startswith(f"{r.name} uses your leftover ")

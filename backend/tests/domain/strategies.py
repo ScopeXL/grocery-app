@@ -6,7 +6,7 @@ Quantities are fractions with denominators up to 64; prices are 1 to 5000 cents.
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import date, timedelta
 from fractions import Fraction
 
 from hypothesis import strategies as st
@@ -27,6 +27,7 @@ from dinnerbell.domain.models import (
     SoldBy,
 )
 from dinnerbell.domain.money import PriceInfo
+from dinnerbell.domain.recommend import ROLES, Candidate
 from dinnerbell.domain.sizes import Container, PackageSize, format_size
 from dinnerbell.domain.units import Dimension, Quantity, Unit
 from tests.domain.builders import NOW, SIZE_CORPUS, offered_amounts
@@ -234,3 +235,49 @@ def new_meals(draw: st.DrawFn) -> Meal:
     return Meal(
         "meal-new", Dish("dish-new", "Sample new dish", lines), (), draw(st.sampled_from(SCALES))
     )
+
+
+# ---- recommendation candidates (M4) --------------------------------------------------------------
+
+
+@st.composite
+def candidate_dishes(
+    draw: st.DrawFn, dish_id: str = "candidate-0", plan: PlanInput | None = None
+) -> Dish:
+    """A dish over the plan's 5 items, so it often shares what the plan leaves over. With
+    ``plan``, its amounts are ones the picker offers for that plan's items and products."""
+
+    def amount_for(item_id: str) -> Amount:
+        if plan is None:
+            return draw(amounts())
+        options = amount_options(plan.items[item_id], plan.products.get(item_id))
+        return draw(st.sampled_from(offered_amounts(options)))
+
+    used = draw(st.lists(st.sampled_from(ITEM_IDS), max_size=5))
+    lines = tuple(DishLine(item_id, amount_for(item_id)) for item_id in used)
+    return Dish(dish_id, draw(st.sampled_from(DISH_NAMES)), lines)
+
+
+@st.composite
+def candidate_lists(draw: st.DrawFn, plan: PlanInput | None = None) -> list[Candidate]:
+    return [
+        Candidate(
+            draw(candidate_dishes(f"candidate-{n}", plan)),
+            draw(st.sampled_from((*ROLES, "main", "main"))),  # mostly mains
+            archived=draw(st.sampled_from((False, False, False, True))),
+            favorite=draw(st.booleans()),
+            last_made=draw(st.none() | st.dates(date(2026, 1, 1), date(2026, 10, 6))),
+        )
+        for n in range(draw(st.integers(0, 6)))
+    ]
+
+
+def recommendation_cases() -> st.SearchStrategy[tuple[PlanInput, list[Candidate]]]:
+    """A plan and candidates for it: readable unit-sold plans, where leftovers are common and
+    priced, mixed with plans of every kind."""
+
+    def with_candidates(plan: PlanInput) -> st.SearchStrategy[tuple[PlanInput, list[Candidate]]]:
+        return st.tuples(st.just(plan), candidate_lists(plan))
+
+    readable = plans(unit_sold_only=True, adjust=False).flatmap(with_candidates)
+    return st.one_of(readable, readable, plans().flatmap(with_candidates))
