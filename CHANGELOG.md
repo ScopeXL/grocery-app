@@ -35,6 +35,7 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
   shows a small spinner. With Reduce Motion on, nothing moves.
 - Sheets slide up when they open and slide away when they close. Messages at the bottom rise in and
   ease out, and no more than three show at once.
+- In shopping mode, a checked item folds away into Done once its marker line is drawn.
 
 ### Fixed
 
@@ -43,6 +44,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
   and you can change it. Picking a product you already use adds that item again instead of a
   copy.
 - Undo works while a sheet is open: its message used to sit behind the sheet, out of reach.
+- Checking off the last item in an aisle now shows its marker line too; the row used to vanish at
+  once.
 - In dark mode, Undo and Refresh on the messages at the bottom of the screen are readable again.
 - The bar above the tabs no longer tucks slightly under them.
 

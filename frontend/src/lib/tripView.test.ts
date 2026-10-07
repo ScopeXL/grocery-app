@@ -279,3 +279,33 @@ describe("deriveView: progress and money", () => {
     expect(names(view.done)).toEqual(["Bread", "Milk", "Eggs"]);
   });
 });
+
+describe("deriveView: rows checked a moment ago", () => {
+  const items = [
+    item("Beef", {
+      section_key: "aisle:0",
+      section_label: "Meat",
+      section_order: 500,
+      state: "done",
+      state_ts: 5,
+    }),
+    item("Beans", { section_key: "aisle:9", section_label: "Aisle 9", section_order: 1009 }),
+  ];
+
+  it("keep their place, even as their section's last row, and count as checked", () => {
+    const view = deriveView(trip(items), [], "aisle", { lingering: new Set(["Beef"]) });
+    expect(view.groups.map((group) => [group.label, names(group.items)])).toEqual([
+      ["Meat", ["Beef"]],
+      ["Aisle 9", ["Beans"]],
+    ]);
+    expect(view.done).toEqual([]);
+    expect(view.doneCount).toBe(1);
+    expect(view.inCartCents).toBe(100);
+  });
+
+  it("join Done once they've folded away", () => {
+    const view = deriveView(trip(items), [], "aisle");
+    expect(view.groups.map((group) => group.label)).toEqual(["Aisle 9"]);
+    expect(names(view.done)).toEqual(["Beef"]);
+  });
+});

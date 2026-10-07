@@ -37,9 +37,9 @@ export interface TripView {
   status: TripStatus;
   /** A finish or reopen is waiting to be sent ("will sync"). */
   statusPending: boolean;
-  /** To-do items only: sections in walking order, or meals. */
+  /** To-do items (and any lingering ones): sections in walking order, or meals. */
   groups: ViewGroup[];
-  /** Checked off, the most recent first. */
+  /** Checked off, the most recent first; a lingering row joins once it has folded away. */
   done: ViewItem[];
   /** Couldn't find, in walking order. */
   missed: ViewItem[];
@@ -60,6 +60,11 @@ export interface TripView {
 export interface ViewOptions {
   /** The member using this phone: unsent check-offs are drawn as theirs. */
   me?: string | null | undefined;
+  /**
+   * Rows checked off on this phone a moment ago: they keep their place in their section or meal
+   * while the marker stroke draws and the row folds away (UX §7.6), and join Done after.
+   */
+  lingering?: ReadonlySet<string> | undefined;
 }
 
 export const OTHER_SECTION = { key: "cat:other", label: "Other" } as const;
@@ -202,9 +207,13 @@ export function deriveView(
     }
   }
 
+  const lingering = options.lingering ?? new Set<string>();
   const everything = [...items.values()];
-  const todo = everything.filter((item) => item.state === "todo");
-  const done = everything.filter((item) => item.state === "done").sort(mostRecentFirst);
+  const checked = everything.filter((item) => item.state === "done");
+  const listed = everything.filter(
+    (item) => item.state === "todo" || (item.state === "done" && lingering.has(item.id)),
+  );
+  const done = checked.filter((item) => !lingering.has(item.id)).sort(mostRecentFirst);
   const missed = everything.filter((item) => item.state === "missed").sort(walkingOrder);
   const header: TripHeader = statusPending
     ? { ...trip.header, status, status_ts: statusTs, actual_total_cents: actualTotal }
@@ -215,14 +224,14 @@ export function deriveView(
     header,
     status,
     statusPending,
-    groups: grouping === "aisle" ? byAisle(todo) : byMeal(todo, everything),
+    groups: grouping === "aisle" ? byAisle(listed) : byMeal(listed, everything),
     done,
     missed,
-    doneCount: done.length,
+    doneCount: checked.length,
     missedCount: missed.length,
-    handledCount: done.length + missed.length,
+    handledCount: checked.length + missed.length,
     total: everything.length,
-    inCartCents: done.reduce((sum, item) => sum + (item.line_cents ?? 0), 0),
+    inCartCents: checked.reduce((sum, item) => sum + (item.line_cents ?? 0), 0),
     estimateCents: trip.header.estimate_cents,
     pendingCount: mine.length,
   };
@@ -237,8 +246,9 @@ export function useTripView(
   const trip = useLocalTrip(tripId);
   const pending = usePendingOps(tripId);
   const me = options.me ?? null;
+  const lingering = options.lingering;
   return useMemo(
-    () => (trip ? deriveView(trip, pending, grouping, { me }) : undefined),
-    [trip, pending, grouping, me],
+    () => (trip ? deriveView(trip, pending, grouping, { me, lingering }) : undefined),
+    [trip, pending, grouping, me, lingering],
   );
 }

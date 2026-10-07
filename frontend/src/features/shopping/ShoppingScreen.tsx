@@ -7,7 +7,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ChevronDown, ChevronLeft } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { qk } from "../../api/keys";
 import type { components } from "../../api/schema";
@@ -33,7 +33,16 @@ import { ShopRow } from "./ShopRow";
 
 type TripItem = components["schemas"]["TripItemOut"];
 const GROUPING_KEY = "dinnerbell.shop.grouping";
-const LINGER_MS = 450; // the stroke draws (250 ms), then the row moves to Done
+// A row just checked here stays while its stroke draws, then folds away (styles/motion.css's
+// exit time) and moves to Done.
+const STRIKE_MS = 250;
+const FOLD_MS = 180;
+
+/** A row just checked off on this phone: which check-off, and whether it's folding away yet. */
+interface Linger {
+  checkOff: number;
+  folding: boolean;
+}
 const SLOW_SYNC_MS = 1500;
 
 function savedGrouping(): Grouping {
@@ -49,12 +58,14 @@ export function ShoppingScreen({ tripId }: { tripId: string }) {
   const [grouping, setGrouping] = useState<Grouping>(savedGrouping);
   const session = useQuery({ queryKey: qk.session(), queryFn: fetchSession });
   const me = session.data?.member ?? null;
+  const [lingering, setLingering] = useState<Record<string, Linger>>({});
+  const checkOffs = useRef(0);
+  const lingeringIds = useMemo(() => new Set(Object.keys(lingering)), [lingering]);
   // Unsent check-offs are this phone's, so they draw in this person's color.
-  const view = useTripView(tripId, grouping, { me: me?.id ?? null });
+  const view = useTripView(tripId, grouping, { me: me?.id ?? null, lingering: lingeringIds });
   const reachable = useStore(connection).server !== "unreachable";
   const [openId, setOpenId] = useState<string | null>(null);
   const [finishing, setFinishing] = useState(false);
-  const [lingering, setLingering] = useState<Record<string, number>>({});
   const [downloaded, setDownloaded] = useState<"pending" | "ok" | "failed">("pending");
   useKeepAwake(view?.status === "active");
   // Check-off toasts (with their Undo) belong to this screen.
@@ -108,12 +119,23 @@ export function ShoppingScreen({ tripId }: { tripId: string }) {
     void outbox.setState(tripId, item.id, state);
     setOpenId(null);
     if (state === "done") {
-      setLingering((current) => ({ ...current, [item.id]: Date.now() }));
+      // Each step checks it's still this check-off: an uncheck and a new check start over.
+      const checkOff = ++checkOffs.current;
+      setLingering((current) => ({ ...current, [item.id]: { checkOff, folding: false } }));
       setTimeout(() => {
         setLingering((current) =>
-          Object.fromEntries(Object.entries(current).filter(([id]) => id !== item.id)),
+          current[item.id]?.checkOff === checkOff
+            ? { ...current, [item.id]: { checkOff, folding: true } }
+            : current,
         );
-      }, LINGER_MS);
+      }, STRIKE_MS);
+      setTimeout(() => {
+        setLingering((current) =>
+          current[item.id]?.checkOff === checkOff
+            ? Object.fromEntries(Object.entries(current).filter(([id]) => id !== item.id))
+            : current,
+        );
+      }, STRIKE_MS + FOLD_MS);
     }
     const message =
       state === "done"
@@ -129,7 +151,7 @@ export function ShoppingScreen({ tripId }: { tripId: string }) {
     });
   };
 
-  const groups = withLingering(view, lingering);
+  const groups = view.groups;
 
   return (
     <main className="mx-auto min-h-dvh w-full max-w-3xl pb-44">
@@ -186,6 +208,7 @@ export function ShoppingScreen({ tripId }: { tripId: string }) {
                   item={item}
                   checkedBy={checker(item)}
                   striking={item.id in lingering}
+                  folding={item.state === "done" && lingering[item.id]?.folding === true}
                   onCheck={() => {
                     setState(item, item.state === "done" ? "todo" : "done");
                   }}
@@ -296,29 +319,12 @@ export function ShoppingScreen({ tripId }: { tripId: string }) {
 }
 
 function pendingFor(view: TripView, itemId: string): boolean {
+  // A row checked a moment ago is still in its group (lingering), not in Done yet.
+  const shown = [...view.done, ...view.groups.flatMap((group) => group.items)];
   return (
-    view.trip.items[itemId] !== undefined && view.done.some((i) => i.id === itemId && i.pending)
+    view.trip.items[itemId] !== undefined &&
+    shown.some((i) => i.id === itemId && i.state === "done" && i.pending)
   );
-}
-
-/** Rows just checked here stay in place while their stroke draws, then move to Done. */
-function withLingering(view: TripView, lingering: Record<string, number>): TripView["groups"] {
-  const ids = Object.keys(lingering);
-  if (ids.length === 0) return view.groups;
-  const groups = view.groups.map((group) => ({ ...group, items: [...group.items] }));
-  for (const id of ids) {
-    const item = view.done.find((done) => done.id === id);
-    if (!item) continue;
-    const key = item.section_key ?? "cat:other";
-    const group = groups.find((g) => g.key === key || g.items.some((i) => i.section_key === key));
-    if (group) {
-      group.items.push(item);
-      group.items.sort(
-        (a, b) => a.bay - b.bay || a.name.localeCompare(b.name) || a.id.localeCompare(b.id),
-      );
-    }
-  }
-  return groups;
 }
 
 /**

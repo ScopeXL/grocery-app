@@ -341,7 +341,7 @@ A live preview line shows the share and the cost.
 - **Each row:** a 64 px product photo tile; the name in bold; the quantity and size ("2 boxes, 16 oz each"); a 48 px checkbox at the right edge, in a 72 px-wide tap column.
 - **Checking an item** (tapping the checkbox):
   1. A marker line is drawn through the name in the checker's color (§7.6).
-  2. The row slides into the collapsed **Done** group.
+  2. The row keeps its place while the line draws (even as the last row in its aisle), then folds away and joins the collapsed **Done** group. The count and the "In cart" total change at once.
   3. A toast says "Checked off Penne pasta", with Undo.
 - **Tapping elsewhere on the row** opens big buttons: **Got it**, **Couldn't find**, **Add a note**, **Open in Kroger**.
 - **Couldn't find** moves the row to the **Couldn't find** group at the end, where **Try again** puts it back.
@@ -549,7 +549,7 @@ Defined once in `frontend/src/styles/tokens.css` (Tailwind v4 `@theme`). Compone
 
 - **The signature moment:**
   1. A slightly wobbly marker stroke (SVG path, randomized per row within a small range) draws left to right through the item name in 250 ms, in the checker's color.
-  2. The row then slides into Done (200 ms).
+  2. The row then folds away (180 ms) and joins Done.
 - **Other motion only answers an action** (sheets opening, a toast appearing, a list reordering) and shows what changed. No decorative entrance animations, and nothing moves on first paint or a tab switch.
 - **How it's built** (ADR 0027): all of it is CSS in `styles/motion.css`, with the timing tokens tap 90 ms, quick 150 ms, enter 220 ms and exit 180 ms. Components only toggle attributes or wait on `getAnimations()`.
 - **`prefers-reduced-motion`:** everything is instant, including backdrops and delays: the strike appears at once, rows move without sliding, a press shades without dipping, and spinners and placeholders stand still.

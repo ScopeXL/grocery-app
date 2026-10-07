@@ -110,6 +110,31 @@ dialog.sheet[data-closing]::backdrop {
   }
 }
 
+/*
+ * Shopping (UX §7.6): a row checked off here keeps its place while the marker stroke draws,
+ * then folds away (its one grid row shrinks to nothing) and moves to Done. It clips only while
+ * folding, so focus rings aren't cut off otherwise.
+ */
+.fold {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows var(--motion-exit) var(--ease-leave),
+    opacity var(--motion-exit) var(--ease-leave),
+    border-color var(--motion-exit) var(--ease-leave);
+}
+.fold > * {
+  min-height: 0;
+}
+.fold[data-folding] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  border-bottom-color: transparent;
+}
+.fold[data-folding] > * {
+  overflow: hidden;
+}
+
 /* Reduce Motion: everything instant. 0.01 ms rather than 0, so every animation still runs to
    its end (and the sheets' close still sees one finish). */
 @media (prefers-reduced-motion: reduce) {

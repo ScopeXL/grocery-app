@@ -413,3 +413,23 @@ test("saved with signal, opened without: still ready for the store", async ({ pa
   await checkOff(page, "Ground beef");
   await expect(page.getByTestId("progress")).toHaveText("1 of 3");
 });
+
+test("a row checked here folds out of its aisle into Done; its checkbox is a big target", async ({
+  page,
+}) => {
+  await signIn(page);
+  await savedTrip(page);
+  await startShopping(page);
+  const box = page.getByRole("checkbox", { name: "Check off Ground beef" });
+  const size = await box.boundingBox();
+  expect(size?.width).toBeGreaterThanOrEqual(48);
+  expect(size?.height).toBeGreaterThanOrEqual(48);
+
+  await box.click();
+  const checked = page.getByRole("checkbox", { name: "Uncheck Ground beef" });
+  await expect(checked).toBeVisible(); // in its aisle while the stroke draws
+  await expect(page.getByText("Done (1)")).toBeVisible();
+  await expect(checked).toBeHidden(); // folded away, into the closed Done list
+  await page.getByText("Done (1)").click();
+  await expect(checked).toBeVisible();
+});
