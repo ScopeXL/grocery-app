@@ -17,6 +17,7 @@ import { outbox } from "../../lib/outbox";
 import { shareText, tripText } from "../../lib/shareText";
 import { showToast } from "../../lib/toast";
 import { rememberTrip } from "../../lib/trips";
+import { useTripView } from "../../lib/tripView";
 import { Button } from "../../ui/Button";
 import { Screen } from "../../ui/Screen";
 import { Skeleton } from "../../ui/Skeleton";
@@ -36,6 +37,9 @@ export function TripDetailScreen({ tripId }: { tripId: string }) {
     queryFn: async () =>
       unwrap(await api.GET("/api/trips/{trip_id}", { params: { path: { trip_id: tripId } } })),
   });
+  // The trip as this phone has it, with a finish or reopen still being sent on top: the server
+  // can lag behind on a weak signal, and its answer mustn't swap the buttons under a finger.
+  const local = useTripView(tripId, "aisle");
   const again = useMutation({
     mutationFn: async () =>
       unwrap(
@@ -74,7 +78,7 @@ export function TripDetailScreen({ tripId }: { tripId: string }) {
     );
   }
   const data = trip.data;
-  const finished = data.status === "finished";
+  const finished = (local?.status ?? data.status) === "finished";
   const title = `Shopping list, ${tripDate(data.created_at)}`;
   const items = data.items.filter((item) => !item.removed);
   const groups: [string, TripItem[]][] = [

@@ -47,6 +47,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 - Undo works while a sheet is open: its message used to sit behind the sheet, out of reach.
 - Checking off the last item in an aisle now shows its marker line too; the row used to vanish at
   once.
+- Right after you finish a trip, opening it from Trips shows it as finished, even before your phone
+  has sent the news. Its buttons used to change under your finger a moment later.
 - In dark mode, Undo and Refresh on the messages at the bottom of the screen are readable again.
 - The bar above the tabs no longer tucks slightly under them.
 

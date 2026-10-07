@@ -4,7 +4,7 @@
  * latest action wins, late check-offs count after another phone finishes, and finishing
  * leads to Trips, Reopen and Shop this again. Synthetic data only.
  */
-import type { BrowserContext, Page } from "@playwright/test";
+import type { BrowserContext, Page, Route } from "@playwright/test";
 
 import { expect, PASSWORD, signIn, test } from "./fixtures";
 import { api, seedTacoNight } from "./seed";
@@ -432,4 +432,31 @@ test("a row checked here folds out of its aisle into Done; its checkbox is a big
   await expect(checked).toBeHidden(); // folded away, into the closed Done list
   await page.getByText("Done (1)").click();
   await expect(checked).toBeVisible();
+});
+
+test("a trip just finished shows as finished, even before the server hears", async ({ page }) => {
+  await signIn(page);
+  await savedTrip(page);
+  await startShopping(page);
+  await checkOff(page, "Ground beef");
+  // Hold what this phone sends, as on a weak signal. (WebKit may let it through: a page its
+  // service worker controls can skip routing. Chromium holds it.)
+  const held: Route[] = [];
+  let holding = true;
+  await page.route("**/api/trips/*/ops", async (route) => {
+    if (holding) held.push(route);
+    else await route.continue();
+  });
+  await page.getByRole("button", { name: "Finish trip" }).click();
+  await page
+    .getByRole("dialog", { name: "Finish trip" })
+    .getByRole("button", { name: "Finish trip" })
+    .click();
+  await expect(page.getByRole("heading", { name: "Trips" })).toBeVisible();
+  await page.getByRole("region", { name: "Finished trips" }).getByRole("link").first().click();
+  await expect(page.getByRole("button", { name: "Shop this again" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Start shopping" })).toHaveCount(0);
+  holding = false;
+  for (const route of held) await route.continue();
+  await page.unroute("**/api/trips/*/ops");
 });
