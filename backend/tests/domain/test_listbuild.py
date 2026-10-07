@@ -19,6 +19,7 @@ from dinnerbell.domain.listbuild import (
     MealUse,
     UnitPrice,
     build_list,
+    price_quantity,
     quantity_text,
     quantity_words,
     unit_price,
@@ -818,3 +819,28 @@ def test_a_size_used_is_the_households_for_its_own_product() -> None:
     line = one_line(plan)
     assert line.size == juice.size_override
     assert line.need == Fraction(1, 4)
+
+
+# ---- pricing a saved quantity again (Shop this again) -------------------------------------------
+
+
+def test_a_saved_quantity_is_priced_like_a_list_line() -> None:
+    sale = product("1 lb", regular=549, promo=499)
+    price = price_quantity(PurchaseUnit.PACKAGE, Fraction(3), sale, None, NOW)
+    assert price is not None
+    assert (price.unit_cents, price.cost_cents, price.regular_cents) == (499, 1497, 1647)
+    assert (price.savings_cents, price.on_sale) == (150, True)
+    # Pounds round half-up once (W2): 1 1/2 lb at $2.99 is 448.5 -> 449.
+    loose = price_quantity(PurchaseUnit.POUND, Fraction(3, 2), by_weight(299), None, NOW)
+    assert loose is not None and loose.cost_cents == 449
+
+
+def test_pieces_need_a_weight_and_nothing_prices_without_a_regular_price() -> None:
+    onions = by_weight(149)
+    unweighed = price_quantity(PurchaseUnit.EACH, Fraction(3), onions, None, NOW)
+    assert unweighed is not None and unweighed.cost_cents is None
+    weighed = price_quantity(PurchaseUnit.EACH, Fraction(3), onions, Fraction(1, 2), NOW)
+    assert weighed is not None and weighed.cost_cents == 224  # W3
+    assert price_quantity(PurchaseUnit.PACKAGE, Fraction(1), None, None, NOW) is None
+    promo_only = product("16 oz", regular=None, promo=299)
+    assert price_quantity(PurchaseUnit.PACKAGE, Fraction(1), promo_only, None, NOW) is None

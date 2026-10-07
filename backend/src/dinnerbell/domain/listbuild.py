@@ -363,6 +363,39 @@ def _leftover_parts(
     return count, measure
 
 
+@dataclass(frozen=True, slots=True)
+class LinePrice:
+    """What a quantity costs today (a saved list bought again, priced afresh)."""
+
+    unit_cents: int  # today's price per package or per pound
+    cost_cents: int | None  # None for pieces whose weight isn't known
+    regular_cents: int | None
+    savings_cents: int
+    on_sale: bool
+    fetched_at: datetime
+
+
+def price_quantity(
+    unit: PurchaseUnit,
+    quantity: Fraction,
+    product: Product | None,
+    each_lb: Fraction | None,
+    now: datetime,
+) -> LinePrice | None:
+    """Price ``quantity`` (already whole packages, pieces or pounds) as the list does: whole
+    packages exactly, pounds rounded half-up once, pieces through one piece's weight. None
+    without a product or a regular price (a promo alone is not trusted)."""
+    require_aware(now)
+    info = None if product is None else product.price
+    if info is None or not info.regular:
+        return None
+    unit_cents = effective_cents(info, now)
+    cost = _line_cents(unit, q(quantity), each_lb, unit_cents)
+    regular = _line_cents(unit, q(quantity), each_lb, info.regular)
+    savings = 0 if cost is None or regular is None else regular - cost
+    return LinePrice(unit_cents, cost, regular, savings, promo_valid(info, now), info.fetched_at)
+
+
 def _line_cents(
     unit: PurchaseUnit, quantity: Fraction, each_lb: Fraction | None, cents: int
 ) -> int | None:
