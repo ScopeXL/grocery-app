@@ -17,6 +17,7 @@ from dinnerbell.planning.models import (
     PlanMeal,
     PlanMealSide,
 )
+from dinnerbell.shopping.models import AppliedOp, Trip, TripItem
 from dinnerbell.state import StateDep
 from dinnerbell.stores.models import Store, StoreSection
 
@@ -27,6 +28,9 @@ router = APIRouter(prefix="/api/_test", include_in_schema=False)
 async def reset(state: StateDep) -> None:
     async with state.db.write() as tx:
         for model in (
+            AppliedOp,
+            TripItem,
+            Trip,
             PlanMealSide,
             PlanMeal,
             PlanExtra,

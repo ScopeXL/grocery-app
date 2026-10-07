@@ -12,6 +12,7 @@ from dinnerbell.household import models as household_models
 from dinnerbell.kroger import models as kroger_models
 from dinnerbell.meals import models as meals_models
 from dinnerbell.planning import models as planning_models
+from dinnerbell.shopping import models as shopping_models
 from dinnerbell.stores import models as stores_models
 
 __all__ = [
@@ -22,5 +23,6 @@ __all__ = [
     "kroger_models",
     "meals_models",
     "planning_models",
+    "shopping_models",
     "stores_models",
 ]

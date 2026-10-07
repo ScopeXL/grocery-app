@@ -32,6 +32,8 @@ EXPORT_TABLES: tuple[str, ...] = (
     "plan_meal_sides",
     "plan_extras",
     "plan_item_overrides",
+    "trips",
+    "trip_items",
 )
 # Not household data: secrets and sessions, or Kroger's data, which may only be cached (ADR 0016).
 EXPORT_EXCLUDED: tuple[str, ...] = (
@@ -39,6 +41,7 @@ EXPORT_EXCLUDED: tuple[str, ...] = (
     "devices",
     "kroger_product_cache",
     "kroger_api_usage",
+    "applied_ops",  # a log of phone actions, kept 60 days so none applies twice
 )
 FORMAT = "dinner-bell-export"
 FORMAT_VERSION = 1
