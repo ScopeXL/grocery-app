@@ -18,6 +18,7 @@ import { occasionLabel } from "../meals/types";
 import { AddMealSheet } from "./AddMealSheet";
 import { ChangeMealSheet } from "./ChangeMealSheet";
 import { MealPicture, MealThumb } from "./MealThumb";
+import { Suggestions } from "./Suggestions";
 import { LibraryPane, ListPane } from "./PlanPanes";
 import { TotalFooter } from "./TotalFooter";
 import { joinNames, scaleLabel, type PlannedMeal } from "./types";
@@ -102,6 +103,7 @@ export function PlanScreen() {
                   ))}
                 </ul>
               ) : null}
+              <Suggestions />
               <Button block className="mt-5" onClick={openAdd}>
                 <Plus aria-hidden="true" />
                 Add a meal
@@ -198,6 +200,7 @@ function TonightCard({
               with {joinNames(meal.sides.map((side) => side.name))}
             </span>
           ) : null}
+          <span className="text-secondary text-ink-soft">{costLine(meal.cost).total}</span>
           {tags.length > 0 ? <span className="mt-2 flex flex-wrap gap-2">{tags}</span> : null}
         </div>
         <Button

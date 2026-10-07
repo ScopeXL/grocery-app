@@ -22,7 +22,7 @@ from dinnerbell.kroger.client import KrogerError
 from dinnerbell.kroger.parse import Product
 from dinnerbell.meals.models import Dish, DishPairing
 from dinnerbell.meals.service import photo_url
-from dinnerbell.planning import listview, service
+from dinnerbell.planning import listview, service, suggest
 from dinnerbell.planning.models import PlanItemOverride
 from dinnerbell.planning.schemas import (
     AlternativeOut,
@@ -36,6 +36,7 @@ from dinnerbell.planning.schemas import (
     PlanOut,
     RepeatIn,
     SidesIn,
+    SuggestionOut,
     UsualSideOut,
     UsualSidesIn,
 )
@@ -50,6 +51,12 @@ SEARCH_LIMIT = 20
 @router.get("/plan")
 async def get_plan(state: StateDep, session: SessionDep) -> PlanOut:
     return await listview.plan_view(state)
+
+
+@router.get("/plan/recommendations")
+async def recommendations(state: StateDep, session: SessionDep) -> list[SuggestionOut]:
+    """Mains that use what this week's list already buys (UX §4.4), best first."""
+    return await suggest.suggestions(state)
 
 
 # ---- planned meals ----------------------------------------------------------------------------

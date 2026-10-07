@@ -203,6 +203,17 @@ class TotalsOut(BaseModel):
     not_priced_text: str | None  # "3 items have no price"
 
 
+class SuggestionOut(BaseModel):
+    """A Main that uses what this week's list already buys (UX §4.4, PLAN §8.4)."""
+
+    dish_id: str
+    name: str
+    photo_url: str | None
+    item_images: list[str]  # up to 3 product photos, for a meal without a photo
+    text: str  # "Taco salad uses your leftover lettuce, cheese and ground beef. Adds about $4."
+    added_cents: int  # what adding it (with no sides) puts on the total
+
+
 class PlanTripOut(BaseModel):
     """The plan's saved list while it's being shopped (UX §4.11's Start shopping)."""
 

@@ -3046,6 +3046,55 @@
         "title": "StoreSectionOut",
         "type": "object"
       },
+      "SuggestionOut": {
+        "description": "A Main that uses what this week's list already buys (UX \u00a74.4, PLAN \u00a78.4).",
+        "properties": {
+          "added_cents": {
+            "title": "Added Cents",
+            "type": "integer"
+          },
+          "dish_id": {
+            "title": "Dish Id",
+            "type": "string"
+          },
+          "item_images": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Item Images",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dish_id",
+          "name",
+          "photo_url",
+          "item_images",
+          "text",
+          "added_cents"
+        ],
+        "title": "SuggestionOut",
+        "type": "object"
+      },
       "TotalsOut": {
         "properties": {
           "have_it": {
@@ -6109,6 +6158,32 @@
           }
         },
         "summary": "Undo New Week",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/plan/recommendations": {
+      "get": {
+        "description": "Mains that use what this week's list already buys (UX \u00a74.4), best first.",
+        "operationId": "recommendations_api_plan_recommendations_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SuggestionOut"
+                  },
+                  "title": "Response Recommendations Api Plan Recommendations Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Recommendations",
         "tags": [
           "planning"
         ]

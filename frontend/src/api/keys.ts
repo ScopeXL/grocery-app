@@ -15,6 +15,7 @@ export const qk = {
   productSearch: (term: string) => ["products", term] as const,
   usualSides: (dishId: string) => ["dishes", "usual-sides", dishId] as const,
   plan: () => ["plan"] as const,
+  suggestions: () => ["plan", "suggestions"] as const,
   alternatives: (itemId: string) => ["alternatives", itemId] as const,
   sections: () => ["stores", "sections"] as const,
   trips: () => ["trips"] as const,

@@ -284,16 +284,18 @@ async def fetch(state: AppState, data: PlanData) -> Live:
 # ---- building the list ------------------------------------------------------------------------
 
 
+def domain_dish(data: PlanData, dish_id: str) -> domain.Dish:
+    row = data.dishes[dish_id]
+    return domain.Dish(
+        row.id,
+        row.name,
+        tuple(domain.DishLine(line.item_id, stored_amount(line)) for line in data.lines[row.id]),
+    )
+
+
 def plan_input(data: PlanData, live: Live) -> domain.PlanInput:
     def dish(dish_id: str) -> domain.Dish:
-        row = data.dishes[dish_id]
-        return domain.Dish(
-            row.id,
-            row.name,
-            tuple(
-                domain.DishLine(line.item_id, stored_amount(line)) for line in data.lines[row.id]
-            ),
-        )
+        return domain_dish(data, dish_id)
 
     meals = tuple(
         domain.Meal(

@@ -6,6 +6,14 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+### Added
+
+- Plan suggests up to three meals that use what you're already buying, with the reason in
+  plain words, like "Taco salad uses your leftover lettuce, cheese and ground beef. Adds about
+  $4." Tap Add and the total moves by about that much.
+- Each planned meal shows what it costs at today's prices.
+- Sale tags say when the sale ends, and Meals has an On sale filter.
+
 ## [0.4.0] - 2026-10-06
 
 ### Added

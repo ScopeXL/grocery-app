@@ -802,6 +802,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/plan/recommendations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Recommendations
+         * @description Mains that use what this week's list already buys (UX §4.4), best first.
+         */
+        get: operations["recommendations_api_plan_recommendations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/plan/repeat": {
         parameters: {
             query?: never;
@@ -1903,6 +1923,24 @@ export interface components {
             key: string;
             /** Label */
             label: string;
+        };
+        /**
+         * SuggestionOut
+         * @description A Main that uses what this week's list already buys (UX §4.4, PLAN §8.4).
+         */
+        SuggestionOut: {
+            /** Added Cents */
+            added_cents: number;
+            /** Dish Id */
+            dish_id: string;
+            /** Item Images */
+            item_images: string[];
+            /** Name */
+            name: string;
+            /** Photo Url */
+            photo_url: string | null;
+            /** Text */
+            text: string;
         };
         /** TotalsOut */
         TotalsOut: {
@@ -3739,6 +3777,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recommendations_api_plan_recommendations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestionOut"][];
                 };
             };
         };

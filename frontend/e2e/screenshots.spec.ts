@@ -69,6 +69,16 @@ async function seedMeals(page: Page): Promise<{ tacos: string; chicken: string; 
     role: "side",
     lines: [line(rice, "packages", "1/4")],
   });
+  // Shares Tacos' beef, cheddar and salsa: Plan suggests it once Tacos is planned.
+  await dish({
+    name: "Taco salad",
+    role: "main",
+    lines: [
+      line(beef, "packages", "1/2"),
+      line(cheddar, "packages", "1/2"),
+      line(salsa, "packages", "1/2"),
+    ],
+  });
   return { tacos, chicken, rice: riceSide };
 }
 
@@ -170,6 +180,9 @@ for (const scheme of ["light", "dark"] as const) {
     await page.goto("/meals");
     await expect(page.getByText("Sheet-pan chicken")).toBeVisible();
     await shot("meals-cards");
+    await page.getByRole("button", { name: "On sale" }).click();
+    await shot("meals-on-sale");
+    await page.getByRole("button", { name: "On sale" }).click();
     await page.goto(`/meals/${tacos}`);
     await expect(page.getByRole("list", { name: "Items in this meal" })).toBeVisible();
     await shot("meal-detail");
@@ -195,6 +208,7 @@ for (const scheme of ["light", "dark"] as const) {
     await seedPlan(page, meals);
     await page.goto("/");
     await expect(page.getByRole("region", { name: "Tonight" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Uses what you're buying" })).toBeVisible();
     await shot("plan-week");
     await page.getByRole("button", { name: "Add a meal" }).click();
     await expect(page.getByRole("dialog", { name: "Add a meal" })).toContainText("Tacos");

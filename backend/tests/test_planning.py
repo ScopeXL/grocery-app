@@ -474,3 +474,45 @@ async def test_meal_cards_say_what_is_on_sale(cook: httpx.AsyncClient) -> None:
     sides = (await cook.get("/api/dishes", params={"role": "side"})).json()
     assert [(c["name"], c["on_sale"]) for c in sides] == [("Rice", False)]
     assert ids  # both mains use the beef on sale
+
+
+async def test_suggestions_use_what_the_list_buys(cook: httpx.AsyncClient) -> None:
+    beef = await item(cook, "Ground beef", BEEF)
+    cheddar = await item(cook, "Shredded cheddar", CHEDDAR)
+    romaine = await item(cook, "Romaine", "0000000000009")  # 3 ct, $3.99
+    salsa = await item(cook, "Salsa", SALSA)  # $2.50 on sale
+    tacos = await dish(
+        cook,
+        "Tacos",
+        "main",
+        [
+            line(beef, "packages", "1/2"),
+            line(cheddar, "packages", "1/2"),
+            line(romaine, "count", "1"),
+        ],
+    )
+    await dish(
+        cook,
+        "Taco salad",
+        "main",
+        [
+            line(beef, "packages", "1/2"),
+            line(cheddar, "packages", "1/2"),
+            line(romaine, "count", "1"),
+            line(salsa, "packages", "1/2"),
+        ],
+    )
+    await dish(cook, "Plain toast", "main", [])
+    assert (await cook.get("/api/plan/recommendations")).json() == []  # nothing planned yet
+
+    before = (await plan_meal(cook, tacos))["totals"]["total_cents"]
+    [suggestion] = (await cook.get("/api/plan/recommendations")).json()
+    assert suggestion["name"] == "Taco salad"
+    assert suggestion["text"].startswith("Taco salad uses your leftover ground beef")
+    # Beef, cheddar and romaine come from what Tacos already buys; only the salsa is new.
+    assert suggestion["added_cents"] == 250
+    assert suggestion["text"].endswith("Adds about $3.")
+
+    after = (await plan_meal(cook, suggestion["dish_id"]))["totals"]["total_cents"]
+    assert after - before == suggestion["added_cents"]
+    assert (await cook.get("/api/plan/recommendations")).json() == []  # it's planned now

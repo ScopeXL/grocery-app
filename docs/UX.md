@@ -135,7 +135,7 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
 | [photo] Chicken stir-fry      [Any]  |
 |                             [Change] |
 | ------------------------------------ |
-| Uses what you're buying         (M4) |
+| Uses what you're buying              |
 | Taco salad uses your leftover        |
 | lettuce, cheese and ground beef.     |
 | Adds about $4.                [Add]  |
@@ -157,6 +157,8 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
   - a day chip, if a day is set;
   - a scale chip, if not ×1;
   - **Change**, which opens a sheet: swap the main, change sides, day, occasion, scale (×½, ×1, ×2), or remove (with Undo).
+- **Uses what you're buying:** up to three Mains that use leftovers of what the list already buys, each with its reason ("Taco salad uses your leftover lettuce, cheese and ground beef. Adds about $4.") and **Add**. Adding puts the Main on the plan without sides, so the total moves by about the amount shown.
+- **Each meal's cost:** the meal's share of what it uses, at today's prices and its scale ("about $9"), under its name.
 - **Total footer:** sticky; it updates as meals change. When the tally isn't zero, it adds "3 items have no price", which opens the List filtered to those lines.
 - **Start a new week** (a quiet button at the end): puts this week's plan away; the toast offers Undo until the new week has meals.
 - **At 1440 px:** the meal library (with Add buttons) on the left and the list in walking order on the right.
@@ -170,7 +172,7 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
 
 ### 4.6 Meals (library)
 
-- A **Mains / Sides** switch, a search field, occasion filter chips and a **Favorites** toggle. An "On sale" filter comes in M4.
+- A **Mains / Sides** switch, a search field, occasion filter chips, a **Favorites** toggle and an **On sale** toggle (meals using something on sale today). Cards with something on sale show a Sale tag and its last day, beside the text, never on a photo.
 - **Cards:**
   - Two per row on phones, more on desktop.
   - Each shows the meal photo (cropped 4:3) or an item strip, the name, "about $14" and a star.
