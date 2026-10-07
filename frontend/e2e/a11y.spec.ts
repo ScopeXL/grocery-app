@@ -118,6 +118,12 @@ for (const scheme of ["light", "dark"] as const) {
       await expect(page.getByRole("dialog")).toBeVisible();
       await check(page, "shopping item");
       await page.getByRole("dialog").getByRole("button", { name: "Close" }).click();
+      await page
+        .getByRole("checkbox", { name: /^Check off/ })
+        .first()
+        .click();
+      await expect(page.getByRole("button", { name: "Undo" })).toBeVisible();
+      await check(page, "shopping, with a toast");
       await page.getByRole("button", { name: "Finish trip" }).click();
       await expect(page.getByRole("dialog", { name: "Finish trip" })).toBeVisible();
       await check(page, "finish trip");

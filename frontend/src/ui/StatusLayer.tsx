@@ -98,7 +98,7 @@ export function UpdatePrompt() {
         <span className="text-secondary font-semibold">A new version is ready.</span>
         <button
           type="button"
-          className="min-h-12 rounded-button bg-lemon px-4 text-secondary font-bold text-on-lemon"
+          className="min-h-12 rounded-button bg-counter px-4 text-secondary font-bold text-ink"
           onClick={() => {
             void outbox.flush().then(() => updateServiceWorker(true));
           }}
@@ -123,7 +123,9 @@ export function ToastRegion() {
       {toast.actionLabel ? (
         <button
           type="button"
-          className="min-h-12 rounded-button px-4 text-secondary font-bold text-lemon"
+          // The toast flips with the theme (ink on counter), so its action is the inverse pill:
+          // lemon text on the light dark-mode toast was unreadable (1.17:1).
+          className="min-h-12 rounded-button bg-counter px-4 text-secondary font-bold text-ink"
           onClick={() => {
             toast.onAction?.();
             dismissToast(toast.id);

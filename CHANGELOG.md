@@ -6,6 +6,10 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+### Fixed
+
+- In dark mode, Undo and Refresh on the messages at the bottom of the screen are readable again.
+
 ## [0.6.0] - 2026-10-07
 
 ### Added

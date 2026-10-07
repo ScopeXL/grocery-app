@@ -73,4 +73,9 @@ describe.each([
     expect(contrast(color("on-basil"), color("basil"))).toBeGreaterThanOrEqual(4.5);
     expect(contrast(color("on-lemon"), color("lemon"))).toBeGreaterThanOrEqual(4.5);
   });
+
+  it("toasts and their Undo pill pass AA", () => {
+    // The toast is ink with counter text; its action pill is the reverse.
+    expect(contrast(color("counter"), color("ink"))).toBeGreaterThanOrEqual(4.5);
+  });
 });
