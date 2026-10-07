@@ -16,6 +16,7 @@ import { Button } from "../../ui/Button";
 import { Chip } from "../../ui/Chip";
 import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
+import { Skeleton } from "../../ui/Skeleton";
 import { RenameItem } from "./RenameItem";
 import type { AmountIn, AmountOut, ItemOut, KindOption, PickerOut } from "./types";
 
@@ -121,7 +122,7 @@ export function AmountPicker({
       {picker.isError ? (
         <p className="text-body text-tomato">{errorMessage(picker.error)}</p>
       ) : !data ? (
-        <p className="text-secondary text-ink-soft">Loading…</p>
+        <Skeleton shape="lines" rows={3} />
       ) : (
         <>
           {data.fix_size ? <FixSize picker={data} /> : null}

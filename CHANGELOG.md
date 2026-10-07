@@ -29,6 +29,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
   Change sheet has a link to open the meal.
 - "Who's using this phone?" shows who's using it now, with a check, and goes back to where you
   opened it. More shows the name too.
+- While a screen loads, grey shapes stand where its content will appear, instead of a blank screen
+  or "Loading…". A quick load doesn't show them at all.
 
 ### Fixed
 

@@ -467,6 +467,7 @@ Android's guide has the same three steps for Chrome: the ⋮ menu, **Install app
 | No price on some items | "3 items have no price", which opens the List filtered to those lines |
 | Update available | A small "New version · Refresh" pill. Never shown during shopping, and never while changes are waiting to sync |
 | Screen can't stay on | A one-time tip: "Your screen may dim while you shop. Settings → Display & Brightness → Auto-Lock" (iPhone) or "Display → Screen timeout" (Android) |
+| Loading | Grey placeholder shapes where the content will be: rows (a photo square and two lines), plain lines, or the meal library's cards. They appear only after 300 ms, so a quick load never flashes them, and a screen reader hears "Loading…" (or "Searching your store…", "Looking at your store…"). Used by Plan, List, Meals, a meal, the meal editor, Trips, a trip, and the sheets that fetch (Add a meal, Add an item, How much?, Swap product, Send to Kroger cart) |
 
 ## 7. Visual direction: "Fridge door"
 

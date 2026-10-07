@@ -2,7 +2,7 @@
  * Captures the key screens for review (`just screenshots`): phone and desktop, light and dark.
  * Fake mode only; files go to the gitignored .screenshots/ folder (CLAUDE.md rule 1).
  */
-import type { Page } from "@playwright/test";
+import type { Page, Route } from "@playwright/test";
 
 import { expect, signIn, test } from "./fixtures";
 
@@ -190,7 +190,29 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByRole("button", { name: "On sale" }).click();
     await shot("meals-on-sale");
     await page.getByRole("button", { name: "On sale" }).click();
-    await page.goto(`/meals/${tacos}`);
+    // The placeholder while a meal loads: its answer is held until the capture. Chromium only:
+    // on WebKit a page the service worker controls can skip Playwright's routing, and the hold
+    // then misses (the capture showed the loaded meal).
+    if (testInfo.project.name === "desktop-chromium") {
+      const held: Route[] = [];
+      let holding = true;
+      await page.route(`**/api/dishes/${tacos}`, async (route) => {
+        if (holding) held.push(route);
+        else await route.continue();
+      });
+      await page.goto(`/meals/${tacos}`);
+      await expect(page.getByRole("status").filter({ hasText: "Loading…" })).toBeAttached();
+      await page.screenshot({
+        path: `${dir}/meal-loading-${scheme}.png`,
+        caret: "initial",
+        animations: "disabled",
+      });
+      holding = false;
+      for (const route of held) await route.continue();
+      await page.unroute(`**/api/dishes/${tacos}`);
+    } else {
+      await page.goto(`/meals/${tacos}`);
+    }
     await expect(page.getByRole("list", { name: "Items in this meal" })).toBeVisible();
     await shot("meal-detail");
     await page.goto(`/meals/${tacos}/edit`);

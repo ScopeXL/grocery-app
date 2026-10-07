@@ -18,6 +18,7 @@ import { useDebounced } from "../../lib/useDebounced";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
+import { Skeleton } from "../../ui/Skeleton";
 import type { ItemOut, ProductResult } from "./types";
 
 const MINE_SHOWN = 6;
@@ -188,7 +189,7 @@ export function AddItemSheet({
               {results.isError ? (
                 <p className="text-secondary text-ink-soft">{errorMessage(results.error)}</p>
               ) : results.isPending ? (
-                <p className="text-secondary text-ink-soft">Searching…</p>
+                <Skeleton rows={2} label="Searching your store…" />
               ) : found.length === 0 ? (
                 <p className="text-body">
                   Nothing at your store matches “{term}”. Try a shorter name, or add it as plain

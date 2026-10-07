@@ -19,6 +19,7 @@ import { showToast } from "../../lib/toast";
 import { rememberTrip } from "../../lib/trips";
 import { Button } from "../../ui/Button";
 import { Screen } from "../../ui/Screen";
+import { Skeleton } from "../../ui/Skeleton";
 import { SendToCartSheet } from "../cart/SendToCartSheet";
 import { useKrogerAccount } from "../kroger/account";
 import { tripDate } from "./TripsScreen";
@@ -64,7 +65,11 @@ export function TripDetailScreen({ tripId }: { tripId: string }) {
   if (!trip.data) {
     return (
       <Screen title="Trip">
-        {trip.isError ? <p className="text-body">{errorMessage(trip.error)}</p> : null}
+        {trip.isError ? (
+          <p className="text-body">{errorMessage(trip.error)}</p>
+        ) : (
+          <Skeleton rows={5} />
+        )}
       </Screen>
     );
   }

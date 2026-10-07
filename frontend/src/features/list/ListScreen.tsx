@@ -10,6 +10,7 @@ import { Button } from "../../ui/Button";
 import { EmptyState } from "../../ui/EmptyState";
 import { Screen } from "../../ui/Screen";
 import { Segmented, segmentOption } from "../../ui/Segmented";
+import { Skeleton } from "../../ui/Skeleton";
 import { underlined } from "../../ui/styles";
 import type { Line, PlanOut } from "../plan/types";
 import { usePlan } from "../plan/usePlan";
@@ -85,7 +86,9 @@ export function ListScreen({ show }: { show?: "unpriced" | undefined }) {
       <Screen title="Shopping list">
         {plan.isError ? (
           <p className="text-body">Your list couldn't be loaded. Try again.</p>
-        ) : null}
+        ) : (
+          <Skeleton rows={6} />
+        )}
       </Screen>
     );
   }

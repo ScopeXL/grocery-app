@@ -14,6 +14,7 @@ import { about, costLine } from "../../lib/money";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
+import { Skeleton } from "../../ui/Skeleton";
 import { underlined } from "../../ui/styles";
 import { AddMealSheet, mainChoice } from "../plan/AddMealSheet";
 import { usePlan } from "../plan/usePlan";
@@ -67,7 +68,13 @@ export function MealDetailScreen({ dishId }: { dishId: string }) {
   });
 
   if (dish.isError) return <Shell>{errorMessage(dish.error)}</Shell>;
-  if (!dish.data) return <Shell>Loading…</Shell>;
+  if (!dish.data) {
+    return (
+      <Shell>
+        <Skeleton rows={4} />
+      </Shell>
+    );
+  }
   const meal = dish.data;
   const cost = costLine(meal.cost);
 

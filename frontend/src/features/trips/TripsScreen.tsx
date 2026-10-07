@@ -15,6 +15,7 @@ import { useLocalTrips } from "../../lib/trips";
 import { Button } from "../../ui/Button";
 import { EmptyState } from "../../ui/EmptyState";
 import { Screen } from "../../ui/Screen";
+import { Skeleton } from "../../ui/Skeleton";
 
 type TripHeader = components["schemas"]["TripHeader"];
 
@@ -65,7 +66,9 @@ export function TripsScreen() {
       {offline && all.length > 0 ? (
         <p className="mb-4 text-secondary text-ink-soft">Showing what’s saved on this phone.</p>
       ) : null}
-      {pages.isPending && !offline ? null : all.length === 0 ? (
+      {pages.isPending && !offline ? (
+        <Skeleton shape="lines" rows={3} />
+      ) : all.length === 0 ? (
         offline ? (
           <p className="text-body">{errorMessage(pages.error)}</p>
         ) : (

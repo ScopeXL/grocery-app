@@ -19,6 +19,7 @@ import { relativeTime } from "../../lib/format";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
+import { Skeleton } from "../../ui/Skeleton";
 import { ModalityChoice, type Modality } from "../kroger/ModalityChoice";
 
 type Cart = components["schemas"]["CartOut"];
@@ -232,7 +233,7 @@ export function SendToCartSheet({
           cart.isError ? (
             <p className="text-body">{errorMessage(cart.error)}</p>
           ) : (
-            <p className="text-body text-ink-soft">Loading…</p>
+            <Skeleton shape="lines" rows={3} />
           )
         ) : data.account !== "connected" ? (
           <NotConnected cart={data} onClose={close} />

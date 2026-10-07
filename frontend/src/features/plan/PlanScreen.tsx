@@ -13,6 +13,7 @@ import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { EmptyState } from "../../ui/EmptyState";
 import { Screen } from "../../ui/Screen";
+import { Skeleton } from "../../ui/Skeleton";
 import { AddMealSheet, mainChoice, type MainChoice } from "./AddMealSheet";
 import { ChangeMealSheet } from "./ChangeMealSheet";
 import { MealPrice } from "./MealPrice";
@@ -55,7 +56,9 @@ export function PlanScreen() {
       <Screen title="This week">
         {plan.isError ? (
           <p className="text-body">Your plan couldn't be loaded. Try again.</p>
-        ) : null}
+        ) : (
+          <Skeleton rows={4} />
+        )}
       </Screen>
     );
   }

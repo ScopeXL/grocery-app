@@ -13,6 +13,7 @@ import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
+import { Skeleton } from "../../ui/Skeleton";
 import type { DishCard } from "../meals/types";
 import { DayPicker, OccasionPicker } from "./MealChoices";
 import { MealPrice } from "./MealPrice";
@@ -205,7 +206,7 @@ function MainStep({
       {mains.isError ? (
         <p className="text-body">{errorMessage(mains.error)}</p>
       ) : mains.isPending ? (
-        <p className="text-secondary text-ink-soft">Loading…</p>
+        <Skeleton rows={3} />
       ) : shown.length === 0 ? (
         <p className="text-body">
           {all.length === 0

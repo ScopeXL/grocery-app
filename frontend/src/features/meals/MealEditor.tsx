@@ -14,6 +14,7 @@ import { clearDraft, loadDraft, saveDraft } from "../../lib/drafts";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
+import { Skeleton } from "../../ui/Skeleton";
 import { underlined } from "../../ui/styles";
 import { AddItemSheet } from "./AddItemSheet";
 import { AmountPicker } from "./AmountPicker";
@@ -53,7 +54,13 @@ export function EditMealScreen({ dishId }: { dishId: string }) {
       unwrap(await api.GET("/api/dishes/{dish_id}", { params: { path: { dish_id: dishId } } })),
   });
   if (dish.isError) return <p className="p-6 text-body">{errorMessage(dish.error)}</p>;
-  if (!dish.data) return <p className="p-6 text-secondary text-ink-soft">Loading…</p>;
+  if (!dish.data) {
+    return (
+      <main className="mx-auto w-full max-w-2xl px-4 pt-12">
+        <Skeleton rows={4} />
+      </main>
+    );
+  }
   const loaded = dish.data;
   return (
     <MealEditor

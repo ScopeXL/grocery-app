@@ -14,6 +14,7 @@ import { about } from "../../lib/money";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
+import { Skeleton } from "../../ui/Skeleton";
 import { underlined } from "../../ui/styles";
 import { ProductFacts } from "../meals/AddItemSheet";
 import { RenameItem } from "../meals/RenameItem";
@@ -287,7 +288,7 @@ function Alternatives({ itemId, onDone }: { itemId: string; onDone: () => void }
       {found.isError ? (
         <p className="text-body">{errorMessage(found.error)}</p>
       ) : found.isPending ? (
-        <p className="text-secondary text-ink-soft">Looking at your store…</p>
+        <Skeleton rows={3} label="Looking at your store…" />
       ) : (
         <ul className="overflow-hidden rounded-tile border border-rule">
           {options.map((option) => (

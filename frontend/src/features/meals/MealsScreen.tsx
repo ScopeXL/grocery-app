@@ -19,6 +19,7 @@ import { EmptyState } from "../../ui/EmptyState";
 import { ProductImage } from "../../ui/ProductImage";
 import { Screen } from "../../ui/Screen";
 import { Segmented, segmentOption } from "../../ui/Segmented";
+import { Skeleton } from "../../ui/Skeleton";
 import type { DishCard, Role } from "./types";
 
 export function MealsScreen({ role }: { role: Role }) {
@@ -110,7 +111,9 @@ export function MealsScreen({ role }: { role: Role }) {
 
       {dishes.isError ? (
         <p className="text-body">{errorMessage(dishes.error)}</p>
-      ) : dishes.isPending ? null : shown.length > 0 ? (
+      ) : dishes.isPending ? (
+        <Skeleton shape="cards" rows={4} />
+      ) : shown.length > 0 ? (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {shown.map((card) => (
             <MealCard key={card.id} card={card} />

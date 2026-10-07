@@ -221,3 +221,20 @@ progress.trip-progress::-moz-progress-bar {
   background: var(--accent);
   border-radius: 9999px;
 }
+
+/* Placeholders while a screen loads (ui/Skeleton, UX §6). They wait 300 ms before showing, so a
+   quick load never flashes them; the shapes are ruled-line grey. */
+.skeleton-wait {
+  animation: skeleton-wait 0s 300ms both;
+}
+.skeleton-shape {
+  background: var(--rule);
+}
+@keyframes skeleton-wait {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
