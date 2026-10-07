@@ -5,10 +5,15 @@ from __future__ import annotations
 from fastapi import APIRouter
 from sqlalchemy import delete, update
 
-from dinnerbell.auth.models import Device
+from dinnerbell.auth.models import Device, JoinCode
 from dinnerbell.catalog.models import Item
 from dinnerbell.household.models import AppMeta, Household, Member
-from dinnerbell.kroger.models import KrogerApiUsage, KrogerProductCache
+from dinnerbell.kroger.models import (
+    KrogerApiUsage,
+    KrogerOAuthState,
+    KrogerProductCache,
+    KrogerToken,
+)
 from dinnerbell.meals.models import Dish, DishItem, DishPairing, Photo
 from dinnerbell.planning.models import (
     Plan,
@@ -17,7 +22,7 @@ from dinnerbell.planning.models import (
     PlanMeal,
     PlanMealSide,
 )
-from dinnerbell.shopping.models import AppliedOp, Trip, TripItem
+from dinnerbell.shopping.models import AppliedOp, CartSend, Trip, TripItem
 from dinnerbell.state import StateDep
 from dinnerbell.stores.models import Store, StoreSection
 
@@ -28,6 +33,7 @@ router = APIRouter(prefix="/api/_test", include_in_schema=False)
 async def reset(state: StateDep) -> None:
     async with state.db.write() as tx:
         for model in (
+            CartSend,
             AppliedOp,
             TripItem,
             Trip,
@@ -45,8 +51,23 @@ async def reset(state: StateDep) -> None:
             Store,
             KrogerProductCache,
             KrogerApiUsage,
+            KrogerOAuthState,
+            JoinCode,
         ):
             await tx.session.execute(delete(model))
+        await tx.session.execute(
+            update(KrogerToken).values(
+                status="disconnected",
+                access_enc=None,
+                access_expires_at=None,
+                refresh_enc=None,
+                refresh_obtained_at=None,
+                scope=None,
+                connected_by_member_id=None,
+                connected_at=None,
+                version=KrogerToken.version + 1,
+            )
+        )
         await tx.session.execute(delete(Device))
         await tx.session.execute(delete(Member))
         await tx.session.execute(

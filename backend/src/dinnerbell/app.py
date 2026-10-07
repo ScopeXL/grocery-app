@@ -17,6 +17,7 @@ from dinnerbell.auth.sessions import AuthState, SessionCodec
 from dinnerbell.catalog.router import router as items_router
 from dinnerbell.core.clock import Clock, SystemClock
 from dinnerbell.core.config import KrogerMode, Settings
+from dinnerbell.core.crypto import token_cipher
 from dinnerbell.core.errors import install_error_handlers
 from dinnerbell.core.logging import get_logger
 from dinnerbell.core.version import build_info
@@ -26,13 +27,14 @@ from dinnerbell.events.hub import EventHub
 from dinnerbell.events.router import router as events_router
 from dinnerbell.household.models import AppMeta
 from dinnerbell.household.router import router as household_router
+from dinnerbell.kroger.account import KrogerAccount
 from dinnerbell.kroger.catalog import ProductCatalog
 from dinnerbell.kroger.client import KrogerApi
 from dinnerbell.kroger.dbusage import DbUsageStore
 from dinnerbell.kroger.errors import install_kroger_error_handler
 from dinnerbell.kroger.fake import FakeKroger
 from dinnerbell.kroger.live import LiveKroger
-from dinnerbell.kroger.router import fake_images as kroger_fake_images
+from dinnerbell.kroger.router import fake_routes as kroger_fake_routes
 from dinnerbell.kroger.router import router as kroger_router
 from dinnerbell.kroger.usage import UsageGuard
 from dinnerbell.meals import service as meals_service
@@ -64,6 +66,14 @@ def make_kroger(settings: Settings, db: Database, clock: Clock) -> KrogerApi:
         usage=UsageGuard(DbUsageStore(db), clock),
         clock=clock,
     )
+
+
+def redirect_uri(settings: Settings) -> str | None:
+    """Where Kroger sends a phone back after Connect Kroger. Live mode needs it set (and
+    registered on the Kroger app); the demo sign-in always comes back to this server."""
+    if settings.kroger_mode is KrogerMode.FAKE:
+        return settings.kroger_redirect_uri or settings.expected_redirect_uri
+    return settings.kroger_redirect_uri
 
 
 async def load_auth_state(db: Database) -> AuthState:
@@ -121,6 +131,13 @@ def create_app(
         db.publisher = hub.publish
         kroger = make_kroger(settings, db, the_clock)
         catalog = ProductCatalog(kroger, db, the_clock)
+        account = KrogerAccount(
+            kroger,
+            db,
+            the_clock,
+            token_cipher(settings.app_secret_key.get_secret_value()),
+            redirect_uri(settings),
+        )
         state = AppState(
             settings=settings,
             clock=the_clock,
@@ -136,6 +153,8 @@ def create_app(
                 clock=the_clock,
             ),
             catalog=catalog,
+            kroger=kroger,
+            account=account,
         )
 
         async def purge_kroger_cache() -> None:
@@ -184,7 +203,7 @@ def create_app(
     app.include_router(stores_router)
     app.include_router(kroger_router)
     if settings.kroger_mode is KrogerMode.FAKE:
-        app.include_router(kroger_fake_images)
+        app.include_router(kroger_fake_routes)
     app.include_router(items_router)
     app.include_router(meals_router)
     app.include_router(planning_router)

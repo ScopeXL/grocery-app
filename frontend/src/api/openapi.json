@@ -327,6 +327,19 @@
         "title": "ClientInfo",
         "type": "object"
       },
+      "ConnectOut": {
+        "properties": {
+          "authorize_url": {
+            "title": "Authorize Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "authorize_url"
+        ],
+        "title": "ConnectOut",
+        "type": "object"
+      },
       "CostOut": {
         "description": "What the dish's own amounts cost at today's prices, as an estimate.",
         "properties": {
@@ -1522,6 +1535,59 @@
           "step"
         ],
         "title": "KindOptionOut",
+        "type": "object"
+      },
+      "KrogerAccountOut": {
+        "properties": {
+          "can_connect": {
+            "title": "Can Connect",
+            "type": "boolean"
+          },
+          "connected_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connected At"
+          },
+          "connected_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connected By"
+          },
+          "demo": {
+            "title": "Demo",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "disconnected",
+              "connected",
+              "needs_reconnect"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "connected_by",
+          "connected_at",
+          "can_connect",
+          "demo"
+        ],
+        "title": "KrogerAccountOut",
         "type": "object"
       },
       "LineExtraOut": {
@@ -2927,19 +2993,43 @@
       },
       "SettingsOut": {
         "properties": {
+          "cart_modality": {
+            "enum": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "title": "Cart Modality",
+            "type": "string"
+          },
           "household_name": {
             "title": "Household Name",
             "type": "string"
           }
         },
         "required": [
-          "household_name"
+          "household_name",
+          "cart_modality"
         ],
         "title": "SettingsOut",
         "type": "object"
       },
       "SettingsUpdate": {
         "properties": {
+          "cart_modality": {
+            "anyOf": [
+              {
+                "enum": [
+                  "PICKUP",
+                  "DELIVERY"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cart Modality"
+          },
           "household_name": {
             "anyOf": [
               {
@@ -5229,6 +5319,63 @@
         "summary": "Restore Item",
         "tags": [
           "items"
+        ]
+      }
+    },
+    "/api/kroger/account": {
+      "get": {
+        "operationId": "kroger_account_api_kroger_account_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KrogerAccountOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Kroger Account",
+        "tags": [
+          "kroger"
+        ]
+      }
+    },
+    "/api/kroger/connect": {
+      "post": {
+        "description": "Start Connect Kroger: the phone goes to the URL, signs in, and comes back to the callback.",
+        "operationId": "connect_api_kroger_connect_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Connect",
+        "tags": [
+          "kroger"
+        ]
+      }
+    },
+    "/api/kroger/connection": {
+      "delete": {
+        "operationId": "disconnect_api_kroger_connection_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Disconnect",
+        "tags": [
+          "kroger"
         ]
       }
     },

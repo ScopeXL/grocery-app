@@ -6,6 +6,9 @@
 * GETs and the token POST retry connect errors, timeouts and 500/502/503/504: 3 attempts with
   full-jitter backoff (0.5 s base, 4 s cap), honoring `Retry-After` up to 10 s.
 * A 401 forces one token refresh and one retry. A 429 blocks the bucket (usage.py).
+* A customer's code exchange and refresh retry only connect errors, which prove the request
+  never left: a refresh that did reach Kroger may already have rotated the token.
+* A cart add is never retried (PLAN §7.5).
 * JSON is parsed with `parse_float=Decimal`, so prices are exact before they become cents.
 * Logs carry the bucket, status and attempt only: never terms, tokens, IDs or payloads.
 """
@@ -21,7 +24,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from email.utils import parsedate_to_datetime
 from typing import Any, cast
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 
 import httpx
 
@@ -30,11 +33,16 @@ from dinnerbell.core.logging import get_logger
 from dinnerbell.core.version import build_info
 from dinnerbell.kroger.cachepolicy import NOT_STORABLE, CachePolicy, cache_policy
 from dinnerbell.kroger.client import (
+    CartItem,
     Fetched,
     KrogerAuthError,
+    KrogerCartUnknownError,
+    KrogerCustomerAuthError,
     KrogerDailyLimitError,
+    KrogerGrantError,
     KrogerRequestError,
     KrogerUnavailableError,
+    TokenGrant,
 )
 from dinnerbell.kroger.parse import (
     Chain,
@@ -52,6 +60,9 @@ API_BASE = "https://api.kroger.com/v1"
 IMAGE_BASE = "https://www.kroger.com/product/images"  # the CSP's img-src allows exactly this
 TOKEN_PATH = "/connect/oauth2/token"  # noqa: S105 - a URL path, not a secret
 TOKEN_SCOPE = "product.compact"  # noqa: S105 - an OAuth scope name, not a secret
+AUTHORIZE_PATH = "/connect/oauth2/authorize"
+CART_SCOPE = "cart.basic:write"
+CART_PATH = "/cart/add"
 TOKEN_MARGIN = timedelta(seconds=60)
 RETRY_STATUSES = frozenset({500, 502, 503, 504})
 MAX_ATTEMPTS = 3
@@ -60,6 +71,7 @@ BACKOFF_CAP_S = 4.0
 RETRY_AFTER_MAX_S = 10.0
 MAX_BATCH = 50
 TRANSIENT_ERRORS = (httpx.ConnectError, httpx.TimeoutException, httpx.RemoteProtocolError)
+NEVER_SENT = (httpx.ConnectError, httpx.ConnectTimeout)  # the request never left this server
 
 type Observer = Callable[[str, httpx.Response], None]
 type Sleep = Callable[[float], Awaitable[None]]
@@ -81,6 +93,8 @@ class LiveKroger:
     ) -> None:
         if transport is None and _under_pytest():
             raise RuntimeError("the live Kroger client needs KROGER_LIVE=1 under pytest")
+        self._client_id = client_id
+        self._base_url = base_url
         self._basic = httpx.BasicAuth(client_id, client_secret)
         self._http = httpx.AsyncClient(
             base_url=base_url,
@@ -159,6 +173,120 @@ class LiveKroger:
         }
         response = await self._get(Bucket.PRODUCTS, "/products", params)
         return Fetched(parse_products(self._json(response)), self._policy(response))
+
+    # ---- a customer's account and cart -------------------------------------------------------
+
+    def authorize_url(self, *, state: str, code_challenge: str, redirect_uri: str) -> str:
+        params = {
+            "scope": CART_SCOPE,
+            "response_type": "code",
+            "client_id": self._client_id,
+            "redirect_uri": redirect_uri,
+            "state": state,
+            "code_challenge": code_challenge,
+            "code_challenge_method": "S256",
+        }
+        return f"{self._base_url}{AUTHORIZE_PATH}?{urlencode(params)}"
+
+    async def exchange_code(self, code: str, code_verifier: str, redirect_uri: str) -> TokenGrant:
+        return await self._customer_token(
+            "exchange",
+            {
+                "grant_type": "authorization_code",
+                "code": code,
+                "redirect_uri": redirect_uri,
+                "code_verifier": code_verifier,
+            },
+        )
+
+    async def refresh(self, refresh_token: str) -> TokenGrant:
+        return await self._customer_token(
+            "refresh", {"grant_type": "refresh_token", "refresh_token": refresh_token}
+        )
+
+    async def add_to_cart(self, access_token: str, items: Sequence[CartItem]) -> None:
+        if not items:
+            return
+        await self._usage.check(Bucket.CART)
+        body = {
+            "items": [
+                {"upc": item.upc, "quantity": item.quantity, "modality": item.modality.value}
+                for item in items
+            ]
+        }
+        try:
+            response = await self._http.put(
+                CART_PATH, json=body, headers={"Authorization": f"Bearer {access_token}"}
+            )
+        except NEVER_SENT as exc:
+            log.warning("kroger.cart_unreachable", reason=type(exc).__name__)
+            raise KrogerUnavailableError("Kroger couldn't be reached") from None
+        except httpx.HTTPError as exc:
+            # It went out (or may have): a timeout or a dropped connection proves nothing.
+            log.warning("kroger.cart_no_answer", reason=type(exc).__name__)
+            raise KrogerCartUnknownError("No clear answer from Kroger's cart") from None
+        self._observe(Bucket.CART, response)
+        status = response.status_code
+        blocked_until = await self._usage.record(
+            Bucket.CART, status, reset_after=_reset_after(response.headers.get("ratelimit-reset"))
+        )
+        log.info("kroger.call", api=Bucket.CART, status=status, attempt=1, items=len(items))
+        if 200 <= status < 300:
+            return
+        if status == 429:
+            raise KrogerDailyLimitError(blocked_until or self._clock.now() + timedelta(hours=1))
+        if status == 401:
+            raise KrogerCustomerAuthError("Kroger refused the customer's access token")
+        if status == 403:
+            raise KrogerAuthError("Kroger refused this app's access to the cart")
+        if 400 <= status < 500:
+            raise KrogerRequestError(status)
+        raise KrogerCartUnknownError(f"No clear answer from Kroger's cart ({status})")
+
+    async def _customer_token(self, label: str, form: dict[str, str]) -> TokenGrant:
+        attempt = 1
+        while True:
+            try:
+                response = await self._http.post(TOKEN_PATH, data=form, auth=self._basic)
+            except NEVER_SENT as exc:
+                await self._retry_or_raise(label, attempt, None, type(exc).__name__)
+                attempt += 1
+                continue
+            except httpx.HTTPError as exc:
+                log.warning("kroger.unavailable", api=label, reason=type(exc).__name__, attempts=1)
+                raise KrogerUnavailableError(f"Kroger isn't answering ({label})") from None
+            self._observe(label, response)
+            status = response.status_code
+            log.info("kroger.call", api=label, status=status, attempt=attempt)
+            error = _oauth_error(response) if status >= 400 else None
+            if status in (408, 429):
+                raise KrogerUnavailableError(f"Kroger isn't answering ({label}, {status})")
+            if (
+                error == "invalid_client"
+                or status == 403
+                or (status == 401 and error != "invalid_grant")
+            ):
+                log.warning("kroger.token_refused", api=label, status=status)
+                raise KrogerAuthError("Kroger refused the client ID or secret")
+            if 400 <= status < 500:
+                log.warning("kroger.grant_refused", api=label, status=status, error=error)
+                raise KrogerGrantError("Kroger refused the sign-in")
+            if status >= 300:
+                raise KrogerUnavailableError(f"Kroger isn't answering ({label}, {status})")
+            body = self._json(response)
+            fields = cast(dict[str, Any], body) if isinstance(body, dict) else {}
+            token = fields.get("access_token")
+            lifetime = fields.get("expires_in")
+            refresh = fields.get("refresh_token")
+            scope = fields.get("scope")
+            if not isinstance(token, str) or not token or not isinstance(lifetime, int):
+                raise KrogerUnavailableError("Kroger sent a token response we couldn't read")
+            return TokenGrant(
+                access_token=token,
+                expires_in=timedelta(seconds=lifetime),
+                refresh_token=refresh if isinstance(refresh, str) and refresh else None,
+                scope=scope if isinstance(scope, str) else None,
+            )
 
     # ---- requests ---------------------------------------------------------------------------
 
@@ -317,6 +445,21 @@ def _retry_after_seconds(value: str | None, now: datetime) -> float | None:
     if when.tzinfo is None:
         return None
     return max(0.0, (when - now).total_seconds())
+
+
+KNOWN_OAUTH_ERRORS = frozenset(
+    {"invalid_grant", "invalid_client", "invalid_request", "unauthorized_client", "invalid_scope"}
+)
+
+
+def _oauth_error(response: httpx.Response) -> str | None:
+    """The OAuth `error` code, only when it's a standard one (it's logged; nothing else is)."""
+    try:
+        body = json.loads(response.content)
+    except ValueError:
+        return None
+    error = cast(dict[str, Any], body).get("error") if isinstance(body, dict) else None
+    return error if error in KNOWN_OAUTH_ERRORS else None
 
 
 def _reset_after(value: str | None) -> timedelta | None:

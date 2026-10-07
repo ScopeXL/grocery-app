@@ -1,4 +1,4 @@
-"""Signed-in devices (docs/adr/0004-household-password-login.md)."""
+"""Signed-in devices, and the one-time codes that add a phone (docs/adr/0004)."""
 
 from __future__ import annotations
 
@@ -22,3 +22,21 @@ class Device(Base):
     created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)
     last_seen_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)
     revoked_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), default=None)
+
+
+class JoinCode(Base):
+    """A code a signed-in phone shows (as a QR code, and in letters) so another phone can sign
+    in without the password: single-use, for 10 minutes, stored hashed (PLAN §10.2)."""
+
+    __tablename__ = "join_codes"
+
+    code_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    created_by_device_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("devices.id", ondelete="CASCADE"), index=True
+    )
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(UTCDateTime(), index=True)
+    used_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), default=None)
+    used_by_device_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("devices.id", ondelete="SET NULL"), default=None
+    )

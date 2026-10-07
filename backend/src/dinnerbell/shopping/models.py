@@ -120,3 +120,32 @@ class AppliedOp(Base):
     received_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow, index=True)
     result: Mapped[str] = mapped_column(String(16))  # applied | superseded | rejected
     reason: Mapped[str | None] = mapped_column(String(32), default=None)
+
+
+class CartSend(Base):
+    """One item sent to the Kroger cart, and what came back (PLAN §7.5).
+
+    The row is written as `unknown` before the call goes out and updated after, so a crash or a
+    timeout reads as "check your Kroger cart", never as "not sent". Items with an `added` row are
+    never sent again unless someone confirms it. Rows go a week after sending, or a day after
+    the trip is finished (Kroger's terms: no customer cart data after shopping).
+    """
+
+    __tablename__ = "cart_sends"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    trip_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("trips.id", ondelete="CASCADE"), index=True
+    )
+    trip_item_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("trip_items.id", ondelete="CASCADE"), index=True
+    )
+    upc: Mapped[str] = mapped_column(String(16))
+    quantity: Mapped[int] = mapped_column(Integer)
+    modality: Mapped[str] = mapped_column(String(16))  # PICKUP | DELIVERY
+    sent_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow, index=True)
+    sent_by_member_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("members.id", ondelete="SET NULL"), default=None
+    )
+    outcome: Mapped[str] = mapped_column(String(8), default="unknown")  # added | failed | unknown
+    reason: Mapped[str | None] = mapped_column(String(32), default=None)

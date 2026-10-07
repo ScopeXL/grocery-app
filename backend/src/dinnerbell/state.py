@@ -15,7 +15,9 @@ from dinnerbell.core.jobs import Jobs
 from dinnerbell.db.backup import BackupService
 from dinnerbell.db.engine import Database
 from dinnerbell.events.hub import EventHub
+from dinnerbell.kroger.account import KrogerAccount
 from dinnerbell.kroger.catalog import ProductCatalog
+from dinnerbell.kroger.client import KrogerApi
 
 
 @dataclass
@@ -29,6 +31,8 @@ class AppState:
     limiter: LoginLimiter
     backups: BackupService
     catalog: ProductCatalog
+    kroger: KrogerApi
+    account: KrogerAccount
     jobs: Jobs = field(default_factory=Jobs)
     started: bool = False
 

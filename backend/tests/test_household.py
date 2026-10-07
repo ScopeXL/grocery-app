@@ -41,9 +41,21 @@ async def test_member_names_are_validated(client: httpx.AsyncClient) -> None:
 
 async def test_household_name(client: httpx.AsyncClient) -> None:
     await login(client)
-    assert (await client.get("/api/settings")).json() == {"household_name": "Our household"}
+    assert (await client.get("/api/settings")).json() == {
+        "household_name": "Our household",
+        "cart_modality": "PICKUP",
+    }
     response = await client.patch("/api/settings", json={"household_name": "Home"}, headers=CSRF)
-    assert response.json() == {"household_name": "Home"}
+    assert response.json() == {"household_name": "Home", "cart_modality": "PICKUP"}
+
+
+async def test_pickup_or_delivery_default(client: httpx.AsyncClient) -> None:
+    await login(client)
+    response = await client.patch("/api/settings", json={"cart_modality": "DELIVERY"}, headers=CSRF)
+    assert response.json()["cart_modality"] == "DELIVERY"
+    assert (await client.get("/api/settings")).json()["cart_modality"] == "DELIVERY"
+    bad = await client.patch("/api/settings", json={"cart_modality": "SHIP"}, headers=CSRF)
+    assert bad.status_code == 422
 
 
 async def test_export_contains_household_data_only(client: httpx.AsyncClient) -> None:

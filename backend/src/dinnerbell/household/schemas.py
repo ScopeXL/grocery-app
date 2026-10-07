@@ -9,6 +9,7 @@ HouseholdName = Annotated[
     str, StringConstraints(strip_whitespace=True, min_length=1, max_length=80)
 ]
 MarkerColor = Literal["basil", "tomato", "carrot", "eggplant", "beet", "olive", "cocoa", "plum"]
+CartModality = Literal["PICKUP", "DELIVERY"]
 
 
 class MemberOut(BaseModel):
@@ -28,7 +29,9 @@ class MemberUpdate(BaseModel):
 
 class SettingsOut(BaseModel):
     household_name: str
+    cart_modality: CartModality  # what Send to Kroger cart offers first
 
 
 class SettingsUpdate(BaseModel):
     household_name: HouseholdName | None = None
+    cart_modality: CartModality | None = None

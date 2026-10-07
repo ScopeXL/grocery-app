@@ -6,6 +6,7 @@ from fastapi import APIRouter
 
 from dinnerbell.auth.deps import SessionDep
 from dinnerbell.household import service
+from dinnerbell.household.models import Household
 from dinnerbell.household.schemas import (
     MemberCreate,
     MemberOut,
@@ -18,11 +19,15 @@ from dinnerbell.state import StateDep
 router = APIRouter(prefix="/api", tags=["household"])
 
 
+def settings_out(home: Household) -> SettingsOut:
+    modality = "DELIVERY" if home.default_cart_modality == "DELIVERY" else "PICKUP"
+    return SettingsOut(household_name=home.name, cart_modality=modality)
+
+
 @router.get("/settings")
 async def get_settings(state: StateDep, session: SessionDep) -> SettingsOut:
     async with state.db.read() as db:
-        home = await service.household(db)
-        return SettingsOut(household_name=home.name)
+        return settings_out(await service.household(db))
 
 
 @router.patch("/settings")
@@ -33,8 +38,10 @@ async def update_settings(
         home = await service.household(tx.session)
         if body.household_name is not None:
             home.name = body.household_name
+        if body.cart_modality is not None:
+            home.default_cart_modality = body.cart_modality
         tx.publish("settings.changed")
-        return SettingsOut(household_name=home.name)
+        return settings_out(home)
 
 
 @router.get("/members")

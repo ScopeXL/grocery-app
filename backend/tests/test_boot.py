@@ -6,6 +6,7 @@ import sqlite3
 import subprocess
 import sys
 import textwrap
+from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -63,6 +64,30 @@ def test_changing_the_secret_key_signs_everyone_out(data_dir: Path) -> None:
     instance_lock.release(data_dir / ".lock")
     boot.prepare(make_settings(data_dir, app_secret_key="another-secret-" + "1" * 32), CLOCK)
     assert _epoch(data_dir / "dinnerbell.db") == before + 1
+
+
+def test_changing_the_secret_key_asks_to_reconnect_kroger(data_dir: Path) -> None:
+    """Tokens encrypted under the old key can't be read: wipe them and say so (PLAN §10.7)."""
+    db = data_dir / "dinnerbell.db"
+    boot.prepare(make_settings(data_dir), CLOCK)
+    with closing(sqlite3.connect(db)) as conn:
+        conn.execute(
+            "UPDATE kroger_tokens SET status = 'connected', access_enc = 'a', refresh_enc = 'r'"
+        )
+        conn.commit()
+    instance_lock.release(data_dir / ".lock")
+    boot.prepare(make_settings(data_dir, app_secret_key="another-secret-" + "1" * 32), CLOCK)
+    with closing(sqlite3.connect(db)) as conn:
+        row = conn.execute("SELECT status, access_enc, refresh_enc FROM kroger_tokens").fetchone()
+    assert row == ("needs_reconnect", None, None)
+
+
+def test_a_disconnected_account_stays_disconnected_after_a_key_change(data_dir: Path) -> None:
+    boot.prepare(make_settings(data_dir), CLOCK)
+    instance_lock.release(data_dir / ".lock")
+    boot.prepare(make_settings(data_dir, app_secret_key="another-secret-" + "1" * 32), CLOCK)
+    with closing(sqlite3.connect(data_dir / "dinnerbell.db")) as conn:
+        assert conn.execute("SELECT status FROM kroger_tokens").fetchone() == ("disconnected",)
 
 
 def test_a_version_change_takes_a_pre_migration_backup_once(data_dir: Path) -> None:

@@ -165,6 +165,15 @@ def reconcile_app_meta(settings: Settings) -> None:
             "auth_epoch = auth_epoch + ?",
             (fingerprint, check, build_info().version, bump),
         )
+        if key_changed:
+            # The Kroger tokens were encrypted under the old key: nothing can read them now.
+            conn.execute(
+                "UPDATE kroger_tokens SET access_enc = NULL, access_expires_at = NULL, "
+                "refresh_enc = NULL, refresh_obtained_at = NULL, scope = NULL, "
+                "version = version + 1, status = CASE WHEN status = 'disconnected' "
+                "THEN 'disconnected' ELSE 'needs_reconnect' END"
+            )
+            conn.execute("DELETE FROM kroger_oauth_states")
         conn.commit()
     finally:
         conn.close()

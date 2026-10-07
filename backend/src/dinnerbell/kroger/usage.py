@@ -23,6 +23,7 @@ class Bucket(StrEnum):
     PRODUCTS = "products"  # search and by-ID share one bucket
     LOCATIONS = "locations"
     CHAINS = "chains"
+    CART = "cart"
 
 
 # Products: Kroger's docs (its responses carry no rate headers). Locations and chains: the
@@ -31,6 +32,7 @@ DAILY_LIMITS: dict[Bucket, int] = {
     Bucket.PRODUCTS: 10_000,
     Bucket.LOCATIONS: 5_000,
     Bucket.CHAINS: 5_000,
+    Bucket.CART: 5_000,
 }
 WINDOW = timedelta(hours=24)
 FIRST_PROBE = timedelta(hours=1)

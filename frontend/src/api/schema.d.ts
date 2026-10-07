@@ -450,6 +450,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/kroger/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Kroger Account */
+        get: operations["kroger_account_api_kroger_account_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/kroger/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Connect
+         * @description Start Connect Kroger: the phone goes to the URL, signs in, and comes back to the callback.
+         */
+        post: operations["connect_api_kroger_connect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/kroger/connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Disconnect */
+        delete: operations["disconnect_api_kroger_connection_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/kroger/products": {
         parameters: {
             query?: never;
@@ -1114,6 +1168,11 @@ export interface components {
             /** X Forwarded Proto */
             x_forwarded_proto: string | null;
         };
+        /** ConnectOut */
+        ConnectOut: {
+            /** Authorize Url */
+            authorize_url: string;
+        };
         /**
          * CostOut
          * @description What the dish's own amounts cost at today's prices, as an estimate.
@@ -1447,6 +1506,22 @@ export interface components {
             step: string | null;
             /** Units */
             units: string[];
+        };
+        /** KrogerAccountOut */
+        KrogerAccountOut: {
+            /** Can Connect */
+            can_connect: boolean;
+            /** Connected At */
+            connected_at: string | null;
+            /** Connected By */
+            connected_by: string | null;
+            /** Demo */
+            demo: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "disconnected" | "connected" | "needs_reconnect";
         };
         /** LineExtraOut */
         LineExtraOut: {
@@ -1880,11 +1955,18 @@ export interface components {
         };
         /** SettingsOut */
         SettingsOut: {
+            /**
+             * Cart Modality
+             * @enum {string}
+             */
+            cart_modality: "PICKUP" | "DELIVERY";
             /** Household Name */
             household_name: string;
         };
         /** SettingsUpdate */
         SettingsUpdate: {
+            /** Cart Modality */
+            cart_modality?: ("PICKUP" | "DELIVERY") | null;
             /** Household Name */
             household_name?: string | null;
         };
@@ -3081,6 +3163,64 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    kroger_account_api_kroger_account_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KrogerAccountOut"];
+                };
+            };
+        };
+    };
+    connect_api_kroger_connect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectOut"];
+                };
+            };
+        };
+    };
+    disconnect_api_kroger_connection_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

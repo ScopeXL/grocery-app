@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import json
 import random
+from collections.abc import Callable, Coroutine
 from datetime import UTC, datetime, timedelta
 from urllib.parse import parse_qs
 
@@ -14,10 +16,16 @@ from structlog.testing import capture_logs
 
 from dinnerbell.core.clock import FakeClock
 from dinnerbell.kroger.client import (
+    CartItem,
     KrogerAuthError,
+    KrogerCartUnknownError,
+    KrogerCustomerAuthError,
     KrogerDailyLimitError,
+    KrogerGrantError,
     KrogerRequestError,
     KrogerUnavailableError,
+    Modality,
+    TokenGrant,
 )
 from dinnerbell.kroger.live import BACKOFF_BASE_S, LiveKroger
 from dinnerbell.kroger.usage import MemoryUsageStore, UsageGuard
@@ -301,3 +309,228 @@ async def test_a_429_with_a_reset_header_blocks_until_then(
     with pytest.raises(KrogerDailyLimitError) as limit:
         await kroger.locations("00001")
     assert limit.value.retry_at == clock.now() + timedelta(hours=1)
+
+
+# ---- a customer's account and cart (M5) ---------------------------------------------------------
+
+
+def live_with(
+    handler: Callable[[httpx.Request], Coroutine[None, None, httpx.Response]],
+    clock: FakeClock,
+    delays: list[float],
+) -> LiveKroger:
+    async def record_sleep(seconds: float) -> None:
+        delays.append(seconds)
+
+    return LiveKroger(
+        "sample-client-id",
+        "sample-client-secret",
+        usage=UsageGuard(MemoryUsageStore(), clock),
+        clock=clock,
+        transport=httpx.MockTransport(handler),
+        base_url="https://api.kroger.test/v1",
+        sleep=record_sleep,
+        rng=random.Random(7),
+    )
+
+
+class Recorder:
+    """Answers each request with the next queued response (or raises the queued error)."""
+
+    def __init__(self, *answers: Queued) -> None:
+        self.answers = list(answers)
+        self.requests: list[httpx.Request] = []
+
+    async def __call__(self, request: httpx.Request) -> httpx.Response:
+        self.requests.append(request)
+        answer = self.answers.pop(0)
+        if isinstance(answer, Exception):
+            raise answer
+        return answer
+
+
+GRANT = {
+    "access_token": "customer-access-1",
+    "refresh_token": "customer-refresh-1",
+    "expires_in": 1800,
+    "scope": "cart.basic:write",
+    "token_type": "bearer",
+}
+CART = [CartItem(upc="0000000000042", quantity=2, modality=Modality.PICKUP)]
+
+
+def test_the_sign_in_url_asks_for_the_cart_with_pkce(
+    kroger: LiveKroger,
+) -> None:
+    url = httpx.URL(
+        kroger.authorize_url(
+            state="sample-state",
+            code_challenge="sample-challenge",
+            redirect_uri="https://dinner.example.com/api/kroger/callback",
+        )
+    )
+    assert (url.host, url.path) == ("api.kroger.test", "/v1/connect/oauth2/authorize")
+    assert dict(url.params) == {
+        "scope": "cart.basic:write",
+        "response_type": "code",
+        "client_id": "sample-client-id",
+        "redirect_uri": "https://dinner.example.com/api/kroger/callback",
+        "state": "sample-state",
+        "code_challenge": "sample-challenge",
+        "code_challenge_method": "S256",
+    }
+
+
+async def test_exchange_sends_the_code_and_verifier_with_basic_auth(
+    clock: FakeClock, delays: list[float]
+) -> None:
+    site = Recorder(httpx.Response(200, json=GRANT))
+    grant = await live_with(site, clock, delays).exchange_code(
+        "sample-code", "sample-verifier", "https://dinner.example.com/api/kroger/callback"
+    )
+    assert grant == TokenGrant(
+        access_token="customer-access-1",
+        expires_in=timedelta(seconds=1800),
+        refresh_token="customer-refresh-1",
+        scope="cart.basic:write",
+    )
+    request = site.requests[0]
+    assert request.url.path == "/v1/connect/oauth2/token"
+    assert parse_qs(request.content.decode()) == {
+        "grant_type": ["authorization_code"],
+        "code": ["sample-code"],
+        "redirect_uri": ["https://dinner.example.com/api/kroger/callback"],
+        "code_verifier": ["sample-verifier"],
+    }
+    expected = base64.b64encode(b"sample-client-id:sample-client-secret").decode()
+    assert request.headers["authorization"] == f"Basic {expected}"
+
+
+async def test_refresh_sends_the_refresh_token(clock: FakeClock, delays: list[float]) -> None:
+    site = Recorder(httpx.Response(200, json={**GRANT, "refresh_token": "customer-refresh-2"}))
+    grant = await live_with(site, clock, delays).refresh("customer-refresh-1")
+    assert grant.refresh_token == "customer-refresh-2"
+    assert parse_qs(site.requests[0].content.decode()) == {
+        "grant_type": ["refresh_token"],
+        "refresh_token": ["customer-refresh-1"],
+    }
+
+
+async def test_a_refresh_without_a_new_refresh_token_says_so(
+    clock: FakeClock, delays: list[float]
+) -> None:
+    body = {key: value for key, value in GRANT.items() if key != "refresh_token"}
+    grant = await live_with(Recorder(httpx.Response(200, json=body)), clock, delays).refresh("r")
+    assert grant.refresh_token is None
+
+
+async def test_token_calls_retry_only_when_the_request_never_left(
+    clock: FakeClock, delays: list[float]
+) -> None:
+    site = Recorder(httpx.ConnectError("refused"), httpx.Response(200, json=GRANT))
+    await live_with(site, clock, delays).refresh("customer-refresh-1")
+    assert len(site.requests) == 2
+
+    site = Recorder(httpx.ReadTimeout("slow"), httpx.Response(200, json=GRANT))
+    with pytest.raises(KrogerUnavailableError):
+        await live_with(site, clock, delays).refresh("customer-refresh-1")
+    assert len(site.requests) == 1  # it may have reached Kroger and rotated the token
+
+
+@pytest.mark.parametrize(
+    ("answer", "error"),
+    [
+        (httpx.Response(400, json={"error": "invalid_grant"}), KrogerGrantError),
+        (httpx.Response(400, content=b"not json"), KrogerGrantError),
+        (httpx.Response(401, json={"error": "invalid_grant"}), KrogerGrantError),
+        (httpx.Response(401, json={"error": "invalid_client"}), KrogerAuthError),
+        (httpx.Response(401), KrogerAuthError),
+        (httpx.Response(403), KrogerAuthError),
+        (httpx.Response(429), KrogerUnavailableError),
+        (httpx.Response(500), KrogerUnavailableError),
+        (httpx.Response(200, json={"nope": 1}), KrogerUnavailableError),
+    ],
+)
+async def test_what_a_refused_refresh_means(
+    clock: FakeClock, delays: list[float], answer: httpx.Response, error: type[Exception]
+) -> None:
+    site = Recorder(answer)
+    with pytest.raises(error):
+        await live_with(site, clock, delays).refresh("customer-refresh-1")
+    assert len(site.requests) == 1
+
+
+async def test_a_cart_add_is_one_put_with_the_customer_token(
+    clock: FakeClock, delays: list[float]
+) -> None:
+    site = Recorder(httpx.Response(204))
+    await live_with(site, clock, delays).add_to_cart("customer-access-1", CART)
+    request = site.requests[0]
+    assert (request.method, request.url.path) == ("PUT", "/v1/cart/add")
+    assert request.headers["authorization"] == "Bearer customer-access-1"
+    assert json.loads(request.content) == {
+        "items": [{"upc": "0000000000042", "quantity": 2, "modality": "PICKUP"}]
+    }
+
+
+@pytest.mark.parametrize(
+    ("answer", "error"),
+    [
+        (httpx.ReadTimeout("slow"), KrogerCartUnknownError),
+        (httpx.RemoteProtocolError("dropped"), KrogerCartUnknownError),
+        (httpx.Response(500), KrogerCartUnknownError),
+        (httpx.Response(503), KrogerCartUnknownError),
+        (httpx.ConnectError("refused"), KrogerUnavailableError),
+        (httpx.ConnectTimeout("no route"), KrogerUnavailableError),
+        (httpx.Response(401), KrogerCustomerAuthError),
+        (httpx.Response(403), KrogerAuthError),
+        (httpx.Response(400), KrogerRequestError),
+        (httpx.Response(429), KrogerDailyLimitError),
+    ],
+)
+async def test_a_cart_add_is_never_retried(
+    clock: FakeClock, delays: list[float], answer: Queued, error: type[Exception]
+) -> None:
+    site = Recorder(answer, httpx.Response(204))
+    with pytest.raises(error):
+        await live_with(site, clock, delays).add_to_cart("customer-access-1", CART)
+    assert len(site.requests) == 1
+    assert delays == []
+
+
+async def test_after_a_cart_429_nothing_goes_out(clock: FakeClock, delays: list[float]) -> None:
+    site = Recorder(httpx.Response(429))
+    kroger = live_with(site, clock, delays)
+    with pytest.raises(KrogerDailyLimitError):
+        await kroger.add_to_cart("customer-access-1", CART)
+    with pytest.raises(KrogerDailyLimitError):
+        await kroger.add_to_cart("customer-access-1", CART)
+    assert len(site.requests) == 1
+
+
+async def test_customer_tokens_never_reach_the_logs(clock: FakeClock, delays: list[float]) -> None:
+    site = Recorder(
+        httpx.Response(200, json=GRANT),
+        httpx.Response(400, json={"error": "invalid_grant", "error_description": "secretish"}),
+        httpx.Response(204),
+    )
+    kroger = live_with(site, clock, delays)
+    with capture_logs() as logs:
+        await kroger.exchange_code("sample-code", "sample-verifier", "https://x.test/cb")
+        with pytest.raises(KrogerGrantError):
+            await kroger.refresh("customer-refresh-1")
+        await kroger.add_to_cart("customer-access-1", CART)
+    text = repr(logs)
+    for value in (
+        "customer-access-1",
+        "customer-refresh-1",
+        "sample-code",
+        "sample-verifier",
+        "secretish",
+        "0000000000042",
+    ):
+        assert value not in text
+    assert {"event": "kroger.grant_refused", "api": "refresh", "status": 400} | {
+        "error": "invalid_grant",
+        "log_level": "warning",
+    } in logs

@@ -42,6 +42,10 @@ EXPORT_EXCLUDED: tuple[str, ...] = (
     "kroger_product_cache",
     "kroger_api_usage",
     "applied_ops",  # a log of phone actions, kept 60 days so none applies twice
+    "kroger_tokens",
+    "kroger_oauth_states",
+    "cart_sends",  # what went to the Kroger cart, kept a week so nothing is added twice
+    "join_codes",
 )
 FORMAT = "dinner-bell-export"
 FORMAT_VERSION = 1
