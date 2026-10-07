@@ -39,6 +39,7 @@ from dinnerbell.meals import service as meals_service
 from dinnerbell.meals.router import router as meals_router
 from dinnerbell.meta.router import router as meta_router
 from dinnerbell.meta.testing import router as testing_router
+from dinnerbell.planning.router import router as planning_router
 from dinnerbell.state import AppState
 from dinnerbell.stores.router import router as stores_router
 from dinnerbell.web.csrf import CSRFGuard
@@ -177,6 +178,7 @@ def create_app(
         app.include_router(kroger_fake_images)
     app.include_router(items_router)
     app.include_router(meals_router)
+    app.include_router(planning_router)
     app.include_router(events_router)
     if settings.dinnerbell_test_mode:
         app.include_router(testing_router)

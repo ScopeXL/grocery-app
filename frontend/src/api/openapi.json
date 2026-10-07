@@ -20,6 +20,68 @@
         "title": "ActiveStoreOut",
         "type": "object"
       },
+      "AlternativeOut": {
+        "properties": {
+          "current": {
+            "title": "Current",
+            "type": "boolean"
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductResult"
+          },
+          "unit_price_cents": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Price Cents"
+          },
+          "unit_price_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Price Text"
+          }
+        },
+        "required": [
+          "product",
+          "unit_price_cents",
+          "unit_price_text",
+          "current"
+        ],
+        "title": "AlternativeOut",
+        "type": "object"
+      },
+      "AlternativesOut": {
+        "properties": {
+          "alternatives": {
+            "items": {
+              "$ref": "#/components/schemas/AlternativeOut"
+            },
+            "title": "Alternatives",
+            "type": "array"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "alternatives"
+        ],
+        "title": "AlternativesOut",
+        "type": "object"
+      },
       "AmountIn": {
         "properties": {
           "kind": {
@@ -752,6 +814,49 @@
         "title": "DishOut",
         "type": "object"
       },
+      "DishRef": {
+        "properties": {
+          "archived": {
+            "title": "Archived",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "item_images": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Item Images",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "photo_url",
+          "item_images",
+          "archived"
+        ],
+        "title": "DishRef",
+        "type": "object"
+      },
       "DishUpdate": {
         "description": "Only the fields sent change; send null to clear servings, notes, the link or the photo.",
         "properties": {
@@ -894,6 +999,179 @@
           "prefill"
         ],
         "title": "EachWeightOut",
+        "type": "object"
+      },
+      "ExtraCreate": {
+        "description": "An item (from the household's items, or a product just turned into one) or plain text.\n\n`quantity` is in the item's list unit: packages, or pounds for things sold by weight.",
+        "properties": {
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "quantity": {
+            "default": "1",
+            "maxLength": 16,
+            "minLength": 1,
+            "title": "Quantity",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "title": "ExtraCreate",
+        "type": "object"
+      },
+      "ExtraOut": {
+        "properties": {
+          "added_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MemberRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "line_key": {
+            "title": "Line Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "string"
+          },
+          "quantity_text": {
+            "title": "Quantity Text",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "id",
+          "item_id",
+          "text",
+          "name",
+          "image_url",
+          "quantity",
+          "quantity_text",
+          "note",
+          "added_by",
+          "line_key"
+        ],
+        "title": "ExtraOut",
+        "type": "object"
+      },
+      "ExtraUpdate": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity"
+          }
+        },
+        "title": "ExtraUpdate",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -1050,6 +1328,69 @@
         "title": "ItemOut",
         "type": "object"
       },
+      "ItemOverrideIn": {
+        "description": "Changes to one line for this plan. Only the fields sent change.\n\n* `have_it`: true \"Have it\", false \"Need it\", null back to \"not asked\".\n* `quantity` (with `unit`, the line's unit as shown): the final quantity wanted. The server\n  keeps the difference from what the plan computes, so later meals still add on top.\n  `\"quantity\": null` goes back to the computed quantity.\n* `swap_product_id`: buy this product instead, for this trip; null undoes the swap. With\n  `always`, the item is linked to it for good instead.",
+        "properties": {
+          "always": {
+            "default": false,
+            "title": "Always",
+            "type": "boolean"
+          },
+          "have_it": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Have It"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity"
+          },
+          "swap_product_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Swap Product Id"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "enum": [
+                  "package",
+                  "each",
+                  "pound"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          }
+        },
+        "title": "ItemOverrideIn",
+        "type": "object"
+      },
       "ItemUpdate": {
         "description": "Only the fields sent change. `product_id: null` unlinks; `size_text: null` undoes a fix.",
         "properties": {
@@ -1165,6 +1506,35 @@
         "title": "KindOptionOut",
         "type": "object"
       },
+      "LineExtraOut": {
+        "properties": {
+          "added_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MemberRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "quantity",
+          "added_by"
+        ],
+        "title": "LineExtraOut",
+        "type": "object"
+      },
       "LineIn": {
         "properties": {
           "amount": {
@@ -1180,6 +1550,217 @@
           "amount"
         ],
         "title": "LineIn",
+        "type": "object"
+      },
+      "LineOut": {
+        "properties": {
+          "at_least": {
+            "title": "At Least",
+            "type": "boolean"
+          },
+          "computed": {
+            "title": "Computed",
+            "type": "string"
+          },
+          "cost_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Cents"
+          },
+          "estimated_weight": {
+            "title": "Estimated Weight",
+            "type": "boolean"
+          },
+          "extra": {
+            "title": "Extra",
+            "type": "string"
+          },
+          "extras": {
+            "items": {
+              "$ref": "#/components/schemas/LineExtraOut"
+            },
+            "title": "Extras",
+            "type": "array"
+          },
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "have_it": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Have It"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "needed_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needed Text"
+          },
+          "product_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Url"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "string"
+          },
+          "quantity_text": {
+            "title": "Quantity Text",
+            "type": "string"
+          },
+          "regular_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regular Cents"
+          },
+          "sale": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SaleOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "section": {
+            "$ref": "#/components/schemas/SectionOut"
+          },
+          "size_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Text"
+          },
+          "staple": {
+            "title": "Staple",
+            "type": "boolean"
+          },
+          "swapped": {
+            "title": "Swapped",
+            "type": "boolean"
+          },
+          "unit": {
+            "enum": [
+              "package",
+              "each",
+              "pound"
+            ],
+            "title": "Unit",
+            "type": "string"
+          },
+          "used_by": {
+            "items": {
+              "$ref": "#/components/schemas/UsedByOut"
+            },
+            "title": "Used By",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "item_id",
+          "name",
+          "image_url",
+          "product_url",
+          "quantity",
+          "quantity_text",
+          "unit",
+          "computed",
+          "extra",
+          "at_least",
+          "needed_text",
+          "size_text",
+          "cost_cents",
+          "regular_cents",
+          "sale",
+          "estimated_weight",
+          "used_by",
+          "extras",
+          "have_it",
+          "staple",
+          "swapped",
+          "warnings",
+          "flags",
+          "section"
+        ],
+        "title": "LineOut",
         "type": "object"
       },
       "LinesIn": {
@@ -1229,6 +1810,123 @@
           "password"
         ],
         "title": "LoginIn",
+        "type": "object"
+      },
+      "MealCreate": {
+        "properties": {
+          "day": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day"
+          },
+          "main_id": {
+            "title": "Main Id",
+            "type": "string"
+          },
+          "occasion": {
+            "default": "dinner",
+            "enum": [
+              "breakfast",
+              "lunch",
+              "dinner",
+              "snack"
+            ],
+            "title": "Occasion",
+            "type": "string"
+          },
+          "scale": {
+            "default": "1",
+            "enum": [
+              "1/2",
+              "1",
+              "2"
+            ],
+            "title": "Scale",
+            "type": "string"
+          },
+          "side_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 6,
+            "title": "Side Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "main_id"
+        ],
+        "title": "MealCreate",
+        "type": "object"
+      },
+      "MealUpdate": {
+        "description": "Only the fields sent change. Send `\"day\": null` for Any day.",
+        "properties": {
+          "day": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day"
+          },
+          "main_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Main Id"
+          },
+          "occasion": {
+            "anyOf": [
+              {
+                "enum": [
+                  "breakfast",
+                  "lunch",
+                  "dinner",
+                  "snack"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occasion"
+          },
+          "scale": {
+            "anyOf": [
+              {
+                "enum": [
+                  "1/2",
+                  "1",
+                  "2"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scale"
+          }
+        },
+        "title": "MealUpdate",
         "type": "object"
       },
       "MemberChoice": {
@@ -1299,6 +1997,30 @@
         "title": "MemberOut",
         "type": "object"
       },
+      "MemberRef": {
+        "description": "Who added something, drawn in their marker color with their initial.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "marker_color": {
+            "title": "Marker Color",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "marker_color"
+        ],
+        "title": "MemberRef",
+        "type": "object"
+      },
       "MemberUpdate": {
         "properties": {
           "marker_color": {
@@ -1337,6 +2059,19 @@
           }
         },
         "title": "MemberUpdate",
+        "type": "object"
+      },
+      "NewWeekUndo": {
+        "properties": {
+          "plan_id": {
+            "title": "Plan Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "plan_id"
+        ],
+        "title": "NewWeekUndo",
         "type": "object"
       },
       "PhotoOut": {
@@ -1408,6 +2143,161 @@
           "fix_size"
         ],
         "title": "PickerOut",
+        "type": "object"
+      },
+      "PlanOut": {
+        "properties": {
+          "changed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changed"
+          },
+          "extras": {
+            "items": {
+              "$ref": "#/components/schemas/ExtraOut"
+            },
+            "title": "Extras",
+            "type": "array"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/LineOut"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "meals": {
+            "items": {
+              "$ref": "#/components/schemas/PlannedMealOut"
+            },
+            "title": "Meals",
+            "type": "array"
+          },
+          "prices_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prices Note"
+          },
+          "today": {
+            "format": "date",
+            "title": "Today",
+            "type": "string"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/TotalsOut"
+          },
+          "usuals": {
+            "items": {
+              "$ref": "#/components/schemas/UsualOut"
+            },
+            "title": "Usuals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "today",
+          "meals",
+          "lines",
+          "extras",
+          "usuals",
+          "totals",
+          "prices_note"
+        ],
+        "title": "PlanOut",
+        "type": "object"
+      },
+      "PlannedMealOut": {
+        "properties": {
+          "added_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MemberRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "day": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "main": {
+            "$ref": "#/components/schemas/DishRef"
+          },
+          "occasion": {
+            "enum": [
+              "breakfast",
+              "lunch",
+              "dinner",
+              "snack"
+            ],
+            "title": "Occasion",
+            "type": "string"
+          },
+          "scale": {
+            "enum": [
+              "1/2",
+              "1",
+              "2"
+            ],
+            "title": "Scale",
+            "type": "string"
+          },
+          "sides": {
+            "items": {
+              "$ref": "#/components/schemas/DishRef"
+            },
+            "title": "Sides",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "main",
+          "sides",
+          "day",
+          "occasion",
+          "scale",
+          "added_by"
+        ],
+        "title": "PlannedMealOut",
         "type": "object"
       },
       "PreviewIn": {
@@ -1611,6 +2501,55 @@
         "title": "ProductResult",
         "type": "object"
       },
+      "SaleOut": {
+        "properties": {
+          "ends": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends"
+          },
+          "savings_cents": {
+            "title": "Savings Cents",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "savings_cents",
+          "ends"
+        ],
+        "title": "SaleOut",
+        "type": "object"
+      },
+      "SectionOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "order": {
+            "title": "Order",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "order"
+        ],
+        "title": "SectionOut",
+        "type": "object"
+      },
       "SessionOut": {
         "properties": {
           "device_id": {
@@ -1680,6 +2619,23 @@
         "title": "SettingsUpdate",
         "type": "object"
       },
+      "SidesIn": {
+        "properties": {
+          "side_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 6,
+            "title": "Side Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side_ids"
+        ],
+        "title": "SidesIn",
+        "type": "object"
+      },
       "StoreOption": {
         "description": "A store found near a ZIP code. `location_id` picks it; the screen never shows it.",
         "properties": {
@@ -1726,6 +2682,227 @@
           "address_lines"
         ],
         "title": "StoreOut",
+        "type": "object"
+      },
+      "TotalsOut": {
+        "properties": {
+          "have_it": {
+            "title": "Have It",
+            "type": "integer"
+          },
+          "needs_check": {
+            "title": "Needs Check",
+            "type": "integer"
+          },
+          "not_priced": {
+            "title": "Not Priced",
+            "type": "integer"
+          },
+          "not_priced_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Not Priced Text"
+          },
+          "prices_as_of": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prices As Of"
+          },
+          "prices_as_of_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prices As Of Text"
+          },
+          "regular_total_cents": {
+            "title": "Regular Total Cents",
+            "type": "integer"
+          },
+          "savings_cents": {
+            "title": "Savings Cents",
+            "type": "integer"
+          },
+          "savings_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Savings Text"
+          },
+          "total_cents": {
+            "title": "Total Cents",
+            "type": "integer"
+          },
+          "total_text": {
+            "title": "Total Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "total_cents",
+          "savings_cents",
+          "regular_total_cents",
+          "not_priced",
+          "needs_check",
+          "have_it",
+          "prices_as_of",
+          "total_text",
+          "savings_text",
+          "prices_as_of_text",
+          "not_priced_text"
+        ],
+        "title": "TotalsOut",
+        "type": "object"
+      },
+      "UsedByOut": {
+        "properties": {
+          "dish_names": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Dish Names",
+            "type": "array"
+          },
+          "meal_id": {
+            "title": "Meal Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "meal_id",
+          "name",
+          "dish_names"
+        ],
+        "title": "UsedByOut",
+        "type": "object"
+      },
+      "UsualOut": {
+        "description": "Something often added as an extra, offered as a one-tap re-add.",
+        "properties": {
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "item_id",
+          "text",
+          "name",
+          "image_url"
+        ],
+        "title": "UsualOut",
+        "type": "object"
+      },
+      "UsualSideOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "pinned": {
+            "title": "Pinned",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "photo_url",
+          "pinned"
+        ],
+        "title": "UsualSideOut",
+        "type": "object"
+      },
+      "UsualSidesIn": {
+        "description": "The exact usual sides for a Main: listed ones are kept, any others are hidden.",
+        "properties": {
+          "side_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 6,
+            "title": "Side Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side_ids"
+        ],
+        "title": "UsualSidesIn",
         "type": "object"
       },
       "ValidationError": {
@@ -2531,6 +3708,106 @@
         ]
       }
     },
+    "/api/dishes/{dish_id}/usual-sides": {
+      "get": {
+        "operationId": "get_usual_sides_api_dishes__dish_id__usual_sides_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dish_id",
+            "required": true,
+            "schema": {
+              "title": "Dish Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UsualSideOut"
+                  },
+                  "title": "Response Get Usual Sides Api Dishes  Dish Id  Usual Sides Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Usual Sides",
+        "tags": [
+          "planning"
+        ]
+      },
+      "put": {
+        "operationId": "put_usual_sides_api_dishes__dish_id__usual_sides_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dish_id",
+            "required": true,
+            "schema": {
+              "title": "Dish Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsualSidesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UsualSideOut"
+                  },
+                  "title": "Response Put Usual Sides Api Dishes  Dish Id  Usual Sides Put",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Usual Sides",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
     "/api/export": {
       "get": {
         "operationId": "export_api_export_get",
@@ -3256,6 +4533,586 @@
         "summary": "Get Thumb",
         "tags": [
           "meals"
+        ]
+      }
+    },
+    "/api/plan": {
+      "get": {
+        "operationId": "get_plan_api_plan_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Plan",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/plan/extras": {
+      "post": {
+        "operationId": "add_extra_api_plan_extras_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtraCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Extra",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/plan/extras/{extra_id}": {
+      "delete": {
+        "operationId": "remove_extra_api_plan_extras__extra_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "extra_id",
+            "required": true,
+            "schema": {
+              "title": "Extra Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Extra",
+        "tags": [
+          "planning"
+        ]
+      },
+      "patch": {
+        "operationId": "update_extra_api_plan_extras__extra_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "extra_id",
+            "required": true,
+            "schema": {
+              "title": "Extra Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtraUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Extra",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/plan/extras/{extra_id}/restore": {
+      "post": {
+        "operationId": "restore_extra_api_plan_extras__extra_id__restore_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "extra_id",
+            "required": true,
+            "schema": {
+              "title": "Extra Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Restore Extra",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/plan/items/{item_id}": {
+      "put": {
+        "operationId": "change_item_api_plan_items__item_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemOverrideIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change Item",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/plan/items/{item_id}/alternatives": {
+      "get": {
+        "description": "Other products for a line, each with its price per ounce (or pound, or piece).",
+        "operationId": "alternatives_api_plan_items__item_id__alternatives_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlternativesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Alternatives",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/plan/meals": {
+      "post": {
+        "operationId": "add_meal_api_plan_meals_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MealCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Meal",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/plan/meals/{meal_id}": {
+      "delete": {
+        "operationId": "remove_meal_api_plan_meals__meal_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "meal_id",
+            "required": true,
+            "schema": {
+              "title": "Meal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Meal",
+        "tags": [
+          "planning"
+        ]
+      },
+      "patch": {
+        "operationId": "update_meal_api_plan_meals__meal_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "meal_id",
+            "required": true,
+            "schema": {
+              "title": "Meal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MealUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Meal",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/plan/meals/{meal_id}/restore": {
+      "post": {
+        "operationId": "restore_meal_api_plan_meals__meal_id__restore_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "meal_id",
+            "required": true,
+            "schema": {
+              "title": "Meal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Restore Meal",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/plan/meals/{meal_id}/sides": {
+      "put": {
+        "operationId": "set_sides_api_plan_meals__meal_id__sides_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "meal_id",
+            "required": true,
+            "schema": {
+              "title": "Meal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SidesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Sides",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/plan/new-week": {
+      "post": {
+        "operationId": "new_week_api_plan_new_week_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "New Week",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/plan/new-week/undo": {
+      "post": {
+        "operationId": "undo_new_week_api_plan_new_week_undo_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewWeekUndo"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Undo New Week",
+        "tags": [
+          "planning"
         ]
       }
     },

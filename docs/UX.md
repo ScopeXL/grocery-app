@@ -158,6 +158,8 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
   - a scale chip, if not ×1;
   - **Change**, which opens a sheet: swap the main, change sides, day, occasion, scale (×½, ×1, ×2), or remove (with Undo).
 - **Total footer:** sticky; it updates as meals change. When the tally isn't zero, it adds "3 items have no price", which opens the List filtered to those lines.
+- **Start a new week** (a quiet button at the end): puts this week's plan away; the toast offers Undo until the new week has meals.
+- **At 1440 px:** the meal library (with Add buttons) on the left and the list in walking order on the right.
 
 ### 4.5 Add a meal (sheet)
 
@@ -277,7 +279,8 @@ A live preview line shows the share and the cost.
   - **Have it already**;
   - **Swap product**, listing alternatives with unit prices ("$0.25 per oz"), then **For this trip** or **Always use this**;
   - **Open in Kroger**.
-- **Extras:** **Add something else** searches Kroger or takes plain text. The **Usuals** row offers one-tap re-adds. Every extra shows who added it.
+- **Extras:** **Add something else** searches Kroger or takes plain text. The **Usuals** row offers one-tap re-adds of things added before. Every extra shows who added it. Lines no meal uses sit in Extras; an extra on a line a meal uses shows there as "Mia added 1 more".
+- **An unlinked item's sheet** offers **Choose a product** instead of Swap product.
 - **Bottom bar:**
   - **Save list** freezes the list into a saved list; the toast says "List saved".
   - Once a list is saved, the bar shows **Start shopping**.

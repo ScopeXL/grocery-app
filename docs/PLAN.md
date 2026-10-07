@@ -215,8 +215,8 @@ frontend/
 | `plans` | id, status (`active`/`archived`), started_at, archived_at | Exactly one active plan |
 | `plan_meals` | id, plan_id, main_id, day?, occasion, scale (FractionText: 1/2, 1, 2), position, added_by_member_id, created_at, deleted_at | |
 | `plan_meal_sides` | plan_meal_id, side_id, position | Swapping a side changes one row |
-| `plan_extras` | id, plan_id, item_id? or text?, quantity (FractionText), note?, added_by_member_id, created_at, deleted_at | Covers the "Requests" idea: each extra shows who added it |
-| `plan_item_overrides` | plan_id, item_id, have_it, qty_delta (FractionText)?, qty_delta_unit?, product_override_id? | Overrides never edit a dish. Quantity overrides are stored as a delta (§8) |
+| `plan_extras` | id, plan_id, item_id? or text?, quantity (FractionText, in the line's unit), note?, added_by_member_id, created_at, deleted_at | Covers the "Requests" idea: each extra shows who added it. Adding what's already an extra adds to it. Usuals come from this table's history: removed extras count, ones on the list now don't |
+| `plan_item_overrides` | plan_id, item_id, have_it (true, false, or null for "not asked yet")?, qty_delta (FractionText)?, qty_delta_unit (`package`/`each`/`pound`)?, swap_product_id?, swap_upc?, swap_size_text?, swap_sold_by? | Overrides never edit a dish. Quantity overrides are stored as a delta (§8). A this-trip swap keeps the facts the household confirmed by choosing it, like an item's link (ADR 0016). Staples wait in the pantry check while have_it is null |
 | `trips` | id, plan_id, store_id, status + status_ts + status_by, created_by, estimate_cents, savings_cents, not_priced, prices_as_of, actual_total_cents?, finished_at?, version (gapless), product_cache_expires_at | Status is last-writer-wins (§9) |
 | `trip_items` | id, trip_id, item_id?, name, product_id?, upc?, size_text, image_ref, qty_text, quantity, unit_cents?, line_cents?, on_sale, section_key, section_label, section_order, aisle_label, bay, used_by (JSON); state + state_ts + state_by; note + note_ts + note_by; version | Frozen snapshot apart from state and note, which are separate last-writer-wins fields |
 | `applied_ops` | op_id (PK), trip_id, kind, client_id, member_id, client_ts, effective_ts, received_at, result, reason | Makes ops idempotent; pruned after 60 days |
@@ -248,7 +248,7 @@ A trip is a snapshot on purpose: later edits to meals or prices must not change 
 | Kroger | `GET kroger/products?q=` (3+ characters; short server-side cache), `POST kroger/connect` (M5; returns the authorize URL), `GET kroger/callback` (M5), `DELETE kroger/connection` |
 | Items | `GET items?q=` (household items first), `POST items`, `PATCH items/{id}` (link product, correct size, each-weight, staple flag), archive and restore |
 | Dishes | `GET dishes?role=&occasion=&q=&favorite=`, `POST dishes`, `GET` / `PATCH dishes/{id}`, `PUT dishes/{id}/items`, `POST dishes/{id}/duplicate`, archive and restore, `PUT dishes/{id}/photo`, `GET` / `PUT dishes/{id}/usual-sides` |
-| Plan | `GET plan` (meals, computed list and totals), `POST plan/meals`, `PATCH plan/meals/{id}` (swap main, day, occasion, scale), `PUT plan/meals/{id}/sides`, `DELETE plan/meals/{id}` and restore, extras CRUD, `PUT plan/items/{itemId}` (have-it, quantity delta, product swap), `GET plan/recommendations`, `POST plan/refresh-prices`, `POST plan/new-week`, `POST plan/repeat?from={planId or tripId}` |
+| Plan | `GET plan` (meals, the computed list, extras, usuals and totals, priced live), `POST plan/meals`, `PATCH plan/meals/{id}` (swap main, day, occasion, scale), `PUT plan/meals/{id}/sides`, `DELETE plan/meals/{id}` and `POST …/restore`, extras (`POST`, `PATCH`, `DELETE` and restore), `PUT plan/items/{itemId}` (have-it, quantity, product swap for this trip or always), `GET plan/items/{itemId}/alternatives` (with unit prices), `POST plan/new-week` and `POST plan/new-week/undo`, `GET plan/recommendations` (M4), `POST plan/repeat?from={planId or tripId}` (M3). Every change answers with the whole plan, so screens update from the response. Prices are fetched live on every read, so there is no refresh endpoint |
 | Trips | `POST trips` (save the list), `GET trips` (history, paginated), `GET trips/{id}[?since_version=N]`, `POST trips/{id}/ops` (batched, idempotent; §9.2), `POST trips/{id}/shop-again`, `POST trips/{id}/send-to-cart` (M5) |
 | Events | `GET events?since=epoch:seq` (SSE; §9.3) |
 | Test only | `/_test/{reset,seed,drop-streams,revoke-sessions}`, available only when `DINNERBELL_TEST_MODE=1`. Startup refuses that flag unless `APP_BASE_URL` is localhost |
@@ -465,6 +465,7 @@ These were verified on 2026-10-06 against Kroger's developer docs, FAQ, Terms an
   - product names like "Sample Whole Milk"; UPCs `00000000000NN`; location `99999001`; chain "SAMPLE MARKET";
   - SVG placeholder images served locally;
   - the real response *shapes*, including casing quirks, missing promos and placeholder aisles.
+  - sale dates written for 2026-10-06 that move with the clock, so the fake store's sales are always current (tests on a fixed clock see them as written; e2e runs on the real clock see the same sales).
 
 ---
 
@@ -547,7 +548,8 @@ def dollars_to_cents(d: Decimal | str | None) -> int | None    # None or <= 0 ->
 def promo_valid(p: PriceInfo, now: datetime) -> bool
 def effective_cents(p: PriceInfo, now: datetime) -> int
 def about_dollars(cents: int) -> int
-def headline(t: Totals, as_of_local: str) -> str
+def headline_parts(t: Totals, as_of_local: str) -> Headline     # total, savings, prices_as_of, before_tax, not_priced
+def headline(t: Totals, as_of_local: str) -> str             # the same, one per line; savings under $10 keep their cents
 
 # models.py     SoldBy, Product(product_id, size_text, sold_by, price), Item(id, name, size_override,
 #               each_weight), AmountKind {PACKAGES, MEASURE, COUNT}, Amount(kind, value, unit) with
@@ -555,8 +557,10 @@ def headline(t: Totals, as_of_local: str) -> str
 #               Flag {NO_PRODUCT; NO_PRICE; SIZE_UNKNOWN; NEEDS_EACH_WEIGHT; NOT_CONVERTIBLE;
 #               EST_EACH_WEIGHT; SWAPPED; APPROX_SWAP; OVERRIDDEN; OVERRIDE_STALE; SHORT; HAVE_IT; ON_SALE}
 #               (built in M1, so amounts and the M2 list builder share them)
-#   M2 adds:    Dish, Meal(main, sides, scale, occasion, day), PurchaseUnit {PACKAGE, EACH, POUND},
-#               QuantityOverride(delta, unit), Extra, PlanInput(...) with .with_meal(m)
+#   M2 adds:    DishLine(item_id, amount), Dish(id, name, lines), Meal(id, main, sides, scale) (day and
+#               occasion stay in the API), PurchaseUnit {PACKAGE, EACH, POUND}, QuantityOverride(delta, unit),
+#               Extra(id, item_id | text, quantity), PlanInput(meals, items, products, have_it, overrides,
+#               swaps, extras): immutable, validated, with .with_meal(m)
 
 # amounts.py    the picker only offers kinds that convert; validate rejects the rest
 def amount_options(item: Item, product: Product | None) -> AmountOptions
@@ -568,6 +572,13 @@ def contribution(a, item, product, original, swapped) -> Contribution    # packa
 
 # listbuild.py  one line per item; qty >= need unless SHORT; overshoot < 1 package / 1 piece / 1/4 lb
 def build_list(plan: PlanInput, now: datetime) -> ShoppingList     # lines sorted by (label.casefold(), key)
+# Line: key, item_id, label, unit, need, computed (before the override), quantity, extra, at_least,
+#       leftover (+ leftover_count, leftover_measure), each_weight (+ _estimated), product_id, size (of the
+#       product used), unit/regular_unit/cost/regular/savings cents, price_fetched_at, unconverted,
+#       used_by (MealUse(meal_id, dish_names), in the order meals were added), flags
+# An "at least" line buys at least one step (a package, a piece, or 1/4 lb or one piece's weight).
+def quantity_text(line, size) -> str; def quantity_words(unit, quantity, size) -> str   # "2 boxes", "1 3/4 lb"
+def unit_price(product, now) -> UnitPrice | None                   # per oz, fl oz, piece or lb: "$0.25 per oz"
 
 # totals.py     total + savings == regular_total; all >= 0
 @dataclass(frozen=True) class Totals: total: int; savings: int; regular_total: int
@@ -1868,7 +1879,7 @@ Shipped as 0.2.0 on 2026-10-06; the phone checklist passed with live Kroger data
 - **The list:** grouped by section or by meal; the pantry check (have-it, staples pre-flagged).
 - **Extras:** from Kroger or plain text, with Usuals and who added them.
 - **Overrides:** a quantity delta; product swap (for this trip, or always) with unit-price comparison; warnings for not sold here, low stock and no price.
-- **Prices:** refreshed when stale; "prices as of"; the sticky total footer.
+- **Prices:** fetched live on every read (nothing is cached, ADR 0016); "prices as of"; the sticky total footer.
 - **Live updates** for plan and list (SSE invalidations).
 - **Desktop:** panes at 1440; print view in aisle order.
 

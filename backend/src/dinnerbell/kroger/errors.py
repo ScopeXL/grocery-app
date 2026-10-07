@@ -18,17 +18,25 @@ from dinnerbell.kroger.client import (
 
 
 def describe(exc: KrogerError, zone: ZoneInfo, now: datetime) -> tuple[int, dict[str, object]]:
+    message = plain_message(exc, zone, now)
     if isinstance(exc, KrogerDailyLimitError):
-        when = about_time(exc.retry_at, zone, now)
-        message = f"Store search is paused until about {when} — your list still works."
         return 503, envelope("kroger_daily_limit", message, retry_at=exc.retry_at.isoformat())
     if isinstance(exc, KrogerAuthError):
-        message = "Store search isn't set up right. Ask whoever runs Dinner Bell to check it."
         return 503, envelope("kroger_setup", message)
     if isinstance(exc, KrogerRequestError):
-        return 502, envelope("kroger_rejected", "Kroger couldn't handle that. Try other words.")
-    message = "Kroger isn't answering right now. Try again in a minute."
+        return 502, envelope("kroger_rejected", message)
     return 503, envelope("kroger_unavailable", message)
+
+
+def plain_message(exc: KrogerError, zone: ZoneInfo, now: datetime) -> str:
+    if isinstance(exc, KrogerDailyLimitError):
+        when = about_time(exc.retry_at, zone, now)
+        return f"Store search is paused until about {when} — your list still works."
+    if isinstance(exc, KrogerAuthError):
+        return "Store search isn't set up right. Ask whoever runs Dinner Bell to check it."
+    if isinstance(exc, KrogerRequestError):
+        return "Kroger couldn't handle that. Try other words."
+    return "Kroger isn't answering right now. Try again in a minute."
 
 
 def about_time(moment: datetime, zone: ZoneInfo, now: datetime) -> str:

@@ -295,6 +295,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/dishes/{dish_id}/usual-sides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Usual Sides */
+        get: operations["get_usual_sides_api_dishes__dish_id__usual_sides_get"];
+        /** Put Usual Sides */
+        put: operations["put_usual_sides_api_dishes__dish_id__usual_sides_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/export": {
         parameters: {
             query?: never;
@@ -575,6 +593,215 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Plan */
+        get: operations["get_plan_api_plan_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/extras": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Extra */
+        post: operations["add_extra_api_plan_extras_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/extras/{extra_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Extra */
+        delete: operations["remove_extra_api_plan_extras__extra_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Extra */
+        patch: operations["update_extra_api_plan_extras__extra_id__patch"];
+        trace?: never;
+    };
+    "/api/plan/extras/{extra_id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore Extra */
+        post: operations["restore_extra_api_plan_extras__extra_id__restore_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/items/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Change Item */
+        put: operations["change_item_api_plan_items__item_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/items/{item_id}/alternatives": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Alternatives
+         * @description Other products for a line, each with its price per ounce (or pound, or piece).
+         */
+        get: operations["alternatives_api_plan_items__item_id__alternatives_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/meals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Meal */
+        post: operations["add_meal_api_plan_meals_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/meals/{meal_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Meal */
+        delete: operations["remove_meal_api_plan_meals__meal_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Meal */
+        patch: operations["update_meal_api_plan_meals__meal_id__patch"];
+        trace?: never;
+    };
+    "/api/plan/meals/{meal_id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore Meal */
+        post: operations["restore_meal_api_plan_meals__meal_id__restore_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/meals/{meal_id}/sides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set Sides */
+        put: operations["set_sides_api_plan_meals__meal_id__sides_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/new-week": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** New Week */
+        post: operations["new_week_api_plan_new_week_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/plan/new-week/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Undo New Week */
+        post: operations["undo_new_week_api_plan_new_week_undo_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/settings": {
         parameters: {
             query?: never;
@@ -652,6 +879,23 @@ export interface components {
         /** ActiveStoreOut */
         ActiveStoreOut: {
             store: components["schemas"]["StoreOut"] | null;
+        };
+        /** AlternativeOut */
+        AlternativeOut: {
+            /** Current */
+            current: boolean;
+            product: components["schemas"]["ProductResult"];
+            /** Unit Price Cents */
+            unit_price_cents: string | null;
+            /** Unit Price Text */
+            unit_price_text: string | null;
+        };
+        /** AlternativesOut */
+        AlternativesOut: {
+            /** Alternatives */
+            alternatives: components["schemas"]["AlternativeOut"][];
+            /** Item Id */
+            item_id: string;
         };
         /** AmountIn */
         AmountIn: {
@@ -871,6 +1115,19 @@ export interface components {
             /** Servings */
             servings: number | null;
         };
+        /** DishRef */
+        DishRef: {
+            /** Archived */
+            archived: boolean;
+            /** Id */
+            id: string;
+            /** Item Images */
+            item_images: string[];
+            /** Name */
+            name: string;
+            /** Photo Url */
+            photo_url: string | null;
+        };
         /**
          * DishUpdate
          * @description Only the fields sent change; send null to clear servings, notes, the link or the photo.
@@ -899,6 +1156,54 @@ export interface components {
             prefill: string | null;
             /** Presets */
             presets: string[];
+        };
+        /**
+         * ExtraCreate
+         * @description An item (from the household's items, or a product just turned into one) or plain text.
+         *
+         *     `quantity` is in the item's list unit: packages, or pounds for things sold by weight.
+         */
+        ExtraCreate: {
+            /** Item Id */
+            item_id?: string | null;
+            /** Note */
+            note?: string | null;
+            /**
+             * Quantity
+             * @default 1
+             */
+            quantity: string;
+            /** Text */
+            text?: string | null;
+        };
+        /** ExtraOut */
+        ExtraOut: {
+            added_by: components["schemas"]["MemberRef"] | null;
+            /** Id */
+            id: string;
+            /** Image Url */
+            image_url: string | null;
+            /** Item Id */
+            item_id: string | null;
+            /** Line Key */
+            line_key: string;
+            /** Name */
+            name: string;
+            /** Note */
+            note: string | null;
+            /** Quantity */
+            quantity: string;
+            /** Quantity Text */
+            quantity_text: string;
+            /** Text */
+            text: string | null;
+        };
+        /** ExtraUpdate */
+        ExtraUpdate: {
+            /** Note */
+            note?: string | null;
+            /** Quantity */
+            quantity?: string | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -944,6 +1249,32 @@ export interface components {
             sold_by: ("unit" | "weight") | null;
         };
         /**
+         * ItemOverrideIn
+         * @description Changes to one line for this plan. Only the fields sent change.
+         *
+         *     * `have_it`: true "Have it", false "Need it", null back to "not asked".
+         *     * `quantity` (with `unit`, the line's unit as shown): the final quantity wanted. The server
+         *       keeps the difference from what the plan computes, so later meals still add on top.
+         *       `"quantity": null` goes back to the computed quantity.
+         *     * `swap_product_id`: buy this product instead, for this trip; null undoes the swap. With
+         *       `always`, the item is linked to it for good instead.
+         */
+        ItemOverrideIn: {
+            /**
+             * Always
+             * @default false
+             */
+            always: boolean;
+            /** Have It */
+            have_it?: boolean | null;
+            /** Quantity */
+            quantity?: string | null;
+            /** Swap Product Id */
+            swap_product_id?: string | null;
+            /** Unit */
+            unit?: ("package" | "each" | "pound") | null;
+        };
+        /**
          * ItemUpdate
          * @description Only the fields sent change. `product_id: null` unlinks; `size_text: null` undoes a fix.
          */
@@ -973,11 +1304,73 @@ export interface components {
             /** Units */
             units: string[];
         };
+        /** LineExtraOut */
+        LineExtraOut: {
+            added_by: components["schemas"]["MemberRef"] | null;
+            /** Id */
+            id: string;
+            /** Quantity */
+            quantity: string;
+        };
         /** LineIn */
         LineIn: {
             amount: components["schemas"]["AmountIn"];
             /** Item Id */
             item_id: string;
+        };
+        /** LineOut */
+        LineOut: {
+            /** At Least */
+            at_least: boolean;
+            /** Computed */
+            computed: string;
+            /** Cost Cents */
+            cost_cents: number | null;
+            /** Estimated Weight */
+            estimated_weight: boolean;
+            /** Extra */
+            extra: string;
+            /** Extras */
+            extras: components["schemas"]["LineExtraOut"][];
+            /** Flags */
+            flags: string[];
+            /** Have It */
+            have_it: boolean | null;
+            /** Image Url */
+            image_url: string | null;
+            /** Item Id */
+            item_id: string | null;
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            /** Needed Text */
+            needed_text: string | null;
+            /** Product Url */
+            product_url: string | null;
+            /** Quantity */
+            quantity: string;
+            /** Quantity Text */
+            quantity_text: string;
+            /** Regular Cents */
+            regular_cents: number | null;
+            sale: components["schemas"]["SaleOut"] | null;
+            section: components["schemas"]["SectionOut"];
+            /** Size Text */
+            size_text: string | null;
+            /** Staple */
+            staple: boolean;
+            /** Swapped */
+            swapped: boolean;
+            /**
+             * Unit
+             * @enum {string}
+             */
+            unit: "package" | "each" | "pound";
+            /** Used By */
+            used_by: components["schemas"]["UsedByOut"][];
+            /** Warnings */
+            warnings: string[];
         };
         /** LinesIn */
         LinesIn: {
@@ -995,6 +1388,41 @@ export interface components {
         LoginIn: {
             /** Password */
             password: string;
+        };
+        /** MealCreate */
+        MealCreate: {
+            /** Day */
+            day?: string | null;
+            /** Main Id */
+            main_id: string;
+            /**
+             * Occasion
+             * @default dinner
+             * @enum {string}
+             */
+            occasion: "breakfast" | "lunch" | "dinner" | "snack";
+            /**
+             * Scale
+             * @default 1
+             * @enum {string}
+             */
+            scale: "1/2" | "1" | "2";
+            /** Side Ids */
+            side_ids?: string[];
+        };
+        /**
+         * MealUpdate
+         * @description Only the fields sent change. Send `"day": null` for Any day.
+         */
+        MealUpdate: {
+            /** Day */
+            day?: string | null;
+            /** Main Id */
+            main_id?: string | null;
+            /** Occasion */
+            occasion?: ("breakfast" | "lunch" | "dinner" | "snack") | null;
+            /** Scale */
+            scale?: ("1/2" | "1" | "2") | null;
         };
         /** MemberChoice */
         MemberChoice: {
@@ -1018,12 +1446,29 @@ export interface components {
             /** Name */
             name: string;
         };
+        /**
+         * MemberRef
+         * @description Who added something, drawn in their marker color with their initial.
+         */
+        MemberRef: {
+            /** Id */
+            id: string;
+            /** Marker Color */
+            marker_color: string;
+            /** Name */
+            name: string;
+        };
         /** MemberUpdate */
         MemberUpdate: {
             /** Marker Color */
             marker_color?: ("basil" | "tomato" | "carrot" | "eggplant" | "beet" | "olive" | "cocoa" | "plum") | null;
             /** Name */
             name?: string | null;
+        };
+        /** NewWeekUndo */
+        NewWeekUndo: {
+            /** Plan Id */
+            plan_id: string;
         };
         /** PhotoOut */
         PhotoOut: {
@@ -1046,6 +1491,50 @@ export interface components {
             /** Kinds */
             kinds: components["schemas"]["KindOptionOut"][];
             product: components["schemas"]["ProductResult"] | null;
+        };
+        /** PlanOut */
+        PlanOut: {
+            /** Changed */
+            changed?: string | null;
+            /** Extras */
+            extras: components["schemas"]["ExtraOut"][];
+            /** Id */
+            id: string | null;
+            /** Lines */
+            lines: components["schemas"]["LineOut"][];
+            /** Meals */
+            meals: components["schemas"]["PlannedMealOut"][];
+            /** Prices Note */
+            prices_note: string | null;
+            /**
+             * Today
+             * Format: date
+             */
+            today: string;
+            totals: components["schemas"]["TotalsOut"];
+            /** Usuals */
+            usuals: components["schemas"]["UsualOut"][];
+        };
+        /** PlannedMealOut */
+        PlannedMealOut: {
+            added_by: components["schemas"]["MemberRef"] | null;
+            /** Day */
+            day: string | null;
+            /** Id */
+            id: string;
+            main: components["schemas"]["DishRef"];
+            /**
+             * Occasion
+             * @enum {string}
+             */
+            occasion: "breakfast" | "lunch" | "dinner" | "snack";
+            /**
+             * Scale
+             * @enum {string}
+             */
+            scale: "1/2" | "1" | "2";
+            /** Sides */
+            sides: components["schemas"]["DishRef"][];
         };
         /** PreviewIn */
         PreviewIn: {
@@ -1101,6 +1590,22 @@ export interface components {
              */
             sold_by: "unit" | "weight";
         };
+        /** SaleOut */
+        SaleOut: {
+            /** Ends */
+            ends: string | null;
+            /** Savings Cents */
+            savings_cents: number;
+        };
+        /** SectionOut */
+        SectionOut: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Order */
+            order: number;
+        };
         /** SessionOut */
         SessionOut: {
             /** Device Id */
@@ -1121,6 +1626,11 @@ export interface components {
             /** Household Name */
             household_name?: string | null;
         };
+        /** SidesIn */
+        SidesIn: {
+            /** Side Ids */
+            side_ids: string[];
+        };
         /**
          * StoreOption
          * @description A store found near a ZIP code. `location_id` picks it; the screen never shows it.
@@ -1139,6 +1649,73 @@ export interface components {
             address_lines: string[];
             /** Name */
             name: string;
+        };
+        /** TotalsOut */
+        TotalsOut: {
+            /** Have It */
+            have_it: number;
+            /** Needs Check */
+            needs_check: number;
+            /** Not Priced */
+            not_priced: number;
+            /** Not Priced Text */
+            not_priced_text: string | null;
+            /** Prices As Of */
+            prices_as_of: string | null;
+            /** Prices As Of Text */
+            prices_as_of_text: string | null;
+            /** Regular Total Cents */
+            regular_total_cents: number;
+            /** Savings Cents */
+            savings_cents: number;
+            /** Savings Text */
+            savings_text: string | null;
+            /** Total Cents */
+            total_cents: number;
+            /** Total Text */
+            total_text: string;
+        };
+        /** UsedByOut */
+        UsedByOut: {
+            /** Dish Names */
+            dish_names: string[];
+            /** Meal Id */
+            meal_id: string;
+            /** Name */
+            name: string;
+        };
+        /**
+         * UsualOut
+         * @description Something often added as an extra, offered as a one-tap re-add.
+         */
+        UsualOut: {
+            /** Image Url */
+            image_url: string | null;
+            /** Item Id */
+            item_id: string | null;
+            /** Name */
+            name: string;
+            /** Text */
+            text: string | null;
+        };
+        /** UsualSideOut */
+        UsualSideOut: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Photo Url */
+            photo_url: string | null;
+            /** Pinned */
+            pinned: boolean;
+        };
+        /**
+         * UsualSidesIn
+         * @description The exact usual sides for a Main: listed ones are kept, any others are hidden.
+         */
+        UsualSidesIn: {
+            /** Side Ids */
+            side_ids: string[];
         };
         /** ValidationError */
         ValidationError: {
@@ -1695,6 +2272,72 @@ export interface operations {
             };
         };
     };
+    get_usual_sides_api_dishes__dish_id__usual_sides_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dish_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsualSideOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_usual_sides_api_dishes__dish_id__usual_sides_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dish_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UsualSidesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsualSideOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     export_api_export_get: {
         parameters: {
             query?: never;
@@ -2224,6 +2867,440 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_plan_api_plan_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+        };
+    };
+    add_extra_api_plan_extras_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExtraCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_extra_api_plan_extras__extra_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                extra_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_extra_api_plan_extras__extra_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                extra_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExtraUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    restore_extra_api_plan_extras__extra_id__restore_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                extra_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_item_api_plan_items__item_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ItemOverrideIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    alternatives_api_plan_items__item_id__alternatives_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlternativesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_meal_api_plan_meals_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MealCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_meal_api_plan_meals__meal_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                meal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_meal_api_plan_meals__meal_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                meal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MealUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    restore_meal_api_plan_meals__meal_id__restore_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                meal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_sides_api_plan_meals__meal_id__sides_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                meal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SidesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    new_week_api_plan_new_week_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+        };
+    };
+    undo_new_week_api_plan_new_week_undo_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NewWeekUndo"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
             };
             /** @description Validation Error */
             422: {
