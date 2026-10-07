@@ -1,6 +1,6 @@
 # ADR 0012: Visual direction "Fridge door"
 
-- **Status:** Accepted (chosen by the owner from two directions)
+- **Status:** Accepted (chosen by the owner from two directions); sizes, the action color and motion are superseded by ADR 0027
 - **Date:** 2026-10-06
 
 ## Context

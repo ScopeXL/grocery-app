@@ -33,3 +33,4 @@ Each record covers one decision: the context, what was decided, and the conseque
 | [0023](0023-ui-primitives-and-typescript-6.md) | UI primitives without runtime style injection; TypeScript 6 | — |
 | [0024](0024-cart-sends-one-item-at-a-time.md) | Cart sends go one item at a time; pound amounts stay in the Kroger app | — |
 | [0025](0025-add-a-phone-with-a-code.md) | Add a phone with a one-time code, scanned or typed | — |
+| [0027](0027-crisper-type-ink-accent-motion.md) | Crisper type (16 px), an ink accent, compact targets, motion that answers taps (CSS only) | — |
