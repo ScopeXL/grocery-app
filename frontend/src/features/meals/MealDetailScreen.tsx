@@ -76,7 +76,7 @@ export function MealDetailScreen({ dishId }: { dishId: string }) {
       <Link
         to="/meals"
         search={{ role: meal.role }}
-        className="mb-2 inline-flex min-h-12 items-center gap-1 text-body font-semibold text-accent"
+        className="mb-2 inline-flex min-h-11 items-center gap-1 text-body font-semibold text-accent"
       >
         <ChevronLeft aria-hidden="true" />
         {meal.role === "main" ? "Meals" : "Sides"}
@@ -122,7 +122,7 @@ export function MealDetailScreen({ dishId }: { dishId: string }) {
           href={meal.recipe_url}
           target="_blank"
           rel="noopener noreferrer"
-          className={`mb-5 inline-flex min-h-12 items-center gap-2 text-body font-semibold text-accent ${underlined}`}
+          className={`mb-5 inline-flex min-h-11 items-center gap-2 text-body font-semibold text-accent ${underlined}`}
         >
           Open the recipe
           <ExternalLink aria-hidden="true" className="size-5" />
@@ -141,7 +141,7 @@ export function MealDetailScreen({ dishId }: { dishId: string }) {
             {meal.lines.map((line) => (
               <li
                 key={line.id}
-                className="flex min-h-16 items-center gap-3 border-b border-rule px-3 py-2 last:border-b-0"
+                className="flex min-h-14 items-center gap-3 border-b border-rule px-3 py-2 last:border-b-0"
               >
                 <ProductImage src={line.item.image_url} alt="" size={48} />
                 <span className="flex min-w-0 flex-1 flex-col">

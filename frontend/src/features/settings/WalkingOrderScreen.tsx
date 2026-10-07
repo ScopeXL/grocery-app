@@ -57,7 +57,7 @@ export function WalkingOrderScreen() {
     <Screen title="Store walking order">
       <Link
         to="/settings"
-        className="-mt-4 mb-4 inline-flex min-h-12 items-center gap-1 text-body font-semibold text-accent"
+        className="-mt-4 mb-4 inline-flex min-h-11 items-center gap-1 text-body font-semibold text-accent"
       >
         <ChevronLeft aria-hidden="true" />
         Settings
@@ -76,7 +76,7 @@ export function WalkingOrderScreen() {
           {order.map((section, index) => (
             <li
               key={section.id}
-              className="flex min-h-16 items-center gap-2 border-b border-rule py-2 pr-2 pl-4 last:border-b-0"
+              className="flex min-h-14 items-center gap-2 border-b border-rule py-2 pr-2 pl-4 last:border-b-0"
             >
               <span className="w-8 text-secondary text-ink-soft">{String(index + 1)}</span>
               <span className="flex-1 text-body font-semibold">{section.label}</span>
@@ -87,7 +87,7 @@ export function WalkingOrderScreen() {
                 onClick={() => {
                   move(index, -1);
                 }}
-                className="flex size-12 items-center justify-center rounded-button border-2 border-rule disabled:opacity-40"
+                className="flex size-11 items-center justify-center rounded-button border-2 border-rule disabled:opacity-40"
               >
                 <ArrowUp aria-hidden="true" />
               </button>
@@ -98,7 +98,7 @@ export function WalkingOrderScreen() {
                 onClick={() => {
                   move(index, 1);
                 }}
-                className="flex size-12 items-center justify-center rounded-button border-2 border-rule disabled:opacity-40"
+                className="flex size-11 items-center justify-center rounded-button border-2 border-rule disabled:opacity-40"
               >
                 <ArrowDown aria-hidden="true" />
               </button>

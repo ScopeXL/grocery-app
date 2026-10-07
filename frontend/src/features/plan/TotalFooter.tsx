@@ -45,7 +45,7 @@ export function TotalFooter({ plan, compact = false }: { plan: PlanOut; compact?
           <Link
             to="/list"
             search={{ show: "unpriced" }}
-            className={`inline-flex min-h-12 shrink-0 items-center text-right text-secondary font-semibold text-accent ${underlined}`}
+            className={`inline-flex min-h-11 shrink-0 items-center text-right text-secondary font-semibold text-accent ${underlined}`}
           >
             {totals.not_priced_text}
           </Link>

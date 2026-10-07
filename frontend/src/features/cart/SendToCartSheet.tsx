@@ -59,7 +59,7 @@ function Group({
         {lines.map((line) => (
           <li
             key={line.trip_item_id}
-            className="flex min-h-16 items-center gap-3 border-b border-rule px-3 py-2 last:border-b-0"
+            className="flex min-h-14 items-center gap-3 border-b border-rule px-3 py-2 last:border-b-0"
           >
             <ProductImage src={line.image_url} alt="" size={48} />
             <div className="flex min-w-0 flex-1 flex-col">

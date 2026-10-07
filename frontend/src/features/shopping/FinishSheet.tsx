@@ -61,7 +61,7 @@ export function FinishSheet({
           onChange={(event) => {
             setPaid(event.target.value.slice(0, 12));
           }}
-          className="min-h-14 w-40 rounded-button border-2 border-rule bg-paper px-4 text-row"
+          className="min-h-12 w-40 rounded-button border-2 border-rule bg-paper px-4 text-row"
         />
       </div>
       <p className="mt-2 min-h-7 text-secondary text-ink-soft" role="status">

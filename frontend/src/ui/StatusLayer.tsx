@@ -30,7 +30,7 @@ export function OfflinePill() {
     pill = (
       <Link
         to="/sign-in"
-        className="pointer-events-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-ink px-4 py-2 text-secondary font-semibold text-counter [--focus-ring:var(--counter)]"
+        className="pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-4 py-2 text-secondary font-semibold text-counter [--focus-ring:var(--counter)]"
       >
         Sign in to sync
       </Link>
@@ -98,7 +98,7 @@ export function UpdatePrompt() {
         <span className="text-secondary font-semibold">A new version is ready.</span>
         <button
           type="button"
-          className="min-h-12 rounded-button bg-counter px-4 text-secondary font-bold text-ink"
+          className="min-h-11 rounded-button bg-counter px-4 text-secondary font-bold text-ink"
           onClick={() => {
             void outbox.flush().then(() => updateServiceWorker(true));
           }}
@@ -125,7 +125,7 @@ export function ToastRegion() {
           type="button"
           // The toast flips with the theme (ink on counter), so its action is the inverse pill:
           // lemon text on the light dark-mode toast was unreadable (1.17:1).
-          className="min-h-12 rounded-button bg-counter px-4 text-secondary font-bold text-ink"
+          className="min-h-11 rounded-button bg-counter px-4 text-secondary font-bold text-ink"
           onClick={() => {
             toast.onAction?.();
             dismissToast(toast.id);

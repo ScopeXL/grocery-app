@@ -63,7 +63,7 @@ export function WhoScreen() {
               onClick={() => {
                 choose.mutate(member.id);
               }}
-              className="flex min-h-16 w-full items-center gap-4 rounded-button border-2 border-rule bg-paper px-4 text-left text-row font-semibold"
+              className="flex min-h-14 w-full items-center gap-4 rounded-button border-2 border-rule bg-paper px-4 text-left text-row font-semibold"
             >
               <MemberBadge name={member.name} color={member.marker_color} />
               {member.name}
@@ -90,7 +90,7 @@ export function WhoScreen() {
             onChange={(event) => {
               setName(event.target.value);
             }}
-            className="min-h-14 rounded-button border-2 border-rule bg-paper px-4 text-body"
+            className="min-h-12 rounded-button border-2 border-rule bg-paper px-4 text-body"
           />
           <Button type="submit" block disabled={addMe.isPending || !name.trim()}>
             Add me

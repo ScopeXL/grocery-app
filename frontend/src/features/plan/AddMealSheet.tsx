@@ -219,7 +219,7 @@ function MainStep({
             <li key={card.id} className="border-b border-rule last:border-b-0">
               <button
                 type="button"
-                className="flex min-h-20 w-full items-center gap-3 px-3 py-2 text-left"
+                className="flex min-h-16 w-full items-center gap-3 px-3 py-2 text-left"
                 onClick={() => {
                   onChoose(card);
                 }}

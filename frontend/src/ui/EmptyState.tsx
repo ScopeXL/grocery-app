@@ -15,12 +15,12 @@ export function EmptyState({
 }) {
   return (
     <section className="overflow-hidden rounded-tile border border-rule bg-paper">
-      <div className="p-6">
+      <div className="p-5">
         <p className="text-row font-semibold">{message}</p>
-        {action ? <div className="mt-5">{action}</div> : null}
+        {action ? <div className="mt-4">{action}</div> : null}
         {note ? <p className="mt-4 text-secondary text-ink-soft">{note}</p> : null}
       </div>
-      <div aria-hidden="true" className="ruled-lines h-24 border-t border-rule" />
+      <div aria-hidden="true" className="ruled-lines h-20 border-t border-rule" />
     </section>
   );
 }

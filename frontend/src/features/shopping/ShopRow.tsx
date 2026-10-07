@@ -57,14 +57,14 @@ export function ShopRow({
         aria-checked={done}
         aria-label={done ? `Uncheck ${item.name}` : `Check off ${item.name}`}
         onClick={onCheck}
-        className="flex w-20 shrink-0 items-center justify-center"
+        className="flex w-18 shrink-0 items-center justify-center"
       >
         <span
-          className={`flex size-14 items-center justify-center rounded-button border-[3px] ${
+          className={`flex size-12 items-center justify-center rounded-button border-[3px] ${
             done ? "border-accent bg-accent text-on-accent" : "border-ink-soft bg-paper"
           }`}
         >
-          {done ? <Check aria-hidden="true" className="size-8" strokeWidth={3} /> : null}
+          {done ? <Check aria-hidden="true" className="size-7" strokeWidth={3} /> : null}
         </span>
       </button>
     </li>

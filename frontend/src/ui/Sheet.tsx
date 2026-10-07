@@ -45,7 +45,7 @@ export function Sheet({
     >
       {open ? (
         <div className="flex max-h-[88dvh] flex-col">
-          <header className="flex items-center justify-between gap-3 border-b border-rule py-2 pr-2 pl-4">
+          <header className="flex items-center justify-between gap-3 border-b border-rule py-1.5 pr-2 pl-4">
             <h2 id={titleId} className="text-row font-bold">
               {title}
             </h2>

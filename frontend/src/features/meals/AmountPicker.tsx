@@ -13,6 +13,7 @@ import { add, isPositive, parseFraction, toMixed, toText } from "../../lib/fract
 import { about } from "../../lib/money";
 import { useDebounced } from "../../lib/useDebounced";
 import { Button } from "../../ui/Button";
+import { Chip } from "../../ui/Chip";
 import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
 import type { AmountIn, AmountOut, ItemOut, KindOption, PickerOut } from "./types";
@@ -191,17 +192,15 @@ function KindSection({
       {option.presets.length > 0 ? (
         <div className="mb-3 flex flex-wrap gap-2">
           {option.presets.map((preset) => (
-            <button
+            <Chip
               key={preset.value + (preset.unit ?? "")}
-              type="button"
-              aria-pressed={same(choice, preset)}
+              on={same(choice, preset)}
               onClick={() => {
                 onChoose({ kind: preset.kind, value: preset.value, unit: preset.unit });
               }}
-              className="min-h-12 rounded-full border-2 border-rule bg-paper px-4 text-body font-semibold aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent"
             >
               {preset.text}
-            </button>
+            </Chip>
           ))}
         </div>
       ) : null}
@@ -215,7 +214,7 @@ function KindSection({
               setTyped(null);
               if (value) set(add(value, { n: -step.n, d: step.d }));
             }}
-            className="flex size-12 items-center justify-center rounded-button border-2 border-rule bg-paper disabled:opacity-50"
+            className="flex size-11 items-center justify-center rounded-button border-2 border-rule bg-paper disabled:opacity-50"
           >
             <Minus aria-hidden="true" />
           </button>
@@ -244,7 +243,7 @@ function KindSection({
               // Counting starts at one whole piece; after that it steps by the option's step.
               set(value ? add(value, step) : { n: 1, d: 1 });
             }}
-            className="flex size-12 items-center justify-center rounded-button border-2 border-rule bg-paper"
+            className="flex size-11 items-center justify-center rounded-button border-2 border-rule bg-paper"
           >
             <Plus aria-hidden="true" />
           </button>
@@ -304,18 +303,16 @@ function EachWeight({ picker }: { picker: PickerOut }) {
       <p className="mb-2 text-body font-semibold">About how much does one weigh?</p>
       <div className="flex flex-wrap gap-2">
         {presets.map((pounds) => (
-          <button
+          <Chip
             key={pounds}
-            type="button"
-            aria-pressed={chosen === pounds}
+            on={chosen === pounds}
             disabled={save.isPending}
             onClick={() => {
               save.mutate(pounds);
             }}
-            className="min-h-12 rounded-full border-2 border-rule bg-paper px-4 text-secondary font-semibold aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent"
           >
             {EACH_WEIGHT_NAMES[pounds] ?? `${pounds} lb`}
-          </button>
+          </Chip>
         ))}
       </div>
       <form

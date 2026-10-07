@@ -9,6 +9,7 @@ import { useState } from "react";
 import { api, unwrap } from "../../api/client";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
+import { Chip } from "../../ui/Chip";
 import { MemberBadge } from "../../ui/MemberBadge";
 import { AddItemSheet } from "../meals/AddItemSheet";
 import type { Line, PlanOut } from "../plan/types";
@@ -57,9 +58,8 @@ export function ExtrasSection({
           <h3 className="mb-2 text-body font-bold">Usuals</h3>
           <div className="flex flex-wrap gap-2" role="group" aria-label="Usuals">
             {plan.usuals.map((usual) => (
-              <button
+              <Chip
                 key={usual.item_id ?? `text:${usual.name}`}
-                type="button"
                 disabled={addExtra.isPending}
                 onClick={() => {
                   addExtra.mutate(
@@ -68,11 +68,10 @@ export function ExtrasSection({
                       : { text: usual.text ?? usual.name, name: usual.name },
                   );
                 }}
-                className="inline-flex min-h-12 items-center gap-1 rounded-full border-2 border-rule bg-paper px-4 text-secondary font-semibold disabled:opacity-60"
               >
                 <Plus aria-hidden="true" className="size-4" />
                 {usual.name}
-              </button>
+              </Chip>
             ))}
           </div>
         </div>

@@ -65,7 +65,7 @@ export function ChooseStore({ onChosen }: { onChosen: (store: StoreOut) => void 
             onChange={(event) => {
               setZip(event.target.value.replace(/\D/g, "").slice(0, 5));
             }}
-            className="min-h-14 w-36 rounded-button border-2 border-rule bg-paper px-4 text-row tracking-wider"
+            className="min-h-12 w-36 rounded-button border-2 border-rule bg-paper px-4 text-row tracking-wider"
           />
           <Button type="submit" disabled={!valid || search.isPending}>
             {search.isPending ? "Finding…" : "Find stores"}
@@ -99,7 +99,7 @@ export function ChooseStore({ onChosen }: { onChosen: (store: StoreOut) => void 
                   onClick={() => {
                     choose.mutate(store);
                   }}
-                  className="flex min-h-16 w-full items-start gap-3 px-4 py-3 text-left disabled:opacity-60"
+                  className="flex min-h-14 w-full items-start gap-3 px-4 py-3 text-left disabled:opacity-60"
                 >
                   <MapPin aria-hidden="true" className="mt-1 size-6 shrink-0 text-accent" />
                   <span className="flex flex-col">

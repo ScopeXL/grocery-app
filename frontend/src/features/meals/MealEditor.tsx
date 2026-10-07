@@ -227,7 +227,7 @@ function MealEditor({
       <Link
         to={editing ? "/meals/$dishId" : "/meals"}
         params={editing ? { dishId } : {}}
-        className="mb-2 inline-flex min-h-12 items-center gap-1 text-body font-semibold text-accent"
+        className="mb-2 inline-flex min-h-11 items-center gap-1 text-body font-semibold text-accent"
       >
         <ChevronLeft aria-hidden="true" />
         {editing ? "Back to the meal" : "Meals"}
@@ -284,7 +284,7 @@ function MealEditor({
                 onClick={() => {
                   update({ role: value, step: editing ? draft.step : 2 });
                 }}
-                className="flex min-h-20 flex-col items-start justify-center rounded-button border-2 border-rule bg-paper px-4 py-3 text-left aria-pressed:border-accent"
+                className="flex min-h-16 flex-col items-start justify-center rounded-button border-2 border-rule bg-paper px-4 py-3 text-left aria-pressed:border-accent"
               >
                 <span className="text-row font-bold">{label}</span>
                 <span className="text-secondary text-ink-soft">{hint}</span>
@@ -496,7 +496,7 @@ function NameField({
         onChange={(event) => {
           onChange(event.target.value);
         }}
-        className="min-h-14 w-full rounded-button border-2 border-rule bg-paper px-4 text-row"
+        className="min-h-12 w-full rounded-button border-2 border-rule bg-paper px-4 text-row"
       />
     </form>
   );

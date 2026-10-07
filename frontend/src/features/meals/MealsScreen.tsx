@@ -18,6 +18,7 @@ import { Chip } from "../../ui/Chip";
 import { EmptyState } from "../../ui/EmptyState";
 import { ProductImage } from "../../ui/ProductImage";
 import { Screen } from "../../ui/Screen";
+import { Segmented, segmentOption } from "../../ui/Segmented";
 import { OCCASIONS, type DishCard, type Occasion, type Role } from "./types";
 
 export function MealsScreen({ role }: { role: Role }) {
@@ -58,23 +59,19 @@ export function MealsScreen({ role }: { role: Role }) {
         ) : undefined
       }
     >
-      <div
-        role="group"
-        aria-label="Mains or sides"
-        className="mb-4 grid grid-cols-2 rounded-button border-2 border-rule bg-paper p-1"
-      >
+      <Segmented label="Mains or sides" className="mb-4">
         {(["main", "side"] as const).map((value) => (
           <Link
             key={value}
             to="/meals"
             search={{ role: value }}
             aria-current={role === value ? "page" : undefined}
-            className="flex min-h-12 items-center justify-center rounded-button text-body font-semibold aria-[current=page]:bg-accent aria-[current=page]:text-on-accent"
+            className={segmentOption}
           >
             {value === "main" ? "Mains" : "Sides"}
           </Link>
         ))}
-      </div>
+      </Segmented>
 
       {all.length > 0 || archived ? (
         <>
@@ -241,7 +238,7 @@ export function FavoriteButton({
       onClick={() => {
         toggle.mutate(!on);
       }}
-      className="marker-carrot flex size-12 items-center justify-center rounded-button text-ink-soft aria-pressed:text-[var(--marker)]"
+      className="marker-carrot flex size-11 items-center justify-center rounded-button text-ink-soft aria-pressed:text-[var(--marker)]"
     >
       <Star aria-hidden="true" className={on ? "fill-current" : ""} />
     </button>

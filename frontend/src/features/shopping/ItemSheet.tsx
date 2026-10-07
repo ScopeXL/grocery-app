@@ -173,7 +173,7 @@ function Choices({
             href={item.product_url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`inline-flex min-h-12 items-center justify-center gap-2 text-body font-semibold text-accent ${underlined}`}
+            className={`inline-flex min-h-11 items-center justify-center gap-2 text-body font-semibold text-accent ${underlined}`}
           >
             Open in Kroger
             <ExternalLink aria-hidden="true" className="size-5" />

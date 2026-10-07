@@ -22,7 +22,7 @@ This document covers every screen at phone size, the main flows step by step, em
 **Reach and touch**
 - Primary actions sit in the thumb zone: a bottom action bar above the tabs, or the bottom of a sheet.
 - Body text is 16 px, secondary text 14, captions 13 (ADR 0027). Anything a person types into is at least 16 px, so iPhones don't zoom in.
-- Tap targets are at least 48 px. Shopping checkboxes are 56 px.
+- **Tap targets** (ADR 0027): primary buttons 48 px; other buttons, icon buttons and text links 44 px; chips and two-way switches 40 px; list rows at least 56 px. The shopping checkbox is 48 px inside a 72 × 80 px tap area. Nothing a finger taps is under 40 px; the accessibility tests check it.
 - **Every action has a visible button.** Swipes and long-presses are only shortcuts for something already on screen.
 
 **Undo and drafts**
@@ -325,7 +325,7 @@ A live preview line shows the share and the cost.
   - The offline pill, when relevant.
   - A small "Screen stays on" note.
 - **Sections** follow the household's walking order. Section headers read "Produce" or "Aisle 12, left side". Within an aisle, items follow shelf order.
-- **Each row:** a 64 px product photo tile; the name in bold; the quantity and size ("2 boxes, 16 oz each"); a 56 px checkbox at the right edge.
+- **Each row:** a 64 px product photo tile; the name in bold; the quantity and size ("2 boxes, 16 oz each"); a 48 px checkbox at the right edge, in a 72 px-wide tap column.
 - **Checking an item** (tapping the checkbox):
   1. A marker line is drawn through the name in the checker's color (§7.6).
   2. The row slides into the collapsed **Done** group.
@@ -506,15 +506,15 @@ Defined once in `frontend/src/styles/tokens.css` (Tailwind v4 `@theme`). Compone
 
 ### 7.4 Space, shape and surfaces
 
-- **Spacing:** an 8 px grid with 16 px side gutters. List rows are at least 64 px tall.
+- **Spacing:** an 8 px grid with 16 px side gutters, on the browser's default 16 px base. List rows are at least 56 px tall (64 px with a photo).
 - **Surfaces:** lists sit on `paper` with ruled `rule` lines between rows, like a notepad. **No grid of identical shadowed cards.** Cards are reserved for things that really are cards (Tonight, recommendations, meal library cards), separated by borders and space rather than soft shadows.
 - **Corner radius follows hierarchy:**
 
   | Element | Radius |
   |---|---|
   | Sheets | 20 px (top corners) |
-  | Buttons | 14 px |
-  | Photo tiles | 10 px |
+  | Buttons | 12 px |
+  | Photo tiles | 8 px |
   | Chips | fully rounded |
 
 - **Focus:** visible on every control, as a 3 px `accent` (ink) outline with a 2 px offset; on inverse surfaces (toasts, prompts) the ring is the `counter` color.
@@ -561,11 +561,11 @@ The first pass was checked against the generic look such a brief tends to produc
 Run `just screenshots` after every UI change. It captures the key screens in fake mode at 390×844 and 1440×900, in light and dark. Then check each screenshot:
 
 - [ ] The primary action is reachable with a thumb, and nothing important hides under the tab bar or the home indicator.
-- [ ] Text is at least 17 px, and nothing is truncated that matters (long meal names wrap).
+- [ ] Body text is 16 px (secondary 14, captions 13), typing fields at least 16 px, and nothing is truncated that matters (long meal names wrap).
 - [ ] Product photos are uncropped, nothing covers them, and Sale tags sit beside them.
 - [ ] No internal IDs, no jargon, no all-caps labels, no "A · B · C" meta strings.
 - [ ] Empty states say what goes there and offer one button.
 - [ ] Contrast holds in dark mode, and the tokens are used (no stray colors).
-- [ ] Touch targets are at least 48 px (checkboxes 56 px).
+- [ ] Touch targets are at least 40 px (buttons 44–48 px, the shopping checkbox 48 px).
 - [ ] Desktop uses the width (panes), with nothing stretched across 1440 px.
 - [ ] Nothing in the screenshots comes from real household data. Fake mode only; screenshots stay in `.screenshots/`, which is gitignored.

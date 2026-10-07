@@ -1,7 +1,7 @@
 /** A member's initial in their marker color. Color is never the only signal (docs/UX.md §7.2). */
 const SIZES = {
-  md: "size-11 border-[3px] text-row",
-  sm: "size-7 border-2 text-caption",
+  md: "size-10 border-[3px] text-row",
+  sm: "size-6 border-2 text-caption",
 } as const;
 
 export function MemberBadge({

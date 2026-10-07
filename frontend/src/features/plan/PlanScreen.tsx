@@ -191,7 +191,7 @@ function TonightCard({
           <Link
             to="/meals/$dishId"
             params={{ dishId: meal.main.id }}
-            className="text-title font-extrabold"
+            className="inline-flex min-h-10 items-center text-title font-extrabold"
           >
             {meal.main.name}
           </Link>
@@ -234,7 +234,7 @@ function MealRow({
         <Link
           to="/meals/$dishId"
           params={{ dishId: meal.main.id }}
-          className="text-row leading-tight font-bold"
+          className="inline-flex min-h-10 items-center text-row leading-tight font-bold"
         >
           {meal.main.name}
         </Link>

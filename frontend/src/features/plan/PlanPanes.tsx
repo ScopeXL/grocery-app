@@ -53,16 +53,14 @@ export function LibraryPane({ onAdd }: { onAdd: (main: DishCard) => void }) {
               key={card.id}
               className="flex items-center gap-2 border-b border-rule py-2 pr-2 pl-3 last:border-b-0"
             >
-              <span className="flex min-w-0 flex-1 flex-col">
-                <Link
-                  to="/meals/$dishId"
-                  params={{ dishId: card.id }}
-                  className="text-body leading-tight font-semibold"
-                >
-                  {card.name}
-                </Link>
+              <Link
+                to="/meals/$dishId"
+                params={{ dishId: card.id }}
+                className="flex min-h-11 min-w-0 flex-1 flex-col justify-center"
+              >
+                <span className="text-body leading-tight font-semibold">{card.name}</span>
                 <span className="text-caption text-ink-soft">{costLine(card.cost).total}</span>
-              </span>
+              </Link>
               <Button
                 variant="secondary"
                 aria-label={`Add ${card.name} to this week`}
@@ -88,7 +86,7 @@ export function ListPane({ plan }: { plan: PlanOut }) {
         <h2 className="text-row font-bold">The list</h2>
         <Link
           to="/list"
-          className={`min-h-12 content-center font-semibold text-accent ${underlined}`}
+          className={`min-h-11 content-center font-semibold text-accent ${underlined}`}
         >
           Open the list
         </Link>

@@ -35,7 +35,7 @@ export function MoreScreen() {
             <Link
               to={to}
               {...(search ? { search } : {})}
-              className="flex min-h-16 items-center gap-4 px-4 text-body font-semibold"
+              className="flex min-h-14 items-center gap-4 px-4 text-body font-semibold"
             >
               <Icon aria-hidden="true" className="text-accent" />
               <span className="flex-1">{label}</span>

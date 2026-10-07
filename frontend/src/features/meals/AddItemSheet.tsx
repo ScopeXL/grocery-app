@@ -92,7 +92,7 @@ export function AddItemSheet({
         onChange={(event) => {
           setText(event.target.value.slice(0, 80));
         }}
-        className="mt-2 mb-4 min-h-14 w-full rounded-button border-2 border-rule bg-paper px-4 text-body"
+        className="mt-2 mb-4 min-h-12 w-full rounded-button border-2 border-rule bg-paper px-4 text-body"
       />
 
       {mine.length > 0 ? (
@@ -103,7 +103,7 @@ export function AddItemSheet({
               <li key={item.id} className="border-b border-rule last:border-b-0">
                 <button
                   type="button"
-                  className="flex min-h-16 w-full items-center gap-3 px-3 py-2 text-left"
+                  className="flex min-h-14 w-full items-center gap-3 px-3 py-2 text-left"
                   onClick={() => {
                     setText("");
                     onPicked(item);
@@ -141,7 +141,7 @@ export function AddItemSheet({
                   <button
                     type="button"
                     disabled={create.isPending}
-                    className="flex min-h-20 w-full items-start gap-3 px-3 py-3 text-left disabled:opacity-60"
+                    className="flex min-h-16 w-full items-start gap-3 px-3 py-3 text-left disabled:opacity-60"
                     onClick={() => {
                       create.mutate({
                         name: tidyName(text || term),

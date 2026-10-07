@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
 
-/** A large on/off row (sides, pantry answers): the whole row is the target, 56 px tall. */
+/** An on/off row (sides): the whole row is the target, 56 px tall. */
 export function ToggleRow({
   on,
   label,
@@ -22,11 +22,11 @@ export function ToggleRow({
     >
       <span
         aria-hidden="true"
-        className={`flex size-8 shrink-0 items-center justify-center rounded-lg border-2 ${
+        className={`flex size-6 shrink-0 items-center justify-center rounded-md border-2 ${
           on ? "border-accent bg-accent text-on-accent" : "border-rule"
         }`}
       >
-        {on ? <Check className="size-5" strokeWidth={3} /> : null}
+        {on ? <Check className="size-4" strokeWidth={3} /> : null}
       </span>
       {label}
     </button>

@@ -35,10 +35,10 @@ export function TabBar() {
               activeOptions={{ exact: to === "/" }}
               // data-status="active" is set by the router; the variant always beats the base color.
               // The active tab's icon sits in a filled ink pill: a cue that isn't color alone.
-              className="group flex min-h-(--tabbar-h) flex-col items-center justify-center gap-1 text-secondary font-semibold text-ink-soft data-[status=active]:text-ink lg:min-h-14 lg:flex-row lg:justify-start lg:gap-3 lg:rounded-button lg:px-4 lg:text-body lg:data-[status=active]:bg-counter"
+              className="group flex min-h-(--tabbar-h) flex-col items-center justify-center gap-0.5 text-caption font-semibold text-ink-soft data-[status=active]:text-ink lg:min-h-14 lg:flex-row lg:justify-start lg:gap-3 lg:rounded-button lg:px-4 lg:text-body lg:data-[status=active]:bg-counter"
             >
-              <span className="flex h-8 w-14 items-center justify-center rounded-full group-data-[status=active]:bg-accent group-data-[status=active]:text-on-accent lg:h-auto lg:w-auto lg:group-data-[status=active]:bg-transparent lg:group-data-[status=active]:text-ink">
-                <Icon aria-hidden="true" size={24} strokeWidth={2.25} />
+              <span className="flex h-7 w-12 items-center justify-center rounded-full group-data-[status=active]:bg-accent group-data-[status=active]:text-on-accent lg:h-auto lg:w-auto lg:group-data-[status=active]:bg-transparent lg:group-data-[status=active]:text-ink">
+                <Icon aria-hidden="true" size={22} strokeWidth={2.25} />
               </span>
               <span>{label}</span>
             </Link>

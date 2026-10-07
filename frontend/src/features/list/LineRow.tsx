@@ -41,10 +41,10 @@ export function LineRow({
         onClick={() => {
           onOpen(line.key);
         }}
-        className="flex min-h-20 w-full items-start gap-3 px-3 py-3 text-left"
+        className="flex min-h-16 w-full items-start gap-3 px-3 py-2.5 text-left"
       >
         <span className={had ? "opacity-50" : ""}>
-          <ProductImage src={line.image_url} alt="" size={64} />
+          <ProductImage src={line.image_url} alt="" size={48} />
         </span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span

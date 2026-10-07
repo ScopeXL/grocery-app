@@ -28,8 +28,30 @@ async function typingFieldsAtLeast16px(page: Page, where: string): Promise<void>
   expect(small, `typing fields under 16 px on ${where}`).toEqual([]);
 }
 
+/** Every control a finger taps is at least 40 px each way (ADR 0027); links in a sentence aren't. */
+async function targetsAtLeast40px(page: Page, where: string): Promise<void> {
+  const small = await page.evaluate(() =>
+    Array.from(document.querySelectorAll("button, a[href], [role=checkbox], summary, select"))
+      .filter((control) => {
+        if (control.closest("[inert], [aria-hidden='true']")) return false;
+        const style = getComputedStyle(control);
+        const box = control.getBoundingClientRect();
+        if (style.visibility === "hidden" || box.width <= 1 || box.height <= 1) return false;
+        if (control.tagName === "A" && style.display === "inline") return false;
+        return box.width < 40 || box.height < 40;
+      })
+      .map((control) => {
+        const box = control.getBoundingClientRect();
+        const text = control.textContent.trim().slice(0, 40);
+        return `${control.tagName.toLowerCase()} "${text}" ${String(Math.round(box.width))}x${String(Math.round(box.height))}`;
+      }),
+  );
+  expect(small, `targets under 40 px on ${where}`).toEqual([]);
+}
+
 async function check(page: Page, where: string): Promise<void> {
   await typingFieldsAtLeast16px(page, where);
+  await targetsAtLeast40px(page, where);
   const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
   // A11Y_ALL=1 fails on every finding, for a full review; normally only serious and critical.
   const blocking = results.violations.filter(

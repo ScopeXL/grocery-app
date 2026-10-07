@@ -21,6 +21,7 @@ import { downloadTrip } from "../../lib/trips";
 import { useTripView, type Grouping, type TripView } from "../../lib/tripView";
 import { useKeepAwake, wakeLockState } from "../../lib/wakeLock";
 import { Button } from "../../ui/Button";
+import { Segmented, segmentOption } from "../../ui/Segmented";
 import { ToastAnchor } from "../../ui/StatusLayer";
 import { underlined } from "../../ui/styles";
 import { FinishedElsewhere } from "./FinishedElsewhere";
@@ -149,11 +150,7 @@ export function ShoppingScreen({ tripId }: { tripId: string }) {
           max={Math.max(view.total, 1)}
         />
         <div className="flex items-center justify-between gap-3">
-          <div
-            role="group"
-            aria-label="Group the list"
-            className="grid grid-cols-2 rounded-button border-2 border-rule bg-paper p-1"
-          >
+          <Segmented label="Group the list">
             {(["aisle", "meal"] as const).map((value) => (
               <button
                 key={value}
@@ -167,12 +164,12 @@ export function ShoppingScreen({ tripId }: { tripId: string }) {
                     // A private window may refuse storage; the choice just isn't remembered.
                   }
                 }}
-                className="min-h-11 rounded-button px-3 text-secondary font-semibold aria-pressed:bg-accent aria-pressed:text-on-accent"
+                className={segmentOption}
               >
                 {value === "aisle" ? "By aisle" : "By meal"}
               </button>
             ))}
-          </div>
+          </Segmented>
           <StatusNote />
         </div>
       </header>
@@ -380,7 +377,7 @@ function Collapsed({
   if (count === 0) return null;
   return (
     <details open={open} className="group mb-6">
-      <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 text-row font-bold">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-row font-bold">
         <ChevronDown aria-hidden="true" className="transition-transform group-open:rotate-180" />
         {label} ({String(count)})
       </summary>

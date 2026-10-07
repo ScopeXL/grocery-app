@@ -29,7 +29,7 @@ const LIVE_TEXT: Record<LiveStatus, string> = {
 
 function Row({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-16 flex-wrap items-center gap-3 border-b border-rule px-4 py-3 last:border-b-0">
+    <div className="flex min-h-14 flex-wrap items-center gap-3 border-b border-rule px-4 py-3 last:border-b-0">
       {children}
     </div>
   );
@@ -73,7 +73,7 @@ function StoreSettings() {
         <Row>
           <Link
             to="/settings/walking-order"
-            className="flex min-h-12 flex-1 items-center justify-between text-body font-semibold text-accent"
+            className="flex min-h-11 flex-1 items-center justify-between text-body font-semibold text-accent"
           >
             Store walking order
             <ChevronRight aria-hidden="true" />
@@ -128,7 +128,7 @@ function ThisPhone() {
         </span>
         <Link
           to="/who"
-          className={`min-h-12 content-center px-2 text-body font-semibold text-accent ${underlined}`}
+          className={`min-h-11 content-center px-2 text-body font-semibold text-accent ${underlined}`}
         >
           Change
         </Link>
@@ -325,7 +325,7 @@ function Data() {
         <a
           href="/api/export"
           download="dinner-bell-export.json"
-          className={`inline-flex min-h-12 items-center gap-2 text-body font-semibold text-accent ${underlined}`}
+          className={`inline-flex min-h-11 items-center gap-2 text-body font-semibold text-accent ${underlined}`}
         >
           <Download aria-hidden="true" />
           Export all data
@@ -364,7 +364,7 @@ function Connection() {
         </span>
       </Row>
       <details className="px-4 py-3">
-        <summary className="min-h-12 cursor-pointer content-center text-body font-semibold">
+        <summary className="min-h-11 cursor-pointer content-center text-body font-semibold">
           Details for whoever runs the server
         </summary>
         <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-secondary">
@@ -400,7 +400,7 @@ function About() {
         </span>
         <Link
           to="/about"
-          className={`min-h-12 content-center px-2 text-body font-semibold text-accent ${underlined}`}
+          className={`min-h-11 content-center px-2 text-body font-semibold text-accent ${underlined}`}
         >
           About & privacy
         </Link>

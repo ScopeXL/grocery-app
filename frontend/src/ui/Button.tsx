@@ -3,13 +3,13 @@ import type { ButtonHTMLAttributes } from "react";
 type Variant = "primary" | "secondary" | "quiet" | "danger" | "quiet-danger";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "min-h-14 bg-accent text-on-accent",
-  secondary: "min-h-12 border-2 border-rule bg-paper text-ink",
+  primary: "min-h-12 bg-accent text-on-accent",
+  secondary: "min-h-11 border-2 border-rule bg-paper text-ink",
   // Quiet buttons are ink text, so the underline is what says "tap me" (ADR 0027).
-  quiet: "min-h-12 text-accent underline decoration-ink-soft/60 decoration-2 underline-offset-4",
-  danger: "min-h-12 border-2 border-rule bg-paper text-tomato",
+  quiet: "min-h-11 text-accent underline decoration-ink-soft/60 decoration-2 underline-offset-4",
+  danger: "min-h-11 border-2 border-rule bg-paper text-tomato",
   "quiet-danger":
-    "min-h-12 text-tomato underline decoration-tomato/40 decoration-2 underline-offset-4",
+    "min-h-11 text-tomato underline decoration-tomato/40 decoration-2 underline-offset-4",
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

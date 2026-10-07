@@ -17,7 +17,7 @@ import { ModalityChoice, type Modality } from "../kroger/ModalityChoice";
 
 function Row({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-16 flex-wrap items-center gap-3 border-b border-rule px-4 py-3 last:border-b-0">
+    <div className="flex min-h-14 flex-wrap items-center gap-3 border-b border-rule px-4 py-3 last:border-b-0">
       {children}
     </div>
   );

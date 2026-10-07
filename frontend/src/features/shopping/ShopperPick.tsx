@@ -46,7 +46,7 @@ export function ShopperPick() {
             onClick={() => {
               choose.mutate(member.id);
             }}
-            className="flex min-h-16 items-center gap-3 rounded-button border-2 border-rule bg-paper px-3 text-left text-row font-bold"
+            className="flex min-h-14 items-center gap-3 rounded-button border-2 border-rule bg-paper px-3 text-left text-row font-bold"
           >
             <MemberBadge name={member.name} color={member.marker_color} />
             {member.name}

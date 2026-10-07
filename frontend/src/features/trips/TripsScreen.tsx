@@ -139,7 +139,7 @@ function TripRow({
       <Link
         to={active ? "/shop/$tripId" : "/trips/$tripId"}
         params={{ tripId: trip.id }}
-        className="flex min-h-16 items-center gap-3 px-4 py-3"
+        className="flex min-h-14 items-center gap-3 px-4 py-3"
       >
         <span className="flex min-w-0 flex-1 flex-col">
           <span className="text-body font-semibold">

@@ -44,7 +44,7 @@ export function JoinScreen() {
         </p>
         <Link
           to="/sign-in"
-          className={`inline-flex min-h-12 items-center text-body font-semibold text-accent ${underlined}`}
+          className={`inline-flex min-h-11 items-center text-body font-semibold text-accent ${underlined}`}
         >
           Go to sign in
         </Link>
@@ -113,7 +113,7 @@ export function JoinScreen() {
       {join.isError ? (
         <Link
           to="/sign-in"
-          className={`inline-flex min-h-12 items-center text-body font-semibold text-accent ${underlined}`}
+          className={`inline-flex min-h-11 items-center text-body font-semibold text-accent ${underlined}`}
         >
           Sign in with the password instead
         </Link>

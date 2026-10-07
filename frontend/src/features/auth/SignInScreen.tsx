@@ -60,7 +60,7 @@ function PasswordForm({ onUseCode }: { onUseCode: () => void }) {
           }}
           aria-describedby={errorId}
           aria-invalid={error ? true : undefined}
-          className="min-h-14 min-w-0 flex-1 rounded-button border-2 border-rule bg-paper px-4 text-body"
+          className="min-h-12 min-w-0 flex-1 rounded-button border-2 border-rule bg-paper px-4 text-body"
         />
         <Button
           variant="secondary"
@@ -69,7 +69,7 @@ function PasswordForm({ onUseCode }: { onUseCode: () => void }) {
           onClick={() => {
             setVisible((v) => !v);
           }}
-          className="min-h-14 w-14 px-0"
+          className="min-h-12 w-12 px-0"
         >
           {visible ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
         </Button>
@@ -122,7 +122,7 @@ function CodeForm({ onUsePassword }: { onUsePassword: () => void }) {
         }}
         aria-describedby={`${hintId} ${errorId}`}
         aria-invalid={join.isError ? true : undefined}
-        className="min-h-14 rounded-button border-2 border-rule bg-paper px-4 text-title font-extrabold tracking-widest uppercase"
+        className="min-h-12 rounded-button border-2 border-rule bg-paper px-4 text-title font-extrabold tracking-widest uppercase"
       />
       <p id={hintId} className="text-secondary text-ink-soft">
         On a phone that’s already signed in, open More, then Settings, then Add a phone.
