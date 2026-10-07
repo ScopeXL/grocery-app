@@ -24,3 +24,12 @@ export function costLine(cost: { about_dollars: number | null; unpriced: number 
   if (cost.about_dollars === null) return { total: "No price yet", note: null };
   return { total: `about $${String(cost.about_dollars)}`, note };
 }
+
+/** A meal's price for a card's corner (UX §2): "$12" on screen, "about $12" when read out. */
+export function mealPrice(cost: {
+  about_dollars: number | null;
+}): { shown: string; spoken: string } | null {
+  if (cost.about_dollars === null) return null;
+  const dollars = `$${String(cost.about_dollars)}`;
+  return { shown: dollars, spoken: `about ${dollars}` };
+}

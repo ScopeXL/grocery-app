@@ -9,11 +9,12 @@ import { useId, useState } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
-import { about, costLine } from "../../lib/money";
+import { about } from "../../lib/money";
 import { Button } from "../../ui/Button";
 import { underlined } from "../../ui/styles";
 import { byAisle } from "../list/ListScreen";
 import type { DishCard } from "../meals/types";
+import { MealPrice } from "./MealPrice";
 import type { PlanOut } from "./types";
 
 export function LibraryPane({ onAdd }: { onAdd: (main: DishCard) => void }) {
@@ -59,8 +60,8 @@ export function LibraryPane({ onAdd }: { onAdd: (main: DishCard) => void }) {
                 className="flex min-h-11 min-w-0 flex-1 flex-col justify-center"
               >
                 <span className="text-body leading-tight font-semibold">{card.name}</span>
-                <span className="text-caption text-ink-soft">{costLine(card.cost).total}</span>
               </Link>
+              <MealPrice cost={card.cost} />
               <Button
                 variant="secondary"
                 aria-label={`Add ${card.name} to this week`}

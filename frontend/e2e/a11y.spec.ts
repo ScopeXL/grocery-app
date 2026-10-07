@@ -35,7 +35,11 @@ async function targetsAtLeast40px(page: Page, where: string): Promise<void> {
       .filter((control) => {
         if (control.closest("[inert], [aria-hidden='true']")) return false;
         const style = getComputedStyle(control);
-        const box = control.getBoundingClientRect();
+        // A stretched button (a Plan card) covers its whole card with ::after: that's the target.
+        const target = control.hasAttribute("data-stretched")
+          ? (control.closest(".relative") ?? control)
+          : control;
+        const box = target.getBoundingClientRect();
         if (style.visibility === "hidden" || box.width <= 1 || box.height <= 1) return false;
         if (control.tagName === "A" && style.display === "inline") return false;
         return box.width < 40 || box.height < 40;

@@ -3,6 +3,8 @@
  * swap the main, or remove it (with Undo). Each tap saves at once; the list follows.
  */
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { ChevronRight } from "lucide-react";
 import { useId, useState } from "react";
 
 import { api, unwrap } from "../../api/client";
@@ -10,6 +12,7 @@ import { qk } from "../../api/keys";
 import { Button } from "../../ui/Button";
 import { Chip } from "../../ui/Chip";
 import { Sheet } from "../../ui/Sheet";
+import { underlined } from "../../ui/styles";
 import { DayPicker, OccasionPicker } from "./MealChoices";
 import { SidePicker } from "./SidePicker";
 import { SCALES, type PlannedMeal } from "./types";
@@ -115,6 +118,14 @@ export function ChangeMealSheet({
             />
 
             <div className="mt-6 flex flex-col items-start gap-1 border-t border-rule pt-4">
+              <Link
+                to="/meals/$dishId"
+                params={{ dishId: meal.main.id }}
+                className={`inline-flex min-h-11 items-center gap-1 text-body font-semibold text-accent ${underlined}`}
+              >
+                Open {meal.main.name}
+                <ChevronRight aria-hidden="true" className="size-4" />
+              </Link>
               <Button
                 variant="quiet"
                 className="-ml-5"

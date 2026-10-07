@@ -18,6 +18,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
   (breakfast, lunch, dinner or a snack): it starts on whatever that meal was last planned as.
 - Making a meal no longer asks "When do you eat it?", and Meals no longer filters by it: what a
   meal is for is chosen when you plan it.
+- Plan's meals are tidier: tap anywhere on one to change it. Its price sits in the corner, and the
+  Change sheet has a link to open the meal.
 
 ### Fixed
 

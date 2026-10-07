@@ -9,13 +9,13 @@ import { useId, useState } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
-import { costLine } from "../../lib/money";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
 import type { DishCard } from "../meals/types";
 import { DayPicker, OccasionPicker } from "./MealChoices";
+import { MealPrice } from "./MealPrice";
 import { SidePicker } from "./SidePicker";
 import type { Occasion } from "./types";
 import { usePlanChange } from "./usePlan";
@@ -231,10 +231,8 @@ function MainStep({
                 ) : (
                   <ProductImage src={card.item_images[0] ?? null} alt="" size={64} />
                 )}
-                <span className="flex min-w-0 flex-col">
-                  <span className="text-body font-semibold">{card.name}</span>
-                  <span className="text-secondary text-ink-soft">{costLine(card.cost).total}</span>
-                </span>
+                <span className="min-w-0 flex-1 text-body font-semibold">{card.name}</span>
+                <MealPrice cost={card.cost} />
               </button>
             </li>
           ))}

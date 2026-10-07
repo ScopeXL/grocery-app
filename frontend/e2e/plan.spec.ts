@@ -84,6 +84,20 @@ test("what a meal is for is chosen when planning, and remembered", async ({ page
   ).toHaveAttribute("aria-pressed", "true");
 });
 
+test("tapping a planned meal opens Change, which can open the meal", async ({ page }) => {
+  await signIn(page);
+  const seeded = await seedTacoNight(page);
+  await api(page, "POST", "/api/plan/meals", { main_id: seeded.chili });
+  const meals = page.getByRole("list", { name: "This week's meals" });
+  await expect(meals).toContainText("Chili");
+  await expect(meals).toContainText("$"); // the price sits in the corner
+  await meals.getByRole("listitem").first().click(); // anywhere on the card
+  const change = page.getByRole("dialog", { name: "Change Chili" });
+  await expect(change).toBeVisible();
+  await change.getByRole("link", { name: "Open Chili" }).click();
+  await expect(page.getByRole("heading", { name: "Chili" })).toBeVisible();
+});
+
 test("plan Tacos twice and Chili: the list merges, rounds and adds up", async ({ page }) => {
   await signIn(page);
   await seedTacoNight(page);
@@ -181,6 +195,8 @@ test("a second phone sees a plan change within 2 seconds", async ({ page, browse
   await expect(otherPage.getByText("No meals planned yet.")).toBeVisible();
 
   await addMeal(page, "Chili");
-  await expect(otherPage.getByRole("link", { name: "Chili" })).toBeVisible({ timeout: 2000 });
+  await expect(otherPage.getByRole("button", { name: "Change Chili" })).toBeVisible({
+    timeout: 2000,
+  });
   await other.close();
 });

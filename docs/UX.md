@@ -52,7 +52,7 @@ This document covers every screen at phone size, the main flows step by step, em
 - **Errors** say what happened and what to do, in the app's voice. They don't apologize and are never vague:
   - "That password didn't match. Try again."
   - "Not saved — you're offline. Try again when you have signal."
-- **Money** always reads as an estimate: "About $142". Show "Before tax, fees and tip" on totals. Never show more precision than the estimate deserves.
+- **Money** always reads as an estimate: "About $142". Show "Before tax, fees and tip" on totals. Never show more precision than the estimate deserves. One exception: a meal's price in a card's corner (Plan, Add a meal, the 1440 library) is just "$12", and screen readers hear "about $12".
 - **Meta information is stacked on separate lines,** not joined with dots. Aisle info reads "Aisle 12, left side".
 - **Attribution names people:** "Added by Mia", "Checked off by Mia".
 
@@ -126,19 +126,19 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
 | This week                    [Mia ●] |
 |                                      |
 | +----------------------------------+ |
-| | Tonight                          | |
 | | [ meal photo                   ] | |
+| | Tonight                     $12  | |
 | | Tacos                            | |
-| | with rice and corn               | |
+| | with rice and corn            ✎  | |
 | +----------------------------------+ |
-|                                      |
-| [photo] Chili                  [Tue] |
-|         with cornbread               |
-|         ×2                  [Change] |
-| ------------------------------------ |
-| [photo] Chicken stir-fry      [Any]  |
-|                             [Change] |
-| ------------------------------------ |
+| +----------------------------------+ |
+| |[photo] Chili                $9  | |
+| |        with cornbread            | |
+| |        [Tue] [×2]             ✎  | |
+| |----------------------------------| |
+| |[photo] Chicken stir-fry     $11  | |
+| |        [Lunch]                ✎  | |
+| +----------------------------------+ |
 | Uses what you're buying              |
 | Taco salad uses your leftover        |
 | lettuce, cheese and ground beef.     |
@@ -155,14 +155,15 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
 ```
 
 - **Tonight card:** shown only when a meal is set for today.
-- **Each planned meal row:**
+- **Each planned meal** (the Tonight card and every row):
   - its photo (or an item strip);
   - the main, plus "with" its sides;
-  - a day chip, if a day is set;
-  - a scale chip, if not ×1;
-  - **Change**, which opens a sheet: how much (×½, ×1, ×2), what it's for, the day, sides; then swap the main, or remove it (with Undo).
+  - its price in the top-right corner ("$12"; screen readers hear "about $12"), or "No price yet" under the sides;
+  - a day chip, if a day is set; a scale chip, if not ×1; what it's for, if not dinner;
+  - a small pencil at the bottom right.
+- **Tapping anywhere on a meal opens Change** (its button is named "Change Tacos"): how much (×½, ×1, ×2), what it's for, the day, sides; then **Open Tacos** (the meal's page), swap the main, or remove it (with Undo).
 - **Uses what you're buying:** up to three Mains that use leftovers of what the list already buys, each with its reason ("Taco salad uses your leftover lettuce, cheese and ground beef. Adds about $4.") and **Add**. Adding puts the Main on the plan without sides, so the total moves by about the amount shown.
-- **Each meal's cost:** the meal's share of what it uses, at today's prices and its scale ("about $9"), under its name.
+- **Each meal's cost:** the meal's share of what it uses, at today's prices and its scale, in the card's corner.
 - **Total footer:** sticky; it updates as meals change. When the tally isn't zero, it adds "3 items have no price", which opens the List filtered to those lines.
 - **Start a new week** (a quiet button at the end): puts this week's plan away; the toast offers Undo until the new week has meals.
 - **At 1440 px:** the meal library (with Add buttons) on the left and the list in walking order on the right.
