@@ -6,6 +6,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-07
+
 ### Added
 
 - Send a saved list straight to your Kroger cart, for pickup or delivery, then check out in
@@ -140,5 +142,7 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 [0.4.0]: https://github.com/ScopeXL/grocery-app/compare/v0.3.0...v0.4.0
 
-[Unreleased]: https://github.com/ScopeXL/grocery-app/compare/v0.5.0...HEAD
 [0.5.0]: https://github.com/ScopeXL/grocery-app/compare/v0.4.0...v0.5.0
+
+[Unreleased]: https://github.com/ScopeXL/grocery-app/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/ScopeXL/grocery-app/compare/v0.5.0...v0.6.0
