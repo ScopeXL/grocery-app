@@ -2,7 +2,7 @@
 
 This is the current plan for Dinner Bell, a household meal-planning and grocery-list PWA. It is the single source for what we are building and how. Decisions and their reasoning live in [`adr/`](adr/README.md). Screens, flows and visual design live in [`UX.md`](UX.md). Working rules for AI sessions live in [`../CLAUDE.md`](../CLAUDE.md).
 
-**Status:** M0 (foundation) shipped as 0.1.0, M1 (store, items and meals) as 0.2.0 and M2 (plan and list) as 0.3.0, all on 2026-10-06. M3 (shopping mode) is next.
+**Status:** M0 (foundation) shipped as 0.1.0, M1 (store, items and meals) as 0.2.0, M2 (plan and list) as 0.3.0 and M3 (shopping mode) as 0.4.0, all on 2026-10-06. M4 (savings) is next.
 
 **Maintenance rule:** when a milestone ships, shrink its section to a one-line summary that points to the CHANGELOG. Keep this file about what is true now and what is left to do.
 
@@ -1879,37 +1879,7 @@ Shipped as 0.3.0 on 2026-10-06; the phone checklist passed with live Kroger data
 
 ### M3 Shopping mode → 0.4.0
 
-**Scope**
-- **Saving:** Save list creates the trip snapshot.
-- **Shopping mode:**
-  - sections in walking order; By aisle / By meal;
-  - check-off with the marker strike and a Done group with Undo;
-  - Couldn't find, and notes for the shopper;
-  - progress and a running total of checked items.
-- **Store walking-order editor.**
-- **Offline and sync:**
-  - the service-worker image cache;
-  - the IndexedDB trip store and outbox;
-  - the ops API;
-  - "Get ready for the store";
-  - the wake lock;
-  - live trip sync.
-- **After the trip:** Finish trip with an optional actual total; History; Reopen; Shop this again; Plan these meals again (repeat last week); share the list as text.
-- **Data:** backups shown in Settings; JSON export.
-- **Image host probe:** CORS, `Vary` and cache headers (§13 item 10).
-
-**Acceptance**
-- e2e: offline check-offs, then reconnect, and the server matches.
-- Two contexts on one trip converge.
-- Undo works across offline.
-- The WebKit project passes, and the app shell loads offline.
-- All §9.8 scenarios pass.
-
-**Phone checklist**
-- [ ] Save the list. In airplane mode, tap Start shopping. Check off 5 items, mark 1 "Couldn't find", undo 1.
-- [ ] Turn the signal back on; a second phone shows the same state.
-- [ ] Two people shop the same trip and see each other's check-offs live.
-- [ ] Finish the trip with what you paid; it appears in Trips. Tap Shop this again.
+Shipped as 0.4.0 on 2026-10-06; the phone checklist passed, offline and on two phones. What it delivered is in the [CHANGELOG](../CHANGELOG.md); how offline shopping works is §9.
 
 ### M4 Savings → 0.5.0
 
