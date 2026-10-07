@@ -89,6 +89,27 @@ dialog.sheet[data-closing]::backdrop {
   }
 }
 
+/* Toasts (lib/toast): they rise in, and ease out when they're done (`data-leaving`, for
+   lib/toast's TOAST_EXIT_MS). The update prompt rises in the same way. */
+.toast {
+  animation: toast-in var(--motion-enter) var(--ease-arrive);
+}
+.toast[data-leaving] {
+  animation: toast-out var(--motion-exit) var(--ease-leave) forwards;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+
 /* Reduce Motion: everything instant. 0.01 ms rather than 0, so every animation still runs to
    its end (and the sheets' close still sees one finish). */
 @media (prefers-reduced-motion: reduce) {

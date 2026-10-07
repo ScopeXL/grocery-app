@@ -26,7 +26,7 @@ This document covers every screen at phone size, the main flows step by step, em
 - **Every action has a visible button.** Swipes and long-presses are only shortcuts for something already on screen.
 
 **Undo and drafts**
-- **Prefer undo over confirmation.** Every destructive action shows an Undo toast for 6 seconds. The one exception is re-sending items to the Kroger cart, which the API can't undo; it uses a confirmation sheet. Toasts sit just above the screen's bottom bar; while a sheet is open they sit at the bottom of the sheet, below its content and never over its buttons, so Undo can be tapped without closing it.
+- **Prefer undo over confirmation.** Every destructive action shows an Undo toast for 6 seconds. Toasts rise in and ease out, and at most three show at once (a fourth eases the oldest out). The one exception is re-sending items to the Kroger cart, which the API can't undo; it uses a confirmation sheet. Toasts sit just above the screen's bottom bar; while a sheet is open they sit at the bottom of the sheet, below its content and never over its buttons, so Undo can be tapped without closing it.
 - **Nothing is lost by closing the app mid-task.** Drafts save automatically.
 
 **Speed and connection**

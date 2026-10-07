@@ -79,3 +79,20 @@ test.describe("with Reduce Motion", () => {
     await expect(page.getByRole("dialog", { name: "Change Tacos" })).toBeVisible();
   });
 });
+
+test("a toast eases out after Undo, and its Undo works once", async ({ page }) => {
+  await signIn(page);
+  await openSettings(page);
+  await page.getByLabel("Add a person").fill("Mia");
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+  await page.getByRole("button", { name: "Change Mia" }).click();
+  await page
+    .getByRole("dialog", { name: "Change Mia" })
+    .getByRole("button", { name: "Remove Mia" })
+    .click();
+  const toast = page.locator(".toast").filter({ hasText: "Removed Mia" });
+  await expect(toast).toBeVisible();
+  await toast.getByRole("button", { name: "Undo" }).click();
+  await expect(toast).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Change Mia" })).toHaveCount(1);
+});
