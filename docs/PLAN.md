@@ -2,7 +2,7 @@
 
 This is the current plan for Dinner Bell, a household meal-planning and grocery-list PWA. It is the single source for what we are building and how. Decisions and their reasoning live in [`adr/`](adr/README.md). Screens, flows and visual design live in [`UX.md`](UX.md). Working rules for AI sessions live in [`../CLAUDE.md`](../CLAUDE.md).
 
-**Status:** M0 (foundation) shipped as 0.1.0 and M1 (store, items and meals) as 0.2.0, both on 2026-10-06. M2 (plan and list) is next.
+**Status:** M0 (foundation) shipped as 0.1.0, M1 (store, items and meals) as 0.2.0 and M2 (plan and list) as 0.3.0, all on 2026-10-06. M3 (shopping mode) is next.
 
 **Maintenance rule:** when a milestone ships, shrink its section to a one-line summary that points to the CHANGELOG. Keep this file about what is true now and what is left to do.
 
@@ -1873,26 +1873,7 @@ Shipped as 0.2.0 on 2026-10-06; the phone checklist passed with live Kroger data
 
 ### M2 Plan and list → 0.3.0
 
-**Scope**
-- **Planning:** a list with optional day and occasion; Add a meal with learned usual sides (and editing them); swap main or side; ×½ / ×1 / ×2; the Tonight card.
-- **Domain:** `listbuild`, `totals` and the M, W, P and L test series, plus properties 3–12.
-- **The list:** grouped by section or by meal; the pantry check (have-it, staples pre-flagged).
-- **Extras:** from Kroger or plain text, with Usuals and who added them.
-- **Overrides:** a quantity delta; product swap (for this trip, or always) with unit-price comparison; warnings for not sold here, low stock and no price.
-- **Prices:** fetched live on every read (nothing is cached, ADR 0016); "prices as of"; the sticky total footer.
-- **Live updates** for plan and list (SSE invalidations).
-- **Desktop:** panes at 1440; print view in aisle order.
-
-**Acceptance**
-- The domain suite (60+ cases and the properties) is green.
-- e2e: plan Tacos ×2 and Chili, which share ground beef. The list merges and rounds, and the total equals a hand-computed fixture.
-- A second browser context sees a plan change within 2 s.
-
-**Phone checklist**
-- [ ] Plan 3 dinners with sides; set one for tonight; scale one ×2.
-- [ ] Mark cooking oil "Have it"; add Milk from Usuals; watch the total change.
-- [ ] A second phone shows the same plan change within a few seconds.
-- [ ] Check one sale price against the shelf tag at the store.
+Shipped as 0.3.0 on 2026-10-06; the phone checklist passed with live Kroger data. What it delivered is in the [CHANGELOG](../CHANGELOG.md); the list's math is §8.
 
 ### M3 Shopping mode → 0.4.0
 
