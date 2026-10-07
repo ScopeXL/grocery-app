@@ -1,4 +1,5 @@
 import { expect, openSettings, signIn, test } from "./fixtures";
+import { api, seedTacoNight } from "./seed";
 
 test("every tab teaches what goes there", async ({ page }) => {
   await signIn(page);
@@ -67,4 +68,19 @@ test("removing a person can be undone", async ({ page }) => {
   await expect(page.getByText("Removed Mia")).toBeVisible();
   await page.getByRole("button", { name: "Undo" }).click();
   await expect(page.getByRole("button", { name: "Remove Mia" })).toBeVisible();
+});
+
+test("a toast's Undo can be tapped while a sheet is open", async ({ page }) => {
+  await signIn(page);
+  const seeded = await seedTacoNight(page);
+  await api(page, "POST", "/api/plan/meals", { main_id: seeded.tacos });
+  await api(page, "POST", "/api/plan/extras", { item_id: seeded.cheddar, quantity: "1" });
+  await page.getByRole("link", { name: "List", exact: true }).click();
+  await page.getByRole("button", { name: /^Shredded cheddar/ }).click();
+  const sheet = page.getByRole("dialog", { name: "Shredded cheddar" });
+  await sheet.getByRole("button", { name: "Remove" }).click();
+  await expect(sheet.getByText("Added outside meals")).toBeHidden();
+  // The toast shows in the sheet: the page behind it can't be tapped.
+  await sheet.getByRole("button", { name: "Undo" }).click();
+  await expect(sheet.getByText("Added outside meals")).toBeVisible();
 });

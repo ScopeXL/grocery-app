@@ -147,20 +147,3 @@ export function ToastRegion() {
     </div>
   );
 }
-
-/** Put inside a fixed bottom bar: toasts then appear just above it. */
-export function ToastAnchor() {
-  return (
-    <div
-      ref={(node) => {
-        toastAnchor.set(node);
-        return () => {
-          if (toastAnchor.get() === node) toastAnchor.set(null);
-        };
-      }}
-      role="status"
-      aria-live="polite"
-      className="pointer-events-none absolute inset-x-0 bottom-full mb-2 flex flex-col items-center gap-2 px-4 print:hidden"
-    />
-  );
-}

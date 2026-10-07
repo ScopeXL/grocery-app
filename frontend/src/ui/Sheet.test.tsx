@@ -1,7 +1,9 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
+import { toastAnchor } from "../lib/toast";
 import { Sheet } from "./Sheet";
+import { ToastAnchor } from "./ToastAnchor";
 
 beforeAll(() => {
   // jsdom has no modal dialogs; opening and closing are all these tests need.
@@ -36,5 +38,33 @@ describe("a sheet with steps", () => {
     choice.focus();
     view.rerender(<Stepped step="search" choice="Sample result" />);
     expect(document.activeElement).toBe(choice);
+  });
+});
+
+describe("toasts while a sheet is open", () => {
+  function Screen({ open, renders }: { open: boolean; renders: number }) {
+    return (
+      <>
+        <Sheet open={open} title="Shredded cheddar" onClose={vi.fn()}>
+          <p>Sample line</p>
+        </Sheet>
+        {/* After the content, like Screen's action bar. */}
+        <div data-renders={renders} className="relative">
+          <ToastAnchor />
+        </div>
+      </>
+    );
+  }
+
+  it("show in the sheet, even after the screen's bar re-renders", () => {
+    const view = render(<Screen open={false} renders={1} />);
+    const onBar = toastAnchor.get();
+    view.rerender(<Screen open renders={1} />);
+    const inSheet = toastAnchor.get();
+    expect(inSheet && screen.getByRole("dialog").contains(inSheet)).toBe(true);
+    view.rerender(<Screen open renders={2} />);
+    expect(toastAnchor.get()).toBe(inSheet);
+    view.rerender(<Screen open={false} renders={3} />);
+    expect(toastAnchor.get()).toBe(onBar);
   });
 });

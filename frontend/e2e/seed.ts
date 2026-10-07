@@ -100,5 +100,5 @@ export async function seedTacoNight(page: Page) {
     role: "side",
     lines: [line(oil, "measure", "1", "tbsp")],
   });
-  return { tacos, chili, riceSide, salad, milk, oil };
+  return { tacos, chili, riceSide, salad, milk, oil, cheddar };
 }

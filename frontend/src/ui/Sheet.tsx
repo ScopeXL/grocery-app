@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 
 import { Button } from "./Button";
+import { ToastAnchor } from "./ToastAnchor";
 
 /**
  * A bottom sheet on the native <dialog> (docs/UX.md §3): the browser handles focus, Escape and
@@ -68,15 +69,19 @@ export function Sheet({
               Close
             </Button>
           </header>
-          {/* Focusable, so a keyboard can scroll it even when nothing inside takes focus. */}
-          <div
-            ref={bodyRef}
-            role="region"
-            aria-labelledby={titleId}
-            tabIndex={0}
-            className="flex-1 overflow-y-auto px-4 py-4"
-          >
-            {children}
+          <div className="relative flex min-h-0 flex-1 flex-col">
+            {/* Focusable, so a keyboard can scroll it even when nothing inside takes focus. */}
+            <div
+              ref={bodyRef}
+              role="region"
+              aria-labelledby={titleId}
+              tabIndex={0}
+              className="flex-1 overflow-y-auto px-4 py-4"
+            >
+              {children}
+            </div>
+            {/* Toasts (and their Undo) show here: the page behind an open sheet can't be tapped. */}
+            <ToastAnchor className="bottom-3" />
           </div>
           {footer ? <footer className="border-t border-rule px-4 py-3">{footer}</footer> : null}
         </div>

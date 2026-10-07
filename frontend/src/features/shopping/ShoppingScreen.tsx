@@ -22,7 +22,7 @@ import { useTripView, type Grouping, type TripView } from "../../lib/tripView";
 import { useKeepAwake, wakeLockState } from "../../lib/wakeLock";
 import { Button } from "../../ui/Button";
 import { Segmented, segmentOption } from "../../ui/Segmented";
-import { ToastAnchor } from "../../ui/StatusLayer";
+import { ToastAnchor } from "../../ui/ToastAnchor";
 import { underlined } from "../../ui/styles";
 import { FinishedElsewhere } from "./FinishedElsewhere";
 import { FinishSheet } from "./FinishSheet";

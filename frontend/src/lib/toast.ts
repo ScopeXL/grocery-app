@@ -35,6 +35,20 @@ export function clearToasts(): void {
 
 /**
  * Where toasts sit: just above a screen's bottom bar when it has one (so they never cover its
- * buttons), else above the tab bar. Bars register an anchor element here; no style is computed.
+ * buttons), else above the tab bar. While a sheet is open they sit at its bottom, since the page
+ * behind it can't be tapped. Bars and sheets register an anchor element (ui/ToastAnchor); the
+ * newest one still on screen wins. No style is computed.
  */
 export const toastAnchor = createStore<HTMLElement | null>(null);
+const anchors: HTMLElement[] = [];
+
+/** Toasts show in `node` until the returned function runs (when it leaves the screen). */
+export function anchorToasts(node: HTMLElement): () => void {
+  anchors.push(node);
+  toastAnchor.set(node);
+  return () => {
+    const at = anchors.lastIndexOf(node);
+    if (at !== -1) anchors.splice(at, 1);
+    toastAnchor.set(anchors.at(-1) ?? null);
+  };
+}

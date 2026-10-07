@@ -27,6 +27,7 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
   ("Shredd"). You now name it first: the name starts with your last word finished ("Shredded"),
   and you can change it. Picking a product you already use adds that item again instead of a
   copy.
+- Undo works while a sheet is open: its message used to sit behind the sheet, out of reach.
 - In dark mode, Undo and Refresh on the messages at the bottom of the screen are readable again.
 - The bar above the tabs no longer tucks slightly under them.
 

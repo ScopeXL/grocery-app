@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { ToastAnchor } from "./StatusLayer";
+import { ToastAnchor } from "./ToastAnchor";
 
 /** The bottom action bar above the tabs (docs/UX.md §1): primary actions in the thumb zone. */
 export function ActionBar({ children }: { children: ReactNode }) {
