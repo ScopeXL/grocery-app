@@ -4,7 +4,7 @@ Every release adds `tests/fixtures/db/<revision>.sql`: the schema at that releas
 synthetic rows in every table. `tests/test_migrations.py` replays each file and migrates it to
 head, so a new migration can't break a real household's data.
 
-    cd backend && uv run python -m tests.fixtures.db.build 202610062123
+    cd backend && uv run python -m tests.fixtures.db.build 202610070100
 
 Only synthetic values: "Sample Parent", location 99999001, UPCs 00000000000NN, made-up IDs.
 Seeds never change once their file is committed; a new release adds a new entry.
@@ -156,6 +156,50 @@ def _m1() -> list[Statement]:
     ]
 
 
+PLAN_OLD, PLAN_NOW = (f"00000000-0000-7000-8000-00000000060{n}" for n in range(1, 3))
+MEAL_1, MEAL_2, MEAL_3 = (f"00000000-0000-7000-8000-00000000070{n}" for n in range(1, 4))
+
+
+def _m2() -> list[Statement]:
+    """0.3.0 (M2): an active and an archived plan, planned meals (one removed) and a side,
+    extras (an item, a removed text one, last week's), overrides (have-it, a delta and a
+    swap), and usual-side pairings (learned and pinned)."""
+    return [
+        *_m1(),
+        "UPDATE app_meta SET last_boot_version = '0.3.0'",
+        "INSERT INTO plans (id, status, started_at, archived_at) VALUES "
+        f"('{PLAN_OLD}', 'archived', '2026-09-28 12:00:00', '2026-10-05 12:00:00'), "
+        f"('{PLAN_NOW}', 'active', '2026-10-05 12:00:00', NULL)",
+        "INSERT INTO plan_meals (id, plan_id, main_id, day, occasion, scale, position, "
+        "added_by_member_id, created_at, deleted_at) VALUES "
+        f"('{MEAL_1}', '{PLAN_NOW}', '{TACOS}', '2026-10-07', 'dinner', '2', 0, '{P1}', "
+        "'2026-10-06 12:50:00', NULL), "
+        f"('{MEAL_2}', '{PLAN_NOW}', '{TACOS}', NULL, 'dinner', '1', 1, '{P1}', "
+        "'2026-10-06 12:51:00', '2026-10-06 13:30:00'), "
+        f"('{MEAL_3}', '{PLAN_OLD}', '{OLD_SOUP}', NULL, 'lunch', '1/2', 0, NULL, "
+        "'2026-09-28 12:10:00', NULL)",
+        f"INSERT INTO plan_meal_sides (plan_meal_id, side_id, position) VALUES ('{MEAL_1}', "
+        f"'{RICE}', 0)",
+        "INSERT INTO plan_extras (id, plan_id, item_id, text, quantity, note, "
+        "added_by_member_id, created_at, deleted_at) VALUES "
+        f"('00000000-0000-7000-8000-000000000801', '{PLAN_NOW}', '{BANANAS}', NULL, '3/2', "
+        f"'Ripe ones', '{P1}', '2026-10-06 12:55:00', NULL), "
+        f"('00000000-0000-7000-8000-000000000802', '{PLAN_NOW}', NULL, 'Birthday candles', '1', "
+        "NULL, NULL, '2026-10-06 12:56:00', '2026-10-06 13:31:00'), "
+        f"('00000000-0000-7000-8000-000000000803', '{PLAN_OLD}', '{OIL}', NULL, '1', NULL, "
+        f"'{P1}', '2026-09-28 12:20:00', NULL)",
+        "INSERT INTO plan_item_overrides (plan_id, item_id, have_it, qty_delta, qty_delta_unit, "
+        "swap_product_id, swap_upc, swap_size_text, swap_sold_by, updated_at) VALUES "
+        f"('{PLAN_NOW}', '{OIL}', 1, NULL, NULL, NULL, NULL, NULL, NULL, "
+        "'2026-10-06 13:00:00'), "
+        f"('{PLAN_NOW}', '{BEEF}', NULL, '1', 'package', '0000000000099', '0000000000099', "
+        "'2 lb', 'UNIT', '2026-10-06 13:01:00')",
+        "INSERT INTO dish_pairings (main_id, side_id, times_chosen, last_chosen_at, pinned, "
+        f"hidden) VALUES ('{TACOS}', '{RICE}', 3, '2026-10-06 12:50:00', 0, 0), "
+        f"('{OLD_SOUP}', '{RICE}', 0, NULL, 1, 0)",
+    ]
+
+
 # Synthetic rows to insert, per released revision (the tables that exist at that revision).
 SEEDS: dict[str, Callable[[], list[Statement]]] = {
     "202610061200": lambda: [
@@ -165,6 +209,7 @@ SEEDS: dict[str, Callable[[], list[Statement]]] = {
         *_PEOPLE,
     ],
     "202610062123": _m1,
+    "202610070100": _m2,
 }
 
 
