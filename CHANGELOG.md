@@ -6,6 +6,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-07
+
 ### Added
 
 - Plan suggests up to three meals that use what you're already buying, with the reason in
@@ -13,6 +15,11 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
   $4." Tap Add and the total moves by about that much.
 - Each planned meal shows what it costs at today's prices.
 - Sale tags say when the sale ends, and Meals has an On sale filter.
+
+### Behind the scenes
+
+- The suggestions are checked against worked examples, so the amount a suggestion says it adds
+  is what the total really moves by.
 
 ## [0.4.0] - 2026-10-06
 
@@ -105,5 +112,7 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 [0.3.0]: https://github.com/ScopeXL/grocery-app/compare/v0.2.0...v0.3.0
 
-[Unreleased]: https://github.com/ScopeXL/grocery-app/compare/v0.4.0...HEAD
 [0.4.0]: https://github.com/ScopeXL/grocery-app/compare/v0.3.0...v0.4.0
+
+[Unreleased]: https://github.com/ScopeXL/grocery-app/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/ScopeXL/grocery-app/compare/v0.4.0...v0.5.0
