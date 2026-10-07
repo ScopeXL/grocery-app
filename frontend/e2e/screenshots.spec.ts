@@ -302,6 +302,14 @@ for (const scheme of ["light", "dark"] as const) {
       .getByRole("dialog", { name: "Add a phone" })
       .getByRole("button", { name: "Done" })
       .click();
+    await page.getByRole("button", { name: "Change Sample Parent" }).click();
+    await expect(page.getByRole("dialog", { name: "Change Sample Parent" })).toBeVisible();
+    await settle(page);
+    await page.screenshot({ path: `${dir}/member-sheet-${scheme}.png`, caret: "initial" });
+    await page
+      .getByRole("dialog", { name: "Change Sample Parent" })
+      .getByRole("button", { name: "Close" })
+      .click();
     await page.getByRole("link", { name: "List", exact: true }).click();
     await page.getByRole("button", { name: "Send to Kroger cart" }).click();
     await expect(cart.getByRole("button", { name: /^Send \d+ items$/ })).toBeVisible();

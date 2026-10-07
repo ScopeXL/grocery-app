@@ -7,7 +7,7 @@ import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
 import { liveStatus, type LiveStatus } from "../../lib/events";
 import { relativeTime } from "../../lib/format";
-import { fetchSession, rememberSignedIn } from "../../lib/session";
+import { fetchSession, rememberSignedIn, type Member } from "../../lib/session";
 import { useStore } from "../../lib/store";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
@@ -18,6 +18,7 @@ import { CONNECT_RESULTS, type ConnectResult } from "../kroger/account";
 import { ChooseStore } from "../stores/ChooseStore";
 import { AddPhoneSheet } from "./AddPhoneSheet";
 import { KrogerAccountSection } from "./KrogerAccountSection";
+import { MemberSheet } from "./MemberSheet";
 
 const LIVE_TEXT: Record<LiveStatus, string> = {
   live: "Live updates: connected",
@@ -153,6 +154,7 @@ function Household() {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
   const [name, setName] = useState("");
+  const [changing, setChanging] = useState<Member | null>(null);
   const nameId = useId();
   const refresh = () => queryClient.invalidateQueries({ queryKey: qk.session() });
 
@@ -196,15 +198,16 @@ function Household() {
       {(session?.members ?? []).map((member) => (
         <Row key={member.id}>
           <MemberBadge name={member.name} color={member.marker_color} />
-          <span className="flex-1 text-body font-semibold">{member.name}</span>
+          <span className="min-w-0 flex-1 text-body font-semibold">{member.name}</span>
           <Button
-            variant="quiet-danger"
-            aria-label={`Remove ${member.name}`}
+            variant="quiet"
+            className="px-3"
+            aria-label={`Change ${member.name}`}
             onClick={() => {
-              remove.mutate(member.id);
+              setChanging(member);
             }}
           >
-            Remove
+            Change
           </Button>
         </Row>
       ))}
@@ -235,6 +238,15 @@ function Household() {
           </div>
         </form>
       </Row>
+      <MemberSheet
+        member={changing}
+        onClose={() => {
+          setChanging(null);
+        }}
+        onRemove={(member) => {
+          remove.mutate(member.id);
+        }}
+      />
     </Section>
   );
 }

@@ -373,7 +373,7 @@ Trips · Settings · Who's using this · Install the app · About and privacy. E
 |---|---|
 | Store | Name and address; **Change store** (ZIP search) |
 | Store walking order | The section list with up/down buttons per row; a drag handle as a shortcut |
-| Household | Members (add, rename, color); household name |
+| Household | One row per person: their badge, name and **Change**. Change opens their sheet: Name; Color (eight marker colors, each showing their initial and a color word: Green, Red, Orange, Purple, Pink, Olive, Brown, Plum); **Save changes** (toast "Changes saved", with Undo); and **Remove Mia** (toast "Removed Mia", with Undo). **Add a person** at the end; household name |
 | Kroger account (M5) | Before connecting: one line on what it's for, and **Connect Kroger**. Connected: "Connected", "By Mia", when; **Disconnect** (its toast offers **Connect again**); and "Send lists for" Pickup / Delivery, the default the send sheet starts with. A lemon "Kroger signed Dinner Bell out." banner with **Reconnect Kroger** when Kroger refuses the account. Sample mode adds: "the Kroger sign-in is a demo, and nothing reaches a real cart." |
 | Devices | This phone, plus other signed-in devices with "last used"; **Add a phone** (§5.6); **Sign out other devices** |
 | Data | **Export all data**; last backup time, and a banner if older than 36 h |

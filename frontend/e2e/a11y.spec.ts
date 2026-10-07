@@ -193,6 +193,10 @@ for (const scheme of ["light", "dark"] as const) {
       await api(page, "POST", "/api/trips");
       await openSettings(page);
       await check(page, "settings");
+      await page.getByRole("button", { name: "Change Sample Parent" }).click();
+      await expect(page.getByRole("dialog", { name: "Change Sample Parent" })).toBeVisible();
+      await check(page, "change a person");
+      await page.getByRole("dialog").getByRole("button", { name: "Close" }).click();
       await page.getByRole("button", { name: "Connect Kroger" }).click();
       await expect(page.getByRole("heading", { name: "Demo sign-in" })).toBeVisible();
       await check(page, "demo sign-in");

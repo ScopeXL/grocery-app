@@ -10,6 +10,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 - Rename an item from its amount picker or from its line on the shopping list. The new name shows
   in your meals and on this week's list, and Undo puts the old one back.
+- Change a person's name or color in Settings: Household, then Change. Removing someone is in the
+  same place now, still with Undo.
 
 ### Changed
 

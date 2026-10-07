@@ -58,7 +58,7 @@ test("Who's using this shows this phone, and goes back where it was opened", asy
   await page.getByRole("link", { name: "Settings" }).click();
   await page.getByLabel("Add a person").fill("Sample Kid");
   await page.getByRole("button", { name: "Add", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Remove Sample Kid" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Change Sample Kid" })).toBeVisible();
   await page.getByRole("link", { name: "Change who’s using this phone" }).click();
   const kid = page.getByRole("button", { name: /Sample Kid/ });
   await expect(kid).toHaveAttribute("aria-pressed", "false");

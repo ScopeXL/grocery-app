@@ -64,10 +64,15 @@ test("removing a person can be undone", async ({ page }) => {
   await openSettings(page);
   await page.getByLabel("Add a person").fill("Mia");
   await page.getByRole("button", { name: "Add", exact: true }).click();
-  await page.getByRole("button", { name: "Remove Mia" }).click();
+  await page.getByRole("button", { name: "Change Mia" }).click();
+  await page
+    .getByRole("dialog", { name: "Change Mia" })
+    .getByRole("button", { name: "Remove Mia" })
+    .click();
   await expect(page.getByText("Removed Mia")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Change Mia" })).toHaveCount(0);
   await page.getByRole("button", { name: "Undo" }).click();
-  await expect(page.getByRole("button", { name: "Remove Mia" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Change Mia" })).toBeVisible();
 });
 
 test("a toast's Undo can be tapped while a sheet is open", async ({ page }) => {
@@ -83,4 +88,30 @@ test("a toast's Undo can be tapped while a sheet is open", async ({ page }) => {
   // The toast shows in the sheet: the page behind it can't be tapped.
   await sheet.getByRole("button", { name: "Undo" }).click();
   await expect(sheet.getByText("Added outside meals")).toBeVisible();
+});
+
+test("a person's name and color can be changed, and Undo puts them back", async ({ page }) => {
+  await signIn(page);
+  await openSettings(page);
+  await page.getByLabel("Add a person").fill("Mia");
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+  await page.getByRole("button", { name: "Change Mia" }).click();
+  const sheet = page.getByRole("dialog", { name: "Change Mia" });
+  await sheet.getByLabel("Name").fill("Sample Teen");
+  await sheet.getByRole("radio", { name: "Plum" }).check();
+  await sheet.getByRole("button", { name: "Save changes" }).click();
+  await expect(page.getByText("Changes saved")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Change Sample Teen" })).toBeVisible();
+  const members = async () =>
+    (
+      (await (await page.request.get("/api/members")).json()) as {
+        name: string;
+        marker_color: string;
+      }[]
+    ).map((member) => `${member.name}: ${member.marker_color}`);
+  expect(await members()).toContain("Sample Teen: plum");
+
+  await page.getByRole("button", { name: "Undo" }).click();
+  await expect(page.getByRole("button", { name: "Change Mia" })).toBeVisible();
+  expect(await members()).not.toContain("Sample Teen: plum");
 });
