@@ -165,7 +165,11 @@ export function MealCard({ card }: { card: DishCard }) {
   const cost = costLine(card.cost);
   return (
     <li className="relative flex flex-col overflow-hidden rounded-tile border border-rule bg-paper">
-      <Link to="/meals/$dishId" params={{ dishId: card.id }} className="flex flex-1 flex-col">
+      <Link
+        to="/meals/$dishId"
+        params={{ dishId: card.id }}
+        className="press-row flex flex-1 flex-col"
+      >
         {card.photo_url ? (
           <img src={card.photo_url} alt="" className="aspect-[4/3] w-full object-cover" />
         ) : (

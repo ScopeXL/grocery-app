@@ -57,7 +57,7 @@ export function LibraryPane({ onAdd }: { onAdd: (main: DishCard) => void }) {
               <Link
                 to="/meals/$dishId"
                 params={{ dishId: card.id }}
-                className="flex min-h-11 min-w-0 flex-1 flex-col justify-center"
+                className="press-row flex min-h-11 min-w-0 flex-1 flex-col justify-center"
               >
                 <span className="text-body leading-tight font-semibold">{card.name}</span>
               </Link>

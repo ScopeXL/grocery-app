@@ -56,7 +56,7 @@ export function JoinScreen() {
     <Button
       block
       variant={installFirst ? "quiet" : "primary"}
-      disabled={join.isPending}
+      pending={join.isPending}
       onClick={() => {
         join.mutate(code);
       }}

@@ -76,6 +76,20 @@ export async function signIn(
   ).toBeVisible();
 }
 
+/**
+ * Wait until every finite animation and transition has ended (styles/motion.css), so a check
+ * sees the final look, not colors halfway through a change. Spinners never end; they're skipped.
+ */
+export async function settled(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    const finite = document.getAnimations().filter((animation) => {
+      const end = animation.effect?.getComputedTiming().endTime;
+      return typeof end === "number" && Number.isFinite(end);
+    });
+    await Promise.all(finite.map((animation) => animation.finished.catch(() => undefined)));
+  });
+}
+
 /** Choose the sample store with the page's own session (no UI). */
 export async function chooseStore(page: Page): Promise<void> {
   const response = await page.request.put("/api/stores/active", {

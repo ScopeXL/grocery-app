@@ -19,7 +19,7 @@ export function Chip({
       aria-pressed={on}
       disabled={disabled}
       onClick={onClick}
-      className="inline-flex min-h-10 items-center gap-1 rounded-full border-2 border-rule bg-paper px-3.5 text-secondary font-semibold disabled:opacity-60 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent"
+      className="press inline-flex min-h-10 items-center gap-1 rounded-full border-2 border-rule bg-paper px-3.5 text-secondary font-semibold disabled:opacity-60 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent"
     >
       {children}
     </button>

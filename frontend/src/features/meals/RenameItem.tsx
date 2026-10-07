@@ -109,7 +109,7 @@ export function RenameItem({ itemId, name }: { itemId: string; name: string }) {
         {rename.isError ? errorMessage(rename.error) : null}
       </p>
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="submit" disabled={rename.isPending || !text.trim()}>
+        <Button type="submit" pending={rename.isPending} disabled={!text.trim()}>
           Save name
         </Button>
         <Button

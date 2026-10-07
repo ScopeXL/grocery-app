@@ -18,7 +18,7 @@ export function ToggleRow({
       aria-pressed={on}
       disabled={disabled}
       onClick={onClick}
-      className="flex min-h-14 w-full items-center gap-3 rounded-button border-2 border-rule bg-paper px-3 text-left text-body font-semibold disabled:opacity-60 aria-pressed:border-accent"
+      className="press-row flex min-h-14 w-full items-center gap-3 rounded-button border-2 border-rule bg-paper px-3 text-left text-body font-semibold disabled:opacity-60 aria-pressed:border-accent"
     >
       <span
         aria-hidden="true"

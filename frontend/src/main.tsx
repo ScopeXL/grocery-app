@@ -7,6 +7,10 @@ import { createRoot } from "react-dom/client";
 
 import { queryClient, router } from "./router";
 
+// iOS Safari only shows :active (the press feedback, styles/motion.css) once a page listens for
+// touches. Passive, so scrolling is never held up.
+document.addEventListener("touchstart", () => undefined, { passive: true });
+
 const container = document.getElementById("root");
 if (!container) throw new Error("The #root element is missing from index.html");
 

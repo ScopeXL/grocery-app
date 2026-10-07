@@ -77,7 +77,7 @@ function PasswordForm({ onUseCode }: { onUseCode: () => void }) {
       <p id={errorId} role="alert" className="min-h-7 text-secondary font-semibold text-tomato">
         {error}
       </p>
-      <Button type="submit" block disabled={signIn.isPending || password.length === 0}>
+      <Button type="submit" block pending={signIn.isPending} disabled={password.length === 0}>
         {signIn.isPending ? "Signing in…" : "Sign in"}
       </Button>
       <p className="mt-2 text-secondary text-ink-soft">
@@ -130,7 +130,7 @@ function CodeForm({ onUsePassword }: { onUsePassword: () => void }) {
       <p id={errorId} role="alert" className="min-h-7 text-secondary font-semibold text-tomato">
         {join.isError ? errorMessage(join.error) : null}
       </p>
-      <Button type="submit" block disabled={join.isPending || !valid}>
+      <Button type="submit" block pending={join.isPending} disabled={!valid}>
         {join.isPending ? "Signing in…" : "Sign in"}
       </Button>
       <Button variant="quiet" className="-ml-5 self-start" onClick={onUsePassword}>

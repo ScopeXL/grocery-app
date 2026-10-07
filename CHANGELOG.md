@@ -31,6 +31,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
   opened it. More shows the name too.
 - While a screen loads, grey shapes stand where its content will appear, instead of a blank screen
   or "Loading…". A quick load doesn't show them at all.
+- Buttons, chips and rows respond when you press them, and a button that's waiting on the server
+  shows a small spinner. With Reduce Motion on, nothing moves.
 
 ### Fixed
 

@@ -197,7 +197,7 @@ function SwapMain({
           <li key={card.id} className="border-b border-rule last:border-b-0">
             <button
               type="button"
-              className="flex min-h-14 w-full items-center px-4 text-left text-body font-semibold"
+              className="press-row flex min-h-14 w-full items-center px-4 text-left text-body font-semibold"
               onClick={() => {
                 onPick(card.id);
               }}

@@ -194,7 +194,7 @@ function TonightCard({
   return (
     <section
       aria-label={meal.occasion === "dinner" ? "Tonight" : "Today"}
-      className="relative mb-5 overflow-hidden rounded-tile border border-rule bg-paper has-[button:active]:bg-counter"
+      className="relative mb-5 overflow-hidden rounded-tile border border-rule bg-paper transition-colors duration-(--motion-tap) has-[button:active]:bg-counter"
     >
       <MealPicture dish={meal.main} />
       <div className="flex items-start gap-3 p-4">
@@ -256,7 +256,7 @@ function MealRow({
   const descriptionId = useId();
   const tags = tagTexts(meal, today, true);
   return (
-    <li className="relative flex items-center gap-3 border-b border-rule px-3 py-3 last:border-b-0 has-[button:active]:bg-counter">
+    <li className="relative flex items-center gap-3 border-b border-rule px-3 py-3 transition-colors duration-(--motion-tap) last:border-b-0 has-[button:active]:bg-counter">
       <MealThumb dish={meal.main} />
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-start justify-between gap-3">

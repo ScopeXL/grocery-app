@@ -32,7 +32,7 @@ export function ShopRow({
       <button
         type="button"
         onClick={onOpen}
-        className="flex min-h-20 min-w-0 flex-1 items-center gap-3 py-2 pl-3 text-left"
+        className="press-row flex min-h-20 min-w-0 flex-1 items-center gap-3 py-2 pl-3 text-left"
       >
         <ProductImage src={item.image_url} alt="" size={64} />
         <span className="flex min-w-0 flex-col">

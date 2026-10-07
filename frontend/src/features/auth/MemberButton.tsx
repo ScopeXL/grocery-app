@@ -26,7 +26,7 @@ export function MemberButton({
       aria-pressed={chosen}
       disabled={disabled}
       onClick={onChoose}
-      className="flex min-h-14 w-full items-center gap-4 rounded-button border-2 border-rule bg-paper px-4 py-2 text-left disabled:opacity-60 aria-pressed:border-accent"
+      className="press-row flex min-h-14 w-full items-center gap-4 rounded-button border-2 border-rule bg-paper px-4 py-2 text-left disabled:opacity-60 aria-pressed:border-accent"
     >
       <MemberBadge name={member.name} color={member.marker_color} />
       <span className="flex min-w-0 flex-1 flex-col">

@@ -30,7 +30,7 @@ This document covers every screen at phone size, the main flows step by step, em
 - **Nothing is lost by closing the app mid-task.** Drafts save automatically.
 
 **Speed and connection**
-- **Taps respond instantly** (optimistic updates); syncing happens behind them.
+- **Taps respond instantly** (optimistic updates); syncing happens behind them. A pressed button or chip dips slightly and shades; a pressed row (a list line, a meal, a person) shades. A button waiting on the server keeps its name, shows a small spinner and can't be tapped twice.
 - **Offline is quiet:** a small pill, never an error wall. Planning screens stay readable offline; editing explains in one line why it waits for a connection.
 - **Live:** changes from other phones appear without a refresh.
 
@@ -550,8 +550,9 @@ Defined once in `frontend/src/styles/tokens.css` (Tailwind v4 `@theme`). Compone
 - **The signature moment:**
   1. A slightly wobbly marker stroke (SVG path, randomized per row within a small range) draws left to right through the item name in 250 ms, in the checker's color.
   2. The row then slides into Done (200 ms).
-- **Other motion only answers an action** (sheets opening, a toast appearing, a list reordering) and shows what changed. No decorative entrance animations.
-- **`prefers-reduced-motion`:** the strike appears instantly, and rows move without sliding.
+- **Other motion only answers an action** (sheets opening, a toast appearing, a list reordering) and shows what changed. No decorative entrance animations, and nothing moves on first paint or a tab switch.
+- **How it's built** (ADR 0027): all of it is CSS in `styles/motion.css`, with the timing tokens tap 90 ms, quick 150 ms, enter 220 ms and exit 180 ms. Components only toggle attributes or wait on `getAnimations()`.
+- **`prefers-reduced-motion`:** everything is instant, including backdrops and delays: the strike appears at once, rows move without sliding, a press shades without dipping, and spinners and placeholders stand still.
 
 ### 7.7 Icons and app icon
 

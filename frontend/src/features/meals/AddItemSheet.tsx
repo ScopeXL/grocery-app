@@ -134,7 +134,7 @@ export function AddItemSheet({
           <p role="alert" className="min-h-7 text-secondary font-semibold text-tomato">
             {create.isError ? errorMessage(create.error) : null}
           </p>
-          <Button type="submit" block disabled={create.isPending || !picked.name.trim()}>
+          <Button type="submit" block pending={create.isPending} disabled={!picked.name.trim()}>
             {confirmLabel}
           </Button>
         </form>
@@ -163,7 +163,7 @@ export function AddItemSheet({
                   <li key={item.id} className="border-b border-rule last:border-b-0">
                     <button
                       type="button"
-                      className="flex min-h-14 w-full items-center gap-3 px-3 py-2 text-left"
+                      className="press-row flex min-h-14 w-full items-center gap-3 px-3 py-2 text-left"
                       onClick={() => {
                         setText("");
                         onPicked(item);
@@ -204,7 +204,7 @@ export function AddItemSheet({
                         <button
                           type="button"
                           disabled={create.isPending}
-                          className="flex min-h-16 w-full items-start gap-3 px-3 py-3 text-left disabled:opacity-60"
+                          className="press-row flex min-h-16 w-full items-start gap-3 px-3 py-3 text-left disabled:opacity-60"
                           onClick={() => {
                             if (mineAlready) {
                               setText("");
@@ -247,7 +247,7 @@ export function AddItemSheet({
             <Button
               variant="secondary"
               block
-              disabled={create.isPending}
+              pending={create.isPending}
               onClick={() => {
                 create.mutate({ name: tidyName(text) });
               }}

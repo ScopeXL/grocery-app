@@ -80,7 +80,7 @@ export function ListActions({ plan }: { plan: PlanOut }) {
             {trip.stale ? (
               <Button
                 variant="secondary"
-                disabled={save.isPending}
+                pending={save.isPending}
                 onClick={() => {
                   save.mutate();
                 }}
@@ -92,7 +92,8 @@ export function ListActions({ plan }: { plan: PlanOut }) {
         ) : (
           <Button
             className="flex-1"
-            disabled={save.isPending || plan.lines.length === 0}
+            pending={save.isPending}
+            disabled={plan.lines.length === 0}
             onClick={() => {
               save.mutate();
             }}

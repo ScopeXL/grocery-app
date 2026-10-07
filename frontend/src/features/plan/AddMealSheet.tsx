@@ -113,6 +113,7 @@ export function AddMealSheet({
             <Button
               variant="secondary"
               disabled={add.isPending}
+              pending={add.isPending && !add.variables}
               onClick={() => {
                 add.mutate(false);
               }}
@@ -122,6 +123,7 @@ export function AddMealSheet({
             <Button
               className="flex-1"
               disabled={add.isPending}
+              pending={add.isPending && add.variables}
               onClick={() => {
                 add.mutate(true);
               }}
@@ -219,7 +221,7 @@ function MainStep({
             <li key={card.id} className="border-b border-rule last:border-b-0">
               <button
                 type="button"
-                className="flex min-h-16 w-full items-center gap-3 px-3 py-2 text-left"
+                className="press-row flex min-h-16 w-full items-center gap-3 px-3 py-2 text-left"
                 onClick={() => {
                   onChoose(card);
                 }}

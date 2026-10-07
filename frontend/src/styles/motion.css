@@ -1,0 +1,53 @@
+/*
+ * Motion (ADR 0027, docs/UX.md §7.6). It answers what someone did, and it all lives here:
+ * components only toggle attributes, change a key, or wait on getAnimations(). Nothing moves on
+ * first paint or a tab switch. Reduce Motion makes all of it instant.
+ */
+:root {
+  --motion-tap: 90ms;
+  --motion-quick: 150ms;
+  --motion-enter: 220ms;
+  --motion-exit: 180ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-arrive: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-leave: cubic-bezier(0.3, 0, 0.8, 0.15);
+}
+
+/* A press: buttons and chips dip slightly while a finger is on them; their colors ease. */
+.press {
+  transition-property: transform, background-color, border-color, color, opacity;
+  transition-duration: var(--motion-tap);
+  transition-timing-function: var(--ease-standard);
+}
+.press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* A whole row (a list line, a meal, a person) shades instead: scaling a full row looks odd. */
+.press-row {
+  transition: background-color var(--motion-tap) var(--ease-standard);
+}
+.press-row:active:not(:disabled) {
+  background-color: var(--counter);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after,
+  ::backdrop {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  .press:active:not(:disabled) {
+    transform: none;
+  }
+}

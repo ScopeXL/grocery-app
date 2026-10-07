@@ -108,7 +108,7 @@ export function WhoScreen({ from }: { from?: WhoFrom | undefined }) {
             }}
             className="min-h-12 rounded-button border-2 border-rule bg-paper px-4 text-body"
           />
-          <Button type="submit" block disabled={addMe.isPending || !name.trim()}>
+          <Button type="submit" block pending={addMe.isPending} disabled={!name.trim()}>
             Add me
           </Button>
           {members.length > 0 ? (

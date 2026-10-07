@@ -41,7 +41,7 @@ export function LineRow({
         onClick={() => {
           onOpen(line.key);
         }}
-        className="flex min-h-16 w-full items-start gap-3 px-3 py-2.5 text-left"
+        className="press-row flex min-h-16 w-full items-start gap-3 px-3 py-2.5 text-left"
       >
         <span className={had ? "opacity-50" : ""}>
           <ProductImage src={line.image_url} alt="" size={48} />

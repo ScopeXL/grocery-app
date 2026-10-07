@@ -235,7 +235,7 @@ function MealEditor({
                 onClick={() => {
                   update({ role: value, step: editing ? draft.step : STEP.items });
                 }}
-                className="flex min-h-16 flex-col items-start justify-center rounded-button border-2 border-rule bg-paper px-4 py-3 text-left aria-pressed:border-accent"
+                className="press-row flex min-h-16 flex-col items-start justify-center rounded-button border-2 border-rule bg-paper px-4 py-3 text-left aria-pressed:border-accent"
               >
                 <span className="text-row font-bold">{label}</span>
                 <span className="text-secondary text-ink-soft">{hint}</span>
@@ -338,6 +338,7 @@ function MealEditor({
               block
               className="flex-1"
               disabled={!canSave}
+              pending={save.isPending}
               onClick={() => {
                 save.mutate();
               }}

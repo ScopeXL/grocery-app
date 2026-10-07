@@ -6,7 +6,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import type { Page } from "@playwright/test";
 
-import { expect, openSettings, signIn, test } from "./fixtures";
+import { expect, openSettings, settled, signIn, test } from "./fixtures";
 import { api, seedTacoNight } from "./seed";
 
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
@@ -54,6 +54,7 @@ async function targetsAtLeast40px(page: Page, where: string): Promise<void> {
 }
 
 async function check(page: Page, where: string): Promise<void> {
+  await settled(page);
   await typingFieldsAtLeast16px(page, where);
   await targetsAtLeast40px(page, where);
   const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();

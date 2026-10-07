@@ -113,6 +113,7 @@ frontend/src/
   - Strict TypeScript; call the API only through the generated client; use the query-key factory.
   - Only design tokens; no raw hex in components.
   - No dependency may inject styles at runtime (strict CSP; ADR 0023). The e2e tests fail on any CSP violation.
+  - Motion is CSS only, in `styles/motion.css` (ADR 0027). Components toggle attributes or wait on `getAnimations()`; never `style={}` or `element.animate()`. Reduce Motion makes it all instant. Checks that read colors call `settled(page)` first.
   - Every action needs a visible button. Swipes are shortcuts only.
   - Prefer Undo over confirmations.
   - Offline state is a quiet pill, never an error wall.

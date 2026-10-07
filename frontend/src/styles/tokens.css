@@ -5,6 +5,7 @@
  */
 @import "tailwindcss";
 @import "@fontsource-variable/atkinson-hyperlegible-next";
+@import "./motion.css";
 
 :root {
   color-scheme: light dark;

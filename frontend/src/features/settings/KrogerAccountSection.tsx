@@ -37,11 +37,12 @@ function PickupOrDelivery() {
     },
     onError: (failure) => showToast(errorMessage(failure)),
   });
+  // Shown once the choice is known, so it never flips from nothing chosen to Pickup.
+  if (!settings.data) return null;
   return (
     <ModalityChoice
       label="Send lists for"
-      value={choose.isPending ? choose.variables : settings.data?.cart_modality}
-      disabled={!settings.data}
+      value={choose.isPending ? choose.variables : settings.data.cart_modality}
       onChange={(modality) => {
         choose.mutate(modality);
       }}

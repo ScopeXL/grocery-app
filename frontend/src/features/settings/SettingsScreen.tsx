@@ -74,7 +74,7 @@ function StoreSettings() {
         <Row>
           <Link
             to="/settings/walking-order"
-            className="flex min-h-11 flex-1 items-center justify-between text-body font-semibold text-accent"
+            className="press-row flex min-h-11 flex-1 items-center justify-between text-body font-semibold text-accent"
           >
             Store walking order
             <ChevronRight aria-hidden="true" />

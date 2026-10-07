@@ -151,7 +151,7 @@ function MemberForm({
       <p role="alert" className="mt-3 min-h-7 text-secondary font-semibold text-tomato">
         {change.isError ? errorMessage(change.error) : null}
       </p>
-      <Button type="submit" block disabled={change.isPending || !trimmed}>
+      <Button type="submit" block pending={change.isPending} disabled={!trimmed}>
         Save changes
       </Button>
       <Button variant="quiet-danger" block className="mt-3" onClick={onRemove}>
