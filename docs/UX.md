@@ -550,7 +550,7 @@ Defined once in `frontend/src/styles/tokens.css` (Tailwind v4 `@theme`). Compone
 - **The signature moment:**
   1. A slightly wobbly marker stroke (SVG path, randomized per row within a small range) draws left to right through the item name in 250 ms, in the checker's color.
   2. The row then folds away (180 ms) and joins Done.
-- **Other motion only answers an action** (sheets opening, a toast appearing, a list reordering) and shows what changed. No decorative entrance animations, and nothing moves on first paint or a tab switch.
+- **Other motion only answers an action** (sheets opening, a toast appearing, a list reordering) and shows what changed. No decorative entrance animations, and nothing moves on first paint or a tab switch. A row added to a list after it appeared (a meal planned, an extra added) eases in; the rows a list opens with stay still. A total or the "18 of 31" count pops once when it changes.
 - **How it's built** (ADR 0027): all of it is CSS in `styles/motion.css`, with the timing tokens tap 90 ms, quick 150 ms, enter 220 ms and exit 180 ms. Components only toggle attributes or wait on `getAnimations()`.
 - **`prefers-reduced-motion`:** everything is instant, including backdrops and delays: the strike appears at once, rows move without sliding, a press shades without dipping, and spinners and placeholders stand still.
 

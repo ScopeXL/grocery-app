@@ -4,15 +4,19 @@
  */
 import { Link } from "@tanstack/react-router";
 
+import { useChangeCount } from "../../lib/motion";
 import { underlined } from "../../ui/styles";
 import type { PlanOut } from "./types";
 
 export function TotalFooter({ plan, compact = false }: { plan: PlanOut; compact?: boolean }) {
   const totals = plan.totals;
+  // A new total pops once (styles/motion.css); the first one just shows.
+  const changes = useChangeCount(totals.total_text);
+  const pop = changes > 0 ? " pop" : "";
   if (compact) {
     return (
       <div className="flex w-full items-center justify-between gap-3" aria-live="polite">
-        <span className="text-row font-extrabold" data-testid="total">
+        <span key={changes} className={`text-row font-extrabold${pop}`} data-testid="total">
           {totals.total_text}
         </span>
         {totals.savings_text ? (
@@ -26,7 +30,7 @@ export function TotalFooter({ plan, compact = false }: { plan: PlanOut; compact?
   return (
     <div className="flex w-full flex-col" aria-live="polite">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-total font-extrabold" data-testid="total">
+        <span key={changes} className={`text-total font-extrabold${pop}`} data-testid="total">
           {totals.total_text}
         </span>
         {totals.savings_text ? (

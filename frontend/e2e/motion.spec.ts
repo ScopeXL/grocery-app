@@ -8,10 +8,11 @@ import { expect, openSettings, settled, signIn, test } from "./fixtures";
 import { api, seedTacoNight } from "./seed";
 
 /** Tacos planned, so the plan has one "Add a meal" button. */
-async function planWithTacos(page: Page): Promise<void> {
+async function planWithTacos(page: Page) {
   const seeded = await seedTacoNight(page);
   await api(page, "POST", "/api/plan/meals", { main_id: seeded.tacos });
   await expect(page.getByRole("list", { name: "This week's meals" })).toContainText("Tacos");
+  return seeded;
 }
 
 test("a sheet opens with focus on itself, and gives it back when it slides away", async ({
@@ -58,6 +59,25 @@ test("Send again? takes over from the cart sheet and hands back, keeping focus",
   await settled(page);
   await expect(page.locator("dialog[open]")).toHaveCount(1);
   await expect(sheet).toBeFocused();
+});
+
+test("a meal planned later eases into the list, and the total pops when it changes", async ({
+  page,
+}) => {
+  await signIn(page);
+  const seeded = await planWithTacos(page);
+  // Back to the plan afresh: the total it opens with just shows.
+  await page.getByRole("link", { name: "List", exact: true }).click();
+  await page.getByRole("link", { name: "Plan", exact: true }).click();
+  const total = page.getByTestId("total");
+  await expect(total).toBeVisible();
+  await expect(total).not.toHaveClass(/\bpop\b/);
+  const meals = page.getByRole("list", { name: "This week's meals" });
+  await expect(meals).toHaveAttribute("data-arrivals", "");
+
+  await api(page, "POST", "/api/plan/meals", { main_id: seeded.chili });
+  await expect(meals).toContainText("Chili");
+  await expect(total).toHaveClass(/\bpop\b/);
 });
 
 test.describe("with Reduce Motion", () => {

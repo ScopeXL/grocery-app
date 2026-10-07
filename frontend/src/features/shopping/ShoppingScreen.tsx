@@ -19,6 +19,7 @@ import { fetchSession } from "../../lib/session";
 import { clearToasts, showToast } from "../../lib/toast";
 import { downloadTrip } from "../../lib/trips";
 import { useTripView, type Grouping, type TripView } from "../../lib/tripView";
+import { useChangeCount } from "../../lib/motion";
 import { useKeepAwake, wakeLockState } from "../../lib/wakeLock";
 import { Button } from "../../ui/Button";
 import { Segmented, segmentOption } from "../../ui/Segmented";
@@ -68,6 +69,8 @@ export function ShoppingScreen({ tripId }: { tripId: string }) {
   const [finishing, setFinishing] = useState(false);
   const [downloaded, setDownloaded] = useState<"pending" | "ok" | "failed">("pending");
   useKeepAwake(view?.status === "active");
+  // "18 of 31" pops once when it changes (styles/motion.css); hooks come before the early return.
+  const progressChanges = useChangeCount(view ? view.doneCount + view.missed.length : null);
   // Check-off toasts (with their Undo) belong to this screen.
   useEffect(() => clearToasts, []);
 
@@ -161,7 +164,11 @@ export function ShoppingScreen({ tripId }: { tripId: string }) {
             <ChevronLeft aria-hidden="true" />
             Done shopping
           </Button>
-          <span className="text-row font-bold" data-testid="progress">
+          <span
+            key={progressChanges}
+            className={`text-row font-bold${progressChanges > 0 ? " pop" : ""}`}
+            data-testid="progress"
+          >
             {String(handled)} of {String(view.total)}
           </span>
         </div>

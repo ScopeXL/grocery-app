@@ -135,6 +135,36 @@ dialog.sheet[data-closing]::backdrop {
   overflow: hidden;
 }
 
+/*
+ * A row added to a list after the list appeared eases in (a meal planned, an extra added). The
+ * list is marked data-arrivals a frame after it appears (lib/motion's arrivals), so the rows it
+ * opened with stay still. Browsers without @starting-style just show the row. The background
+ * fade keeps a pressed row's shading smooth (this rule replaces the row's own transition).
+ */
+[data-arrivals] > li {
+  transition:
+    opacity var(--motion-enter) var(--ease-arrive),
+    translate var(--motion-enter) var(--ease-arrive),
+    background-color var(--motion-tap) var(--ease-standard);
+}
+@starting-style {
+  [data-arrivals] > li {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+/* A total or count that just changed pops once (re-keyed by lib/motion's useChangeCount). */
+.pop {
+  display: inline-block;
+  animation: pop 280ms var(--ease-standard);
+}
+@keyframes pop {
+  40% {
+    transform: scale(1.06);
+  }
+}
+
 /* Reduce Motion: everything instant. 0.01 ms rather than 0, so every animation still runs to
    its end (and the sheets' close still sees one finish). */
 @media (prefers-reduced-motion: reduce) {

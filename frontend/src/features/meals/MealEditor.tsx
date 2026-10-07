@@ -11,6 +11,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
 import { clearDraft, loadDraft, saveDraft } from "../../lib/drafts";
+import { arrivals } from "../../lib/motion";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
@@ -248,7 +249,10 @@ function MealEditor({
       {show(STEP.items) ? (
         <Step title="What goes in it?">
           {draft.lines.length > 0 ? (
-            <ul className="mb-3 overflow-hidden rounded-tile border border-rule bg-paper">
+            <ul
+              ref={arrivals}
+              className="mb-3 overflow-hidden rounded-tile border border-rule bg-paper"
+            >
               {draft.lines.map((line) => (
                 <li key={line.key} className="border-b border-rule px-3 py-2 last:border-b-0">
                   <div className="flex items-center gap-3">

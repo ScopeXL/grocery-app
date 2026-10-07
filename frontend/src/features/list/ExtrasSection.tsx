@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 
 import { api, unwrap } from "../../api/client";
+import { arrivals } from "../../lib/motion";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { Chip } from "../../ui/Chip";
@@ -42,7 +43,10 @@ export function ExtrasSection({
     <section aria-label="Extras" className="mb-8">
       <h2 className="mb-3 text-row font-bold">Extras</h2>
       {lines.length > 0 ? (
-        <ul className="mb-4 overflow-hidden rounded-tile border border-rule bg-paper">
+        <ul
+          ref={arrivals}
+          className="mb-4 overflow-hidden rounded-tile border border-rule bg-paper"
+        >
           {lines.map((line) => (
             <ExtraLine key={line.key} line={line} onOpen={onOpen} />
           ))}

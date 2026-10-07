@@ -36,6 +36,7 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 - Sheets slide up when they open and slide away when they close. Messages at the bottom rise in and
   ease out, and no more than three show at once.
 - In shopping mode, a checked item folds away into Done once its marker line is drawn.
+- A meal or item you add eases into its list, and the total pops when it changes.
 
 ### Fixed
 

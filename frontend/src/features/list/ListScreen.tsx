@@ -6,6 +6,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
+import { arrivals } from "../../lib/motion";
 import { Button } from "../../ui/Button";
 import { EmptyState } from "../../ui/EmptyState";
 import { Screen } from "../../ui/Screen";
@@ -145,7 +146,10 @@ export function ListScreen({ show }: { show?: "unpriced" | undefined }) {
             {groups.map((group) => (
               <section key={group.key} aria-label={group.label} className="mb-6">
                 <h2 className="mb-2 text-row font-bold">{group.label}</h2>
-                <ul className="overflow-hidden rounded-tile border border-rule bg-paper">
+                <ul
+                  ref={arrivals}
+                  className="overflow-hidden rounded-tile border border-rule bg-paper"
+                >
                   {group.lines.map((line) => (
                     <LineRow key={line.key} line={line} onOpen={setOpenKey} />
                   ))}

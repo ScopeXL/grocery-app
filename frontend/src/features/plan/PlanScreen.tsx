@@ -9,6 +9,7 @@ import { useId, useState, type ReactNode } from "react";
 import { api, unwrap } from "../../api/client";
 import { dayLabel } from "../../lib/days";
 import { mealPrice } from "../../lib/money";
+import { arrivals } from "../../lib/motion";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { EmptyState } from "../../ui/EmptyState";
@@ -97,6 +98,7 @@ export function PlanScreen() {
               {tonight ? <TonightCard meal={tonight} onChange={setChangingId} /> : null}
               {rest.length > 0 ? (
                 <ul
+                  ref={arrivals}
                   aria-label="This week's meals"
                   className="overflow-hidden rounded-tile border border-rule bg-paper"
                 >
