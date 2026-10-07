@@ -26,6 +26,12 @@ EXPORT_TABLES: tuple[str, ...] = (
     "photos",
     "dishes",
     "dish_items",
+    "dish_pairings",
+    "plans",
+    "plan_meals",
+    "plan_meal_sides",
+    "plan_extras",
+    "plan_item_overrides",
 )
 # Not household data: secrets and sessions, or Kroger's data, which may only be cached (ADR 0016).
 EXPORT_EXCLUDED: tuple[str, ...] = (

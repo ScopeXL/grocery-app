@@ -1,4 +1,4 @@
-"""Dishes (a Main or a Side), their item lines, and household photos (docs/PLAN.md §5)."""
+"""Dishes (a Main or a Side), their item lines, usual sides and household photos (PLAN §5)."""
 
 from __future__ import annotations
 
@@ -63,3 +63,22 @@ class DishItem(Base):
     amount: Mapped[Fraction] = mapped_column(FractionText())
     unit: Mapped[str | None] = mapped_column(String(8), default=None)
     position: Mapped[int] = mapped_column(Integer)
+
+
+class DishPairing(Base):
+    """How often a Side was planned with a Main ("usual sides"), plus the household's edits:
+    `pinned` keeps a side among the usual ones; `hidden` keeps it out however often it's chosen.
+    """
+
+    __tablename__ = "dish_pairings"
+
+    main_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("dishes.id", ondelete="CASCADE"), primary_key=True
+    )
+    side_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("dishes.id", ondelete="CASCADE"), primary_key=True, index=True
+    )
+    times_chosen: Mapped[int] = mapped_column(Integer, default=0)
+    last_chosen_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), default=None)
+    pinned: Mapped[bool] = mapped_column(Boolean, default=False)
+    hidden: Mapped[bool] = mapped_column(Boolean, default=False)

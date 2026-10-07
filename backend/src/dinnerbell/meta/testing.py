@@ -9,7 +9,14 @@ from dinnerbell.auth.models import Device
 from dinnerbell.catalog.models import Item
 from dinnerbell.household.models import AppMeta, Household, Member
 from dinnerbell.kroger.models import KrogerApiUsage, KrogerProductCache
-from dinnerbell.meals.models import Dish, DishItem, Photo
+from dinnerbell.meals.models import Dish, DishItem, DishPairing, Photo
+from dinnerbell.planning.models import (
+    Plan,
+    PlanExtra,
+    PlanItemOverride,
+    PlanMeal,
+    PlanMealSide,
+)
 from dinnerbell.state import StateDep
 from dinnerbell.stores.models import Store, StoreSection
 
@@ -20,6 +27,12 @@ router = APIRouter(prefix="/api/_test", include_in_schema=False)
 async def reset(state: StateDep) -> None:
     async with state.db.write() as tx:
         for model in (
+            PlanMealSide,
+            PlanMeal,
+            PlanExtra,
+            PlanItemOverride,
+            Plan,
+            DishPairing,
             DishItem,
             Dish,
             Photo,
