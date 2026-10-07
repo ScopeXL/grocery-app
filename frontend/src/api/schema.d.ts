@@ -1383,6 +1383,11 @@ export interface components {
             /** Archived */
             archived: boolean;
             cost: components["schemas"]["CostOut"];
+            /**
+             * Default Occasion
+             * @enum {string}
+             */
+            default_occasion: "breakfast" | "lunch" | "dinner" | "snack";
             /** Favorite */
             favorite: boolean;
             /** Id */
@@ -1450,6 +1455,11 @@ export interface components {
             /** Archived */
             archived: boolean;
             cost: components["schemas"]["CostOut"];
+            /**
+             * Default Occasion
+             * @enum {string}
+             */
+            default_occasion: "breakfast" | "lunch" | "dinner" | "snack";
             /** Favorite */
             favorite: boolean;
             /** Id */
@@ -1793,12 +1803,8 @@ export interface components {
             day?: string | null;
             /** Main Id */
             main_id: string;
-            /**
-             * Occasion
-             * @default dinner
-             * @enum {string}
-             */
-            occasion: "breakfast" | "lunch" | "dinner" | "snack";
+            /** Occasion */
+            occasion?: ("breakfast" | "lunch" | "dinner" | "snack") | null;
             /**
              * Scale
              * @default 1

@@ -35,6 +35,7 @@ from dinnerbell.kroger.client import KrogerError
 from dinnerbell.kroger.parse import Product
 from dinnerbell.meals.models import Dish, DishItem, Photo
 from dinnerbell.meals.schemas import CostOut, DishCard, DishLineOut, DishOut, LineIn
+from dinnerbell.planning.occasions import default_occasions
 from dinnerbell.state import AppState
 from dinnerbell.stores.service import active_store
 
@@ -162,6 +163,7 @@ async def get_dish(session: AsyncSession, dish_id: str) -> Dish:
 async def dish_out(state: AppState, dish_id: str) -> DishOut:
     async with state.db.read() as db:
         loaded = await load(db, [await get_dish(db, dish_id)])
+        defaults = await default_occasions(db, [dish_id])
     pricing = await pricing_for(state, loaded.items.values())
     dish = loaded.dishes[0]
     lines = [
@@ -172,6 +174,7 @@ async def dish_out(state: AppState, dish_id: str) -> DishOut:
         name=dish.name,
         role="side" if dish.role == "side" else "main",
         occasions=dish.occasions,  # pyright: ignore[reportArgumentType]
+        default_occasion=defaults[dish.id],  # pyright: ignore[reportArgumentType]
         servings=dish.servings,
         notes=dish.notes,
         recipe_url=dish.recipe_url,
@@ -209,6 +212,7 @@ async def cards(
             found = [dish for dish in found if occasion in dish.occasions]
         found.sort(key=lambda dish: (not dish.favorite, dish.name.casefold(), dish.id))
         loaded = await load(db, found)
+        defaults = await default_occasions(db, [dish.id for dish in found])
     pricing = await pricing_for(state, loaded.items.values())
     out: list[DishCard] = []
     for dish in loaded.dishes:
@@ -225,6 +229,7 @@ async def cards(
                 name=dish.name,
                 role="side" if dish.role == "side" else "main",
                 occasions=dish.occasions,  # pyright: ignore[reportArgumentType]
+                default_occasion=defaults[dish.id],  # pyright: ignore[reportArgumentType]
                 favorite=dish.favorite,
                 photo_url=photo_url(dish.photo_id, thumb=True),
                 item_images=list(dict.fromkeys(images))[:CARD_IMAGES],

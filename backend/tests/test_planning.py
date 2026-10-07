@@ -212,6 +212,35 @@ async def test_change_a_meal_then_remove_it_with_undo(cook: httpx.AsyncClient) -
     assert [m["id"] for m in restored.json()["meals"]] == [meal_id]
 
 
+async def test_a_main_is_planned_for_what_it_was_last_planned_for(
+    cook: httpx.AsyncClient,
+) -> None:
+    """ADR 0026: no occasion on the meal; Add a meal starts with its last planned occasion."""
+    ids = await taco_night(cook)
+
+    async def default(dish_id: str) -> str:
+        return (await cook.get(f"/api/dishes/{dish_id}")).json()["default_occasion"]
+
+    cards = (await cook.get("/api/dishes", params={"role": "main"})).json()
+    assert {card["name"]: card["default_occasion"] for card in cards} == {
+        "Chili": "dinner",
+        "Tacos": "dinner",
+    }
+    await plan_meal(cook, ids["tacos"], occasion="lunch")
+    breakfast = (await plan_meal(cook, ids["tacos"], occasion="breakfast"))["changed"]
+    assert await default(ids["tacos"]) == "breakfast"
+    await cook.delete(f"/api/plan/meals/{breakfast}", headers=CSRF)  # a removed meal doesn't count
+    assert await default(ids["tacos"]) == "lunch"
+
+    plan = await plan_meal(cook, ids["tacos"])  # no occasion sent
+    assert [meal["occasion"] for meal in plan["meals"]] == ["lunch", "lunch"]
+    assert await default(ids["chili"]) == "dinner"
+
+    await cook.post("/api/plan/new-week", headers=CSRF)  # past weeks still count
+    plan = await plan_meal(cook, ids["tacos"])
+    assert [meal["occasion"] for meal in plan["meals"]] == ["lunch"]
+
+
 async def test_only_mains_and_sides_in_their_places(cook: httpx.AsyncClient) -> None:
     ids = await taco_night(cook)
     wrong = await cook.post("/api/plan/meals", json={"main_id": ids["rice_side"]}, headers=CSRF)

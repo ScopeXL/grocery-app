@@ -29,6 +29,7 @@ from dinnerbell.planning.models import (
     PlanMeal,
     PlanMealSide,
 )
+from dinnerbell.planning.occasions import default_occasions
 from dinnerbell.planning.schemas import MealCreate, MealUpdate
 
 USUAL_SIDES = 6
@@ -103,11 +104,12 @@ async def add_meal(
     last = await session.scalar(
         select(func.max(PlanMeal.position)).where(PlanMeal.plan_id == plan.id)
     )
+    occasion = body.occasion or (await default_occasions(session, [main.id]))[main.id]
     meal = PlanMeal(
         plan_id=plan.id,
         main_id=main.id,
         day=body.day,
-        occasion=body.occasion,
+        occasion=occasion,
         scale=Fraction(body.scale),
         position=0 if last is None else last + 1,
         added_by_member_id=member_id,

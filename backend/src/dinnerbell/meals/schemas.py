@@ -31,6 +31,7 @@ class DishCard(BaseModel):
     name: str
     role: Role
     occasions: list[Occasion]
+    default_occasion: Occasion  # what Add a meal starts with: its last planned occasion (ADR 0026)
     favorite: bool
     photo_url: str | None  # the household's photo (thumbnail), cropped 4:3 on cards
     item_images: list[str]  # up to 3 product photos, shown uncropped when there's no photo
@@ -59,6 +60,7 @@ class DishOut(BaseModel):
     name: str
     role: Role
     occasions: list[Occasion]
+    default_occasion: Occasion  # what Add a meal starts with: its last planned occasion (ADR 0026)
     servings: int | None
     notes: str | None
     recipe_url: str | None

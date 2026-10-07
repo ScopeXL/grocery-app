@@ -703,6 +703,16 @@
           "cost": {
             "$ref": "#/components/schemas/CostOut"
           },
+          "default_occasion": {
+            "enum": [
+              "breakfast",
+              "lunch",
+              "dinner",
+              "snack"
+            ],
+            "title": "Default Occasion",
+            "type": "string"
+          },
           "favorite": {
             "title": "Favorite",
             "type": "boolean"
@@ -776,6 +786,7 @@
           "name",
           "role",
           "occasions",
+          "default_occasion",
           "favorite",
           "photo_url",
           "item_images",
@@ -953,6 +964,16 @@
           "cost": {
             "$ref": "#/components/schemas/CostOut"
           },
+          "default_occasion": {
+            "enum": [
+              "breakfast",
+              "lunch",
+              "dinner",
+              "snack"
+            ],
+            "title": "Default Occasion",
+            "type": "string"
+          },
           "favorite": {
             "title": "Favorite",
             "type": "boolean"
@@ -1054,6 +1075,7 @@
           "name",
           "role",
           "occasions",
+          "default_occasion",
           "servings",
           "notes",
           "recipe_url",
@@ -2185,15 +2207,21 @@
             "type": "string"
           },
           "occasion": {
-            "default": "dinner",
-            "enum": [
-              "breakfast",
-              "lunch",
-              "dinner",
-              "snack"
+            "anyOf": [
+              {
+                "enum": [
+                  "breakfast",
+                  "lunch",
+                  "dinner",
+                  "snack"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ],
-            "title": "Occasion",
-            "type": "string"
+            "title": "Occasion"
           },
           "scale": {
             "default": "1",

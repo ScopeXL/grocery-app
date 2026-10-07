@@ -56,7 +56,8 @@ class MealCreate(BaseModel):
     main_id: str
     side_ids: list[str] = Field(default_factory=list[str], max_length=MAX_SIDES)
     day: date | None = None
-    occasion: Occasion = "dinner"
+    # None: what this main was last planned as, else dinner (ADR 0026).
+    occasion: Occasion | None = None
     scale: Scale = "1"
 
 
