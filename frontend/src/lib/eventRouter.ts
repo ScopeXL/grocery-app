@@ -6,6 +6,8 @@ import type { QueryClient, QueryKey } from "@tanstack/react-query";
 
 import { qk } from "../api/keys";
 import type { ServerEvent } from "./events";
+import { outbox } from "./outbox";
+import { applyTripEvent, syncActiveTrips } from "./trips";
 
 const DEBOUNCE_MS = 250;
 const MAX_WAIT_MS = 1000;
@@ -38,7 +40,20 @@ export function createEventHandler(queryClient: QueryClient, onSignedOut: () => 
   return (event: ServerEvent) => {
     switch (event.type) {
       case "hello":
-        if (event.mode === "resync") void queryClient.invalidateQueries();
+        // The stream (re)opened: send anything waiting, and catch up if we missed events.
+        void outbox.flush();
+        if (event.mode === "resync") {
+          void queryClient.invalidateQueries();
+          void syncActiveTrips();
+        }
+        break;
+      case "trip.created":
+      case "trip.items":
+      case "trip.state":
+        // Trip events carry the change itself; the trip on this phone merges it by version.
+        void applyTripEvent(event);
+        invalidate(qk.trips());
+        invalidate(qk.plan());
         break;
       case "members.changed":
         invalidate(qk.members());

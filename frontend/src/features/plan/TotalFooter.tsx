@@ -6,8 +6,22 @@ import { Link } from "@tanstack/react-router";
 
 import type { PlanOut } from "./types";
 
-export function TotalFooter({ plan }: { plan: PlanOut }) {
+export function TotalFooter({ plan, compact = false }: { plan: PlanOut; compact?: boolean }) {
   const totals = plan.totals;
+  if (compact) {
+    return (
+      <div className="flex w-full items-center justify-between gap-3" aria-live="polite">
+        <span className="text-row font-extrabold" data-testid="total">
+          {totals.total_text}
+        </span>
+        {totals.savings_text ? (
+          <span className="shrink-0 rounded-full bg-lemon px-3 py-0.5 text-caption font-bold text-on-lemon">
+            {totals.savings_text}
+          </span>
+        ) : null}
+      </div>
+    );
+  }
   return (
     <div className="flex w-full flex-col" aria-live="polite">
       <div className="flex items-center justify-between gap-3">

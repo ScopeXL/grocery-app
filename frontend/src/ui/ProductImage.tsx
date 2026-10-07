@@ -1,6 +1,8 @@
 import { ShoppingBasket } from "lucide-react";
 import { useState } from "react";
 
+import { forgetImage } from "../lib/images";
+
 /**
  * The only way a Kroger product photo is drawn (CLAUDE.md rule 3; Kroger's terms): never
  * cropped (`object-contain`), never filtered, never covered. Badges and prices sit beside it,
@@ -38,6 +40,7 @@ export function ProductImage({
           className="size-full object-contain"
           onError={() => {
             setFailed(true);
+            void forgetImage(src); // a broken copy saved for the store mustn't stick around
           }}
         />
       ) : (

@@ -23,8 +23,13 @@ import { InstallScreen } from "./features/onboarding/InstallScreen";
 import { PlanScreen } from "./features/plan/PlanScreen";
 import { AboutScreen } from "./features/settings/AboutScreen";
 import { SettingsScreen } from "./features/settings/SettingsScreen";
+import { WalkingOrderScreen } from "./features/settings/WalkingOrderScreen";
+import { ShoppingScreen } from "./features/shopping/ShoppingScreen";
+import { TripDetailScreen } from "./features/trips/TripDetailScreen";
+import { TripsScreen } from "./features/trips/TripsScreen";
 import { createEventHandler } from "./lib/eventRouter";
 import { LiveUpdates } from "./lib/events";
+import { outbox } from "./lib/outbox";
 import { shouldShowInstallFirst } from "./lib/platform";
 import {
   fetchSession,
@@ -33,6 +38,8 @@ import {
   signedInBefore,
   type Session,
 } from "./lib/session";
+import { warmTripImages } from "./lib/images";
+import { hydrateTrips, photoUrls, syncActiveTrips, tripStore } from "./lib/trips";
 import { OfflinePill, ToastRegion, UpdatePrompt } from "./ui/StatusLayer";
 import { TabBar } from "./ui/TabBar";
 
@@ -81,12 +88,39 @@ function RootLayout() {
   );
 }
 
+/**
+ * Every saved list being shopped, on this phone with its photos, so a phone is ready for the
+ * store even when someone else saved the list (PLAN §9.4).
+ */
+async function refreshTrips(): Promise<void> {
+  if (!(await syncActiveTrips())) return;
+  for (const trip of tripStore.list()) {
+    if (trip.header.status === "active") void warmTripImages(trip.header.id, photoUrls(trip));
+  }
+}
+
 function SignedLayout() {
   const client = useQueryClient();
   useEffect(() => {
+    // Saved lists live on this phone (IndexedDB); unsent taps go out whenever there's signal.
+    void hydrateTrips().then(refreshTrips);
+    const visible = () => {
+      if (document.visibilityState === "visible") void refreshTrips();
+    };
+    document.addEventListener("visibilitychange", visible);
+    const stop = outbox.start();
+    return () => {
+      document.removeEventListener("visibilitychange", visible);
+      stop();
+    };
+  }, []);
+  useEffect(() => {
     const live = new LiveUpdates({
       onEvent: createEventHandler(client, handleSignedOut),
-      onPoll: () => void client.invalidateQueries(),
+      onPoll: () => {
+        void client.invalidateQueries();
+        void refreshTrips();
+      },
       probeSession,
     });
     live.start();
@@ -186,6 +220,16 @@ const editMealRoute = createRoute({
   },
 });
 
+/** Shopping mode is full screen: no tabs, nothing between the shopper and the list. */
+const shopRoute = createRoute({
+  getParentRoute: () => signedRoute,
+  path: "/shop/$tripId",
+  component: function Shop() {
+    const { tripId } = shopRoute.useParams();
+    return <ShoppingScreen tripId={tripId} />;
+  },
+});
+
 /** The tabs need a store first (UX §4.3); offline or unknown, the app doesn't block on it. */
 async function hasStore(client: QueryClient): Promise<boolean> {
   try {
@@ -254,6 +298,24 @@ const settingsRoute = createRoute({
   path: "/settings",
   component: SettingsScreen,
 });
+const tripsRoute = createRoute({
+  getParentRoute: () => tabsRoute,
+  path: "/trips",
+  component: TripsScreen,
+});
+const tripRoute = createRoute({
+  getParentRoute: () => tabsRoute,
+  path: "/trips/$tripId",
+  component: function Trip() {
+    const { tripId } = tripRoute.useParams();
+    return <TripDetailScreen tripId={tripId} />;
+  },
+});
+const walkingOrderRoute = createRoute({
+  getParentRoute: () => tabsRoute,
+  path: "/settings/walking-order",
+  component: WalkingOrderScreen,
+});
 const aboutRoute = createRoute({
   getParentRoute: () => tabsRoute,
   path: "/about",
@@ -268,6 +330,7 @@ const routeTree = rootRoute.addChildren([
     welcomeRoute,
     newMealRoute,
     editMealRoute,
+    shopRoute,
     tabsRoute.addChildren([
       planRoute,
       mealsRoute,
@@ -275,6 +338,9 @@ const routeTree = rootRoute.addChildren([
       listRoute,
       moreRoute,
       settingsRoute,
+      walkingOrderRoute,
+      tripsRoute,
+      tripRoute,
       aboutRoute,
     ]),
   ]),

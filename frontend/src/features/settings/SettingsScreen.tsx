@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Download, LogOut } from "lucide-react";
+import { ChevronRight, Download, LogOut } from "lucide-react";
 import { useId, useState, type ReactNode } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
@@ -63,6 +63,17 @@ function StoreSettings() {
           >
             Change store
           </Button>
+        </Row>
+      ) : null}
+      {store && !changing ? (
+        <Row>
+          <Link
+            to="/settings/walking-order"
+            className="flex min-h-12 flex-1 items-center justify-between text-body font-semibold text-basil"
+          >
+            Store walking order
+            <ChevronRight aria-hidden="true" />
+          </Link>
         </Row>
       ) : (
         <div className="flex flex-col gap-2 p-4">

@@ -217,8 +217,8 @@ frontend/
 | `plan_meal_sides` | plan_meal_id, side_id, position | Swapping a side changes one row |
 | `plan_extras` | id, plan_id, item_id? or text?, quantity (FractionText, in the line's unit), note?, added_by_member_id, created_at, deleted_at | Covers the "Requests" idea: each extra shows who added it. Adding what's already an extra adds to it. Usuals come from this table's history: removed extras count, ones on the list now don't |
 | `plan_item_overrides` | plan_id, item_id, have_it (true, false, or null for "not asked yet")?, qty_delta (FractionText)?, qty_delta_unit (`package`/`each`/`pound`)?, swap_product_id?, swap_upc?, swap_size_text?, swap_sold_by? | Overrides never edit a dish. Quantity overrides are stored as a delta (§8). A this-trip swap keeps the facts the household confirmed by choosing it, like an item's link (ADR 0016). Staples wait in the pantry check while have_it is null |
-| `trips` | id, plan_id, store_id, status + status_ts + status_by, created_by, estimate_cents, savings_cents, not_priced, prices_as_of, actual_total_cents?, finished_at?, version (gapless), product_cache_expires_at | Status is last-writer-wins (§9) |
-| `trip_items` | id, trip_id, item_id?, name, product_id?, upc?, size_text, image_ref, qty_text, quantity, unit_cents?, line_cents?, on_sale, section_key, section_label, section_order, aisle_label, bay, used_by (JSON); state + state_ts + state_by; note + note_ts + note_by; version | Frozen snapshot apart from state and note, which are separate last-writer-wins fields |
+| `trips` | id, plan_id? (none for Shop this again), store_id, status + status_ts + status_by, created_by, created_at, estimate_cents, savings_cents, not_priced, prices_as_of, actual_total_cents?, finished_at?, version (gapless), fingerprint (the list it was saved from), product_cache_expires_at | Status is last-writer-wins (§9). One active saved list per plan: saving again updates it |
+| `trip_items` | id, trip_id, line_key (item id or `extra:<id>`), item_id?, name, product_id?, upc?, image_url?, product_url?, size_text?, qty_text, quantity, unit, unit_cents?, line_cents?, regular_cents?, on_sale, sale_ends?, section_key?, section_label?, section_order, aisle_side?, bay, used_by (JSON), warnings (JSON), position; state + state_ts + state_by; note + note_ts + note_by; version; removed_at? | Frozen snapshot apart from state and note, which are separate last-writer-wins fields. Updating the saved list refreshes the snapshot, keeps states and notes, and marks to-do lines no longer needed as removed (with a new version, so phones hear it) |
 | `applied_ops` | op_id (PK), trip_id, kind, client_id, member_id, client_ts, effective_ts, received_at, result, reason | Makes ops idempotent; pruned after 60 days |
 | `kroger_tokens` (1 row) | access_enc, access_expires_at, refresh_enc, refresh_obtained_at, scope, connected_by, status (`connected`/`needs_reconnect`), version | Fernet-encrypted (§10). Always present; empty until connected |
 | `kroger_oauth_states` | state, code_verifier, device_id, expires_at, used_at | M5 |
@@ -249,7 +249,7 @@ A trip is a snapshot on purpose: later edits to meals or prices must not change 
 | Items | `GET items?q=` (household items first), `POST items`, `PATCH items/{id}` (link product, correct size, each-weight, staple flag), archive and restore |
 | Dishes | `GET dishes?role=&occasion=&q=&favorite=`, `POST dishes`, `GET` / `PATCH dishes/{id}`, `PUT dishes/{id}/items`, `POST dishes/{id}/duplicate`, archive and restore, `PUT dishes/{id}/photo`, `GET` / `PUT dishes/{id}/usual-sides` |
 | Plan | `GET plan` (meals, the computed list, extras, usuals and totals, priced live), `POST plan/meals`, `PATCH plan/meals/{id}` (swap main, day, occasion, scale), `PUT plan/meals/{id}/sides`, `DELETE plan/meals/{id}` and `POST …/restore`, extras (`POST`, `PATCH`, `DELETE` and restore), `PUT plan/items/{itemId}` (have-it, quantity, product swap for this trip or always), `GET plan/items/{itemId}/alternatives` (with unit prices), `POST plan/new-week` and `POST plan/new-week/undo`, `GET plan/recommendations` (M4), `POST plan/repeat?from={planId or tripId}` (M3). Every change answers with the whole plan, so screens update from the response. Prices are fetched live on every read, so there is no refresh endpoint |
-| Trips | `POST trips` (save the list), `GET trips` (history, paginated), `GET trips/{id}[?since_version=N]`, `POST trips/{id}/ops` (batched, idempotent; §9.2), `POST trips/{id}/shop-again`, `POST trips/{id}/send-to-cart` (M5) |
+| Trips | `POST trips` (save the plan's list, or update its saved list: 201 or 200), `GET trips[?before=]` (active, then finished a page at a time), `GET trips/{id}[?since_version=N]`, `POST trips/{id}/ops` (batched, idempotent; §9.2), `POST trips/{id}/shop-again`, `POST trips/{id}/send-to-cart` (M5). Walking order: `GET` / `PUT stores/active/sections`. `POST plan/repeat {trip_id}` plans a trip's meals again |
 | Events | `GET events?since=epoch:seq` (SSE; §9.3) |
 | Test only | `/_test/{reset,seed,drop-streams,revoke-sessions}`, available only when `DINNERBELL_TEST_MODE=1`. Startup refuses that flag unless `APP_BASE_URL` is localhost |
 
@@ -589,7 +589,9 @@ def summarize(lines) -> Totals
 def marginal_cost(plan, dish, now) -> tuple[int, int]          # (added cents, count of new unpriced items)
 def recommend(plan, candidates, now, *, limit=3, min_value_cents=100, name_min_cents=25) -> tuple[Recommendation, ...]
 
-# snapshot.py   to_snapshot(shopping_list, created_at) -> JSON-safe dict (fractions as text; schema_version=1)
+# (no snapshot.py: a saved list's snapshot is its trip_items rows, made from the List's own lines in
+#  shopping/service.py; L17 lives in tests/test_shopping.py)
+# listbuild.price_quantity(unit, quantity, product, each_lb, now) re-prices a saved amount (Shop this again)
 ```
 
 ### 8.3 Size parser

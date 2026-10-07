@@ -16,4 +16,8 @@ export const qk = {
   usualSides: (dishId: string) => ["dishes", "usual-sides", dishId] as const,
   plan: () => ["plan"] as const,
   alternatives: (itemId: string) => ["alternatives", itemId] as const,
+  sections: () => ["stores", "sections"] as const,
+  trips: () => ["trips"] as const,
+  tripHistory: (before: string | null) => ["trips", "history", before] as const,
+  trip: (id: string) => ["trips", "detail", id] as const,
 };

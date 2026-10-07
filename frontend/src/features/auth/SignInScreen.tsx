@@ -5,6 +5,7 @@ import { useId, useState } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
+import { outbox } from "../../lib/outbox";
 import { rememberSignedIn } from "../../lib/session";
 import { BellMark } from "../../ui/BellMark";
 import { Button } from "../../ui/Button";
@@ -23,6 +24,7 @@ export function SignInScreen() {
       unwrap(await api.POST("/api/auth/login", { body: { password: value } })),
     onSuccess: async (session) => {
       rememberSignedIn(true);
+      void outbox.resume(); // taps saved while signed out go out now
       queryClient.setQueryData(qk.session(), session);
       await navigate({ to: session.member ? "/" : "/who" });
     },

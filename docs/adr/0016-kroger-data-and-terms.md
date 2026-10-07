@@ -34,8 +34,9 @@ The real Cache-Control values on API responses couldn't be verified during plann
 **Search.** Results are held in memory for at most 60 s. Search terms are never stored or logged. Only products the household links to an item go into `kroger_product_cache`; search results never do.
 
 **Trips.**
-- An active trip holds the Kroger fields it needs for shopping, as temporary storage for that trip.
-- After a trip finishes and its `product_cache_expires_at` passes, the Kroger descriptive fields (description, image, aisle) are cleared. History re-fetches them when viewed online.
+- An active trip holds the Kroger fields it needs for shopping, as temporary storage for that trip: the photo and product links, the aisle and shelf, and stock warnings. Item names are the household's own; Kroger's descriptions are never copied.
+- When a trip finishes, `product_cache_expires_at` is set 24 hours ahead. That's the same window in which an offline phone's late check-offs still count (PLAN §9.2), so the trip is still in use until then.
+- An hourly job then clears those Kroger fields. Names, amounts, estimates, totals and what was bought stay, and History works without the cleared fields. Reopening a trip after that shops it without photos or aisles.
 
 **Product photos.**
 - They are hot-linked from Kroger's image host and never stored on the server.

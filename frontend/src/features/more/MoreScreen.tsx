@@ -1,5 +1,13 @@
 import { Link, type LinkProps } from "@tanstack/react-router";
-import { ChevronRight, Info, Settings, Smartphone, UserRound, type LucideIcon } from "lucide-react";
+import {
+  ChevronRight,
+  History,
+  Info,
+  Settings,
+  Smartphone,
+  UserRound,
+  type LucideIcon,
+} from "lucide-react";
 
 import { Screen } from "../../ui/Screen";
 
@@ -11,6 +19,7 @@ interface Row {
 }
 
 const ROWS: Row[] = [
+  { label: "Trips", icon: History, to: "/trips" },
   { label: "Settings", icon: Settings, to: "/settings" },
   { label: "Who’s using this", icon: UserRound, to: "/who" },
   { label: "Install the app", icon: Smartphone, to: "/install", search: { from: "more" } },

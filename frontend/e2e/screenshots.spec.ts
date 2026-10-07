@@ -238,5 +238,47 @@ for (const scheme of ["light", "dark"] as const) {
     await expect(page.getByRole("dialog", { name: "Ground beef" })).toContainText("per");
     await settle(page);
     await page.screenshot({ path: `${dir}/swap-${scheme}.png`, caret: "initial" });
+    await page
+      .getByRole("dialog", { name: "Ground beef" })
+      .getByRole("button", { name: "Close" })
+      .click();
+
+    // Save the list, then shop it.
+    await page.getByRole("button", { name: "Save list" }).click();
+    await expect(page.getByRole("button", { name: "Start shopping" })).toBeVisible();
+    await shot("list-saved");
+    await page.getByRole("button", { name: "Start shopping" }).click();
+    await expect(page.getByRole("region", { name: "Get ready for the store" })).toBeVisible();
+    await shot("shopping");
+    await page.getByRole("checkbox", { name: "Check off Tortillas" }).click();
+    await page.getByRole("checkbox", { name: "Check off Salsa" }).click();
+    await expect(page.getByText("Done (2)")).toBeVisible();
+    await page.getByText("Done (2)").click();
+    await shot("shopping-done");
+    await page.getByRole("button", { name: /^Ground beef/ }).click();
+    await expect(page.getByRole("dialog", { name: "Ground beef" })).toBeVisible();
+    await settle(page);
+    await page.screenshot({ path: `${dir}/shopping-item-${scheme}.png`, caret: "initial" });
+    await page
+      .getByRole("dialog", { name: "Ground beef" })
+      .getByRole("button", { name: "Close" })
+      .click();
+    await page.getByRole("button", { name: "Finish trip" }).click();
+    const finish = page.getByRole("dialog", { name: "Finish trip" });
+    await finish.getByLabel("What did you pay? (optional)").fill("41.20");
+    await page.screenshot({ path: `${dir}/finish-${scheme}.png`, caret: "initial" });
+    await finish.getByRole("button", { name: "Finish trip" }).click();
+    await expect(page.getByRole("heading", { name: "Trips" })).toBeVisible();
+    await shot("trips");
+    await page.getByRole("region", { name: "Finished trips" }).getByRole("link").first().click();
+    await expect(page.getByRole("button", { name: "Shop this again" })).toBeVisible();
+    await shot("trip-detail");
+
+    // The store's walking order, from Settings.
+    await page.getByRole("link", { name: "More", exact: true }).click();
+    await page.getByRole("link", { name: "Settings" }).click();
+    await page.getByRole("link", { name: "Store walking order" }).click();
+    await expect(page.getByRole("list", { name: "Sections" })).toBeVisible();
+    await shot("walking-order");
   });
 }

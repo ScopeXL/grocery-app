@@ -4,16 +4,15 @@
  * else. Tapping a line opens its sheet. Printing gives every line in aisle order.
  */
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Printer } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "../../ui/Button";
 import { EmptyState } from "../../ui/EmptyState";
 import { Screen } from "../../ui/Screen";
-import { TotalFooter } from "../plan/TotalFooter";
 import type { Line, PlanOut } from "../plan/types";
 import { usePlan } from "../plan/usePlan";
 import { ExtrasSection } from "./ExtrasSection";
+import { ListActions } from "./ListActions";
 import { LineRow } from "./LineRow";
 import { LineSheet } from "./LineSheet";
 import { PantryCheck } from "./PantryCheck";
@@ -98,28 +97,7 @@ export function ListScreen({ show }: { show?: "unpriced" | undefined }) {
   const empty = data.lines.length === 0 && data.meals.length === 0;
 
   return (
-    <Screen
-      title="Shopping list"
-      actions={
-        empty ? undefined : (
-          <div className="flex w-full items-center gap-4">
-            <TotalFooter plan={data} />
-            {/* A wrapper, because Button's own inline-flex would beat "hidden" (CSS order). */}
-            <div className="hidden lg:block">
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  window.print();
-                }}
-              >
-                <Printer aria-hidden="true" />
-                Print
-              </Button>
-            </div>
-          </div>
-        )
-      }
-    >
+    <Screen title="Shopping list" actions={empty ? undefined : <ListActions plan={data} />}>
       <div className="print:hidden">
         {empty ? (
           <EmptyState

@@ -284,6 +284,7 @@ A live preview line shows the share and the cost.
 - **Bottom bar:**
   - **Save list** freezes the list into a saved list; the toast says "List saved".
   - Once a list is saved, the bar shows **Start shopping**.
+  - If the plan changes after that, the bar says "The list changed since you saved it." and offers **Update saved list**: changed lines take the new amounts, new ones are added, and to-do ones no longer needed leave. Whatever was checked off or couldn't be found stays.
   - On desktop it also shows **Print**.
 
 ### 4.12 Shopping mode (full screen)

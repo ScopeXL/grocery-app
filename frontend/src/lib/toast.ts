@@ -27,3 +27,14 @@ export function showToast(message: string, action?: { label: string; onAction: (
 export function dismissToast(id: number): void {
   toasts.set((list) => list.filter((toast) => toast.id !== id));
 }
+
+/** Clear every toast (leaving shopping mode: its Undo buttons belong to that screen). */
+export function clearToasts(): void {
+  toasts.set([]);
+}
+
+/**
+ * Where toasts sit: just above a screen's bottom bar when it has one (so they never cover its
+ * buttons), else above the tab bar. Bars register an anchor element here; no style is computed.
+ */
+export const toastAnchor = createStore<HTMLElement | null>(null);

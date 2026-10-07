@@ -6,6 +6,22 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+### Added
+
+- Save list turns this week's list into a saved list to shop from. If the plan changes, Update
+  saved list brings it up to date without losing what's already checked off.
+- Shopping mode: the list in your store's walking order (or by meal), big checkboxes, a marker
+  line through each item in your color, Couldn't find, notes, Undo, and a running total of
+  what's in the cart.
+- It works with no signal. The list and its photos are saved on your phone before you go, and
+  check-offs sync as soon as there's signal again.
+- Two people can shop the same list and see each other's check-offs as they happen.
+- Finish the trip with what you paid. Trips keeps your history: shop a list again at today's
+  prices, plan those meals again, or reopen a trip.
+- Share a list as text with anyone who doesn't have the app.
+- Store walking order in Settings: put the store's sections in the order you walk them.
+- The screen stays on while you shop.
+
 ## [0.3.0] - 2026-10-06
 
 ### Added

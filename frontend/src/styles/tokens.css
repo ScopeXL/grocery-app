@@ -175,3 +175,40 @@
 .marker-plum {
   --marker: var(--marker-plum);
 }
+
+/* The signature moment (UX §7.6): a checked item's marker stroke draws itself left to right.
+   Under reduced motion the base layer's rule makes it appear at once. */
+.marker-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: marker-draw 250ms ease-out forwards;
+}
+
+@keyframes marker-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Shopping progress ("18 of 31"): a thin basil bar on the counter color. */
+progress.trip-progress {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 8px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--counter);
+  overflow: hidden;
+}
+progress.trip-progress::-webkit-progress-bar {
+  background: var(--counter);
+}
+progress.trip-progress::-webkit-progress-value {
+  background: var(--basil);
+  border-radius: 9999px;
+}
+progress.trip-progress::-moz-progress-bar {
+  background: var(--basil);
+  border-radius: 9999px;
+}
