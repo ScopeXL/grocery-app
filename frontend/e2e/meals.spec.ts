@@ -94,10 +94,12 @@ test("first run: choose a store, add Tacos with four items and a photo, archive 
   await expect(page.getByRole("button", { name: "Change photo" })).toBeVisible();
   await page.getByRole("button", { name: "Save meal" }).click();
   await expect(page.getByText("Meal saved")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "You're set." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "You’re set." })).toBeVisible();
+  await page.getByRole("button", { name: "See this week’s plan" }).click();
+  await expect(page.getByRole("heading", { name: "This week" })).toBeVisible();
 
   // The library card shows the photo and an estimated cost.
-  await page.getByRole("button", { name: "Go to Meals" }).click();
+  await page.getByRole("link", { name: "Meals", exact: true }).click();
   const card = page.getByRole("listitem").filter({ hasText: "Tacos" });
   await expect(card).toContainText(/about \$\d+/);
   await expect(card.locator('img[src^="/api/photos/"]')).toBeVisible();

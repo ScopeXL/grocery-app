@@ -54,13 +54,13 @@ export function FirstRunScreen({ step }: { step: FirstRunStep }) {
         </>
       ) : (
         <>
-          <h1 className="mb-2 text-title font-extrabold">You're set.</h1>
+          <h1 className="mb-2 text-title font-extrabold">You’re set.</h1>
           <p className="mb-6 text-body text-ink-soft">
-            Add the meals you make any time from Meals. Planning the week arrives in the next
-            update.
+            Plan this week’s dinners and the shopping list builds itself. Add more meals any time
+            from Meals.
           </p>
-          <Button block onClick={() => void navigate({ to: "/meals", search: { role: "main" } })}>
-            Go to Meals
+          <Button block onClick={() => void navigate({ to: "/" })}>
+            See this week’s plan
           </Button>
         </>
       )}
