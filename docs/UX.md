@@ -21,7 +21,7 @@ This document covers every screen at phone size, the main flows step by step, em
 
 **Reach and touch**
 - Primary actions sit in the thumb zone: a bottom action bar above the tabs, or the bottom of a sheet.
-- Base text is at least 17 px; body text is 18 px.
+- Body text is 16 px, secondary text 14, captions 13 (ADR 0027). Anything a person types into is at least 16 px, so iPhones don't zoom in.
 - Tap targets are at least 48 px. Shopping checkboxes are 56 px.
 - **Every action has a visible button.** Swipes and long-presses are only shortcuts for something already on screen.
 
@@ -488,16 +488,17 @@ Defined once in `frontend/src/styles/tokens.css` (Tailwind v4 `@theme`). Compone
 ### 7.3 Type
 
 - **Typeface:** Atkinson Hyperlegible Next, a self-hosted variable font. It was designed for low-vision legibility, with distinct I/l/1 and 0/O, which is what a glance in an aisle needs. It's the only family.
-- **Weights:** 400 (body), 600 (emphasis, row names), 800 (screen titles, meal names on cards, the total).
+- **Weights:** 400 (body), 600 (emphasis, row names), 700 (row and section titles), 800 (screen titles, meal names on cards, the total).
+- **Sizes** are in rem on the browser's default base (16 px on phones), so a larger default text size scales everything (ADR 0027).
 
-| Role | Size | Line height |
+| Role | Size (px) | Line height (px) |
 |---|---|---|
-| Caption (sparingly, e.g. "Prices as of") | 15 | 1.4 |
-| Secondary | 17 | 1.45 |
-| Body | 18 | 1.45 |
-| Row title | 22 | 1.25 |
-| Screen title | 28 | 1.15 |
-| Total figure | 36 | 1.1 |
+| Caption (sparingly, e.g. "Prices as of") | 13 | 18 |
+| Secondary | 14 | 20 |
+| Body | 16 | 24 |
+| Row title | 18 | 24 |
+| Screen title | 24 | 30 |
+| Total figure | 30 | 36 |
 
 - Prices use tabular figures where the font supports them.
 - Sentence case throughout. Reading width is capped at about 72 characters on desktop.

@@ -34,7 +34,7 @@ export function TabBar() {
               to={to}
               activeOptions={{ exact: to === "/" }}
               // data-status="active" is set by the router; the variant always beats the base color.
-              className="flex min-h-16 flex-col items-center justify-center gap-1 text-secondary font-semibold text-ink-soft data-[status=active]:text-basil lg:min-h-14 lg:flex-row lg:justify-start lg:gap-3 lg:rounded-button lg:px-4 lg:text-body lg:data-[status=active]:bg-counter"
+              className="flex min-h-(--tabbar-h) flex-col items-center justify-center gap-1 text-secondary font-semibold text-ink-soft data-[status=active]:text-basil lg:min-h-14 lg:flex-row lg:justify-start lg:gap-3 lg:rounded-button lg:px-4 lg:text-body lg:data-[status=active]:bg-counter"
             >
               <Icon aria-hidden="true" size={26} strokeWidth={2.25} />
               <span>{label}</span>

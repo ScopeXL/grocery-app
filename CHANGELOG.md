@@ -6,9 +6,14 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+### Changed
+
+- Text is smaller and crisper, and screens fit more.
+
 ### Fixed
 
 - In dark mode, Undo and Refresh on the messages at the bottom of the screen are readable again.
+- The bar above the tabs no longer tucks slightly under them.
 
 ## [0.6.0] - 2026-10-07
 

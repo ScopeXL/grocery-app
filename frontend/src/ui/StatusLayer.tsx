@@ -93,7 +93,7 @@ export function UpdatePrompt() {
   // Never under a shopper, and never while taps are waiting to be sent (PLAN §9.5).
   if (!needRefresh || shopping || pending > 0) return null;
   return (
-    <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-30 flex justify-center px-4 print:hidden lg:bottom-6">
+    <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+var(--tabbar-h)+12px)] z-30 flex justify-center px-4 print:hidden lg:bottom-6">
       <div className="flex items-center gap-3 rounded-button bg-ink py-2 pr-2 pl-4 text-counter">
         <span className="text-secondary font-semibold">A new version is ready.</span>
         <button
@@ -141,7 +141,7 @@ export function ToastRegion() {
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-40 flex flex-col items-center gap-2 px-4 print:hidden lg:bottom-6"
+      className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+var(--tabbar-h)+12px)] z-40 flex flex-col items-center gap-2 px-4 print:hidden lg:bottom-6"
     >
       {items}
     </div>

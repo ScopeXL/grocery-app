@@ -22,6 +22,9 @@
   /* Product photos sit on white in both themes, like a label (docs/UX.md §7.5). */
   --photo-tile: #ffffff;
 
+  /* The tab bar's height: the action bar, toasts and prompts sit just above it. */
+  --tabbar-h: 4rem;
+
   --marker-basil: #1e6b45;
   --marker-tomato: #c2381e;
   --marker-carrot: #a3500f;
@@ -72,18 +75,21 @@
 
   --font-sans: "Atkinson Hyperlegible Next Variable", ui-sans-serif, system-ui, sans-serif;
 
-  --text-caption: 15px;
-  --text-caption--line-height: 1.4;
-  --text-secondary: 17px;
-  --text-secondary--line-height: 1.45;
-  --text-body: 18px;
-  --text-body--line-height: 1.45;
-  --text-row: 22px;
-  --text-row--line-height: 1.25;
-  --text-title: 28px;
-  --text-title--line-height: 1.15;
-  --text-total: 36px;
-  --text-total--line-height: 1.1;
+  /* ADR 0027: rem, so a larger default text size scales everything. 16 px body. */
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.125rem;
+  --text-secondary: 0.875rem;
+  --text-secondary--line-height: 1.25rem;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --text-row: 1.125rem;
+  --text-row--line-height: 1.5rem;
+  --text-title: 1.5rem;
+  --text-title--line-height: 1.875rem;
+  --text-title--letter-spacing: -0.01em;
+  --text-total: 1.875rem;
+  --text-total--line-height: 2.25rem;
+  --text-total--letter-spacing: -0.01em;
 
   --radius-sheet: 20px;
   --radius-button: 14px;
@@ -95,8 +101,9 @@
     background: var(--counter);
     color: var(--ink);
     font-family: var(--font-sans);
-    font-size: 18px;
-    line-height: 1.45;
+    /* The browser's default (16 px): Tailwind's spacing scale then means what it says. */
+    font-size: 100%;
+    line-height: 1.5;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
   }

@@ -11,7 +11,25 @@ import { api, seedTacoNight } from "./seed";
 
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
+/** iPhones zoom into any typing field under 16 px (ADR 0027): none may be smaller. */
+async function typingFieldsAtLeast16px(page: Page, where: string): Promise<void> {
+  const small = await page.evaluate(() =>
+    Array.from(
+      document.querySelectorAll(
+        "input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=hidden]), select, textarea",
+      ),
+    )
+      .filter((field) => {
+        const box = field.getBoundingClientRect();
+        return box.width > 1 && box.height > 1 && parseFloat(getComputedStyle(field).fontSize) < 16;
+      })
+      .map((field) => field.outerHTML.slice(0, 120)),
+  );
+  expect(small, `typing fields under 16 px on ${where}`).toEqual([]);
+}
+
 async function check(page: Page, where: string): Promise<void> {
+  await typingFieldsAtLeast16px(page, where);
   const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
   // A11Y_ALL=1 fails on every finding, for a full review; normally only serious and critical.
   const blocking = results.violations.filter(
