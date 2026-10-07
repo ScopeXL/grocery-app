@@ -6,6 +6,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-06
+
 ### Added
 
 - Save list turns this week's list into a saved list to shop from. If the plan changes, Update
@@ -21,6 +23,12 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 - Share a list as text with anyone who doesn't have the app.
 - Store walking order in Settings: put the store's sections in the order you walk them.
 - The screen stays on while you shop.
+
+### Behind the scenes
+
+- Every tap in the store is saved on the phone first and sent exactly once, even when two
+  phones disagree or a phone's clock is off; a finished trip's copy of Kroger's photos and
+  aisles is cleared a day later.
 
 ## [0.3.0] - 2026-10-06
 
@@ -87,5 +95,7 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 [0.2.0]: https://github.com/ScopeXL/grocery-app/compare/v0.1.0...v0.2.0
 
-[Unreleased]: https://github.com/ScopeXL/grocery-app/compare/v0.3.0...HEAD
 [0.3.0]: https://github.com/ScopeXL/grocery-app/compare/v0.2.0...v0.3.0
+
+[Unreleased]: https://github.com/ScopeXL/grocery-app/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/ScopeXL/grocery-app/compare/v0.3.0...v0.4.0
