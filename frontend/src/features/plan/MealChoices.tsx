@@ -1,12 +1,48 @@
 /**
- * Choices shared by Add a meal and Change (UX §4.5, ADR 0026): which day, as Sunday-to-Saturday
- * pills. Each pill is the next such day, today included; tapping the chosen one clears it, and
- * with none chosen the meal is for any day.
+ * Choices shared by Add a meal and Change (UX §4.5, ADR 0026):
+ * - what the meal is for (breakfast, lunch, dinner or a snack), chosen when planning it;
+ * - which day, as Sunday-to-Saturday pills. Each pill is the next such day, today included;
+ *   tapping the chosen one clears it, and with none chosen the meal is for any day.
  */
 import { useId } from "react";
 
 import { dayReadout, weekPills } from "../../lib/days";
 import { Button } from "../../ui/Button";
+import { Chip } from "../../ui/Chip";
+import { OCCASIONS, type Occasion } from "./types";
+
+export function OccasionPicker({
+  occasion,
+  onOccasion,
+  disabled = false,
+}: {
+  occasion: Occasion;
+  onOccasion: (occasion: Occasion) => void;
+  disabled?: boolean;
+}) {
+  const headingId = useId();
+  return (
+    <section aria-labelledby={headingId} className="mb-5">
+      <h3 id={headingId} className="mb-2 text-body font-bold">
+        Eat it for
+      </h3>
+      <div role="group" aria-labelledby={headingId} className="flex flex-wrap gap-2">
+        {OCCASIONS.map((choice) => (
+          <Chip
+            key={choice.value}
+            on={occasion === choice.value}
+            disabled={disabled}
+            onClick={() => {
+              onOccasion(choice.value);
+            }}
+          >
+            {choice.label}
+          </Chip>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 const PILL =
   "flex min-h-12 flex-col items-center justify-center rounded-lg border-2 border-rule bg-paper text-secondary font-semibold leading-tight disabled:opacity-60 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent";

@@ -29,7 +29,8 @@ export function Suggestions() {
     async ({ dishId }: { dishId: string; name: string }) =>
       unwrap(
         await api.POST("/api/plan/meals", {
-          body: { main_id: dishId, side_ids: [], day: null, occasion: "dinner", scale: "1" },
+          // No occasion: the server uses what this main was last planned for (ADR 0026).
+          body: { main_id: dishId, side_ids: [], day: null, scale: "1" },
         }),
       ),
     (plan, { name }) => {

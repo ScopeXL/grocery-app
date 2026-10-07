@@ -52,6 +52,38 @@ test("a meal's day is a Sunday-to-Saturday pill, tapped again to clear", async (
   await expect(page.getByRole("list", { name: "This week's meals" })).toContainText("Tacos");
 });
 
+test("what a meal is for is chosen when planning, and remembered", async ({ page }) => {
+  await signIn(page);
+  await seedTacoNight(page);
+  await page.getByRole("button", { name: "Add a meal" }).click();
+  const pick = page.getByRole("dialog", { name: "Add a meal" });
+  // Every main is listed: no occasion filter.
+  await expect(pick.getByRole("button", { name: /^Chili/ })).toBeVisible();
+  await pick.getByRole("button", { name: /^Tacos/ }).click();
+  const sheet = page.getByRole("dialog", { name: "Add Tacos" });
+  const eatFor = sheet.getByRole("group", { name: "Eat it for" });
+  await expect(eatFor.getByRole("button", { name: "Dinner" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await eatFor.getByRole("button", { name: "Lunch" }).click();
+  await sheet.getByRole("button", { name: "Skip sides" }).click();
+  await expect(page.getByRole("list", { name: "This week's meals" })).toContainText("Lunch");
+
+  // Next time, Tacos starts as lunch.
+  await page.getByRole("button", { name: "Add a meal" }).click();
+  await page
+    .getByRole("dialog", { name: "Add a meal" })
+    .getByRole("button", { name: /^Tacos/ })
+    .click();
+  await expect(
+    page
+      .getByRole("dialog", { name: "Add Tacos" })
+      .getByRole("group", { name: "Eat it for" })
+      .getByRole("button", { name: "Lunch" }),
+  ).toHaveAttribute("aria-pressed", "true");
+});
+
 test("plan Tacos twice and Chili: the list merges, rounds and adds up", async ({ page }) => {
   await signIn(page);
   await seedTacoNight(page);

@@ -1,6 +1,6 @@
 # ADR 0006: The plan is a list with optional days; usual sides are learned; occasions are tags
 
-- **Status:** Accepted (the owner's answers to the open questions)
+- **Status:** Accepted (the owner's answers to the open questions); its occasion part is superseded by ADR 0026
 - **Date:** 2026-10-06
 
 ## Context

@@ -10,8 +10,7 @@ import { qk } from "../../api/keys";
 import { Button } from "../../ui/Button";
 import { Chip } from "../../ui/Chip";
 import { Sheet } from "../../ui/Sheet";
-import { OCCASIONS } from "../meals/types";
-import { DayPicker } from "./MealChoices";
+import { DayPicker, OccasionPicker } from "./MealChoices";
 import { SidePicker } from "./SidePicker";
 import { SCALES, type PlannedMeal } from "./types";
 import { usePlanChange, useRemoveMeal } from "./usePlan";
@@ -89,6 +88,13 @@ export function ChangeMealSheet({
               ))}
             </div>
 
+            <OccasionPicker
+              occasion={meal.occasion}
+              disabled={busy}
+              onOccasion={(occasion) => {
+                update.mutate({ id: meal.id, body: { occasion } });
+              }}
+            />
             <DayPicker
               day={meal.day}
               today={today}
@@ -97,22 +103,6 @@ export function ChangeMealSheet({
                 update.mutate({ id: meal.id, body: { day } });
               }}
             />
-
-            <h3 className="mb-2 text-body font-bold">Occasion</h3>
-            <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="Occasion">
-              {OCCASIONS.map((occasion) => (
-                <Chip
-                  key={occasion.value}
-                  on={meal.occasion === occasion.value}
-                  disabled={busy}
-                  onClick={() => {
-                    update.mutate({ id: meal.id, body: { occasion: occasion.value } });
-                  }}
-                >
-                  {occasion.label}
-                </Chip>
-              ))}
-            </div>
 
             <SidePicker
               mainId={meal.main.id}

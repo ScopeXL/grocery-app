@@ -1,9 +1,10 @@
 /**
- * Add a meal (UX §4.5): choose a Main (search; occasion chips with Dinner chosen; favorites
- * first), then an optional day (Sunday-to-Saturday pills) and its Sides (the usual ones first,
- * as large toggles, then all sides). The toast "Tacos added" offers Undo.
+ * Add a meal (UX §4.5): choose a Main from every main (favorites first, a search on top), then
+ * what it's for (starting with what it was last planned for, else dinner: ADR 0026), an optional
+ * day (Sunday-to-Saturday pills) and its Sides (the usual ones first, then all sides). The toast
+ * "Tacos added" offers Undo.
  */
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, type UseQueryResult } from "@tanstack/react-query";
 import { useId, useState } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
@@ -11,12 +12,12 @@ import { qk } from "../../api/keys";
 import { costLine } from "../../lib/money";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
-import { Chip } from "../../ui/Chip";
 import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
-import { OCCASIONS, type DishCard, type Occasion } from "../meals/types";
-import { DayPicker } from "./MealChoices";
+import type { DishCard } from "../meals/types";
+import { DayPicker, OccasionPicker } from "./MealChoices";
 import { SidePicker } from "./SidePicker";
+import type { Occasion } from "./types";
 import { usePlanChange } from "./usePlan";
 
 export function AddMealSheet({
@@ -28,20 +29,31 @@ export function AddMealSheet({
   open: boolean;
   today: string;
   onClose: () => void;
-  /** Start at the sides step for this Main (from a meal's own page). */
-  preset?: { id: string; name: string } | undefined;
+  /** Start at the second step for this Main (from a meal's own page or the library pane). */
+  preset?: MainChoice | undefined;
 }) {
-  const [occasion, setOccasion] = useState<Occasion>("dinner");
-  const [chosen, setChosen] = useState<{ id: string; name: string } | null>(null);
+  const queryClient = useQueryClient();
+  // null: the main's own default, until someone taps another occasion.
+  const [occasion, setOccasion] = useState<Occasion | null>(null);
+  const [chosen, setChosen] = useState<MainChoice | null>(null);
   const [sides, setSides] = useState<string[]>([]);
   const [day, setDay] = useState<string | null>(null);
   const main = chosen ?? preset ?? null;
+  const mains = useQuery({
+    queryKey: qk.dishList("main", false),
+    queryFn: async () =>
+      unwrap(await api.GET("/api/dishes", { params: { query: { role: "main" } } })),
+    enabled: open,
+  });
+  // The freshest default wins: the list refetches when the sheet opens again after an add.
+  const latest = main ? mains.data?.find((card) => card.id === main.id) : undefined;
+  const shownOccasion = occasion ?? latest?.default_occasion ?? main?.defaultOccasion ?? "dinner";
 
   const reset = () => {
     setChosen(null);
     setSides([]);
     setDay(null);
-    setOccasion("dinner");
+    setOccasion(null);
   };
   const close = () => {
     reset();
@@ -62,7 +74,7 @@ export function AddMealSheet({
             main_id: main.id,
             side_ids: withSides ? sides : [],
             day,
-            occasion,
+            occasion: shownOccasion,
             scale: "1",
           },
         }),
@@ -71,6 +83,8 @@ export function AddMealSheet({
     (plan) => {
       const name = main?.name ?? "Meal";
       close();
+      // Its default occasion may have changed.
+      void queryClient.invalidateQueries({ queryKey: qk.dishList("main", false) });
       const mealId = plan.changed;
       showToast(
         `${name} added`,
@@ -117,8 +131,10 @@ export function AddMealSheet({
       }
     >
       {main ? (
-        <SidesStep
+        <DetailsStep
           mainId={main.id}
+          occasion={shownOccasion}
+          onOccasion={setOccasion}
           sides={sides}
           onSides={setSides}
           day={day}
@@ -130,16 +146,15 @@ export function AddMealSheet({
               : () => {
                   setChosen(null);
                   setSides([]);
+                  setOccasion(null);
                 }
           }
         />
       ) : (
         <MainStep
-          open={open}
-          occasion={occasion}
-          onOccasion={setOccasion}
+          mains={mains}
           onChoose={(card) => {
-            setChosen({ id: card.id, name: card.name });
+            setChosen(mainChoice(card));
           }}
         />
       )}
@@ -147,31 +162,29 @@ export function AddMealSheet({
   );
 }
 
+/** A main as Add a meal needs it: which one, and what it's usually planned for. */
+export interface MainChoice {
+  id: string;
+  name: string;
+  defaultOccasion: Occasion;
+}
+
+export function mainChoice(card: Pick<DishCard, "id" | "name" | "default_occasion">): MainChoice {
+  return { id: card.id, name: card.name, defaultOccasion: card.default_occasion };
+}
+
 function MainStep({
-  open,
-  occasion,
-  onOccasion,
+  mains,
   onChoose,
 }: {
-  open: boolean;
-  occasion: Occasion;
-  onOccasion: (value: Occasion) => void;
+  mains: UseQueryResult<DishCard[]>;
   onChoose: (card: DishCard) => void;
 }) {
   const searchId = useId();
   const [query, setQuery] = useState("");
-  const mains = useQuery({
-    queryKey: qk.dishList("main", false),
-    queryFn: async () =>
-      unwrap(await api.GET("/api/dishes", { params: { query: { role: "main" } } })),
-    enabled: open,
-  });
   const needle = query.trim().toLowerCase();
   const all = mains.data ?? [];
-  const shown = all.filter(
-    (card) =>
-      card.occasions.includes(occasion) && (!needle || card.name.toLowerCase().includes(needle)),
-  );
+  const shown = needle ? all.filter((card) => card.name.toLowerCase().includes(needle)) : all;
 
   return (
     <>
@@ -188,19 +201,6 @@ function MainStep({
         }}
         className="mb-3 min-h-12 w-full rounded-button border-2 border-rule bg-paper px-4 text-body"
       />
-      <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Occasion">
-        {OCCASIONS.map((item) => (
-          <Chip
-            key={item.value}
-            on={occasion === item.value}
-            onClick={() => {
-              onOccasion(item.value);
-            }}
-          >
-            {item.label}
-          </Chip>
-        ))}
-      </div>
       {mains.isError ? (
         <p className="text-body">{errorMessage(mains.error)}</p>
       ) : mains.isPending ? (
@@ -209,7 +209,7 @@ function MainStep({
         <p className="text-body">
           {all.length === 0
             ? "No mains yet. Make one in Meals first."
-            : "Nothing matches. Try another word or occasion."}
+            : `Nothing matches “${query.trim()}”. Try another word.`}
         </p>
       ) : (
         <ul className="overflow-hidden rounded-tile border border-rule">
@@ -244,8 +244,10 @@ function MainStep({
   );
 }
 
-export function SidesStep({
+function DetailsStep({
   mainId,
+  occasion,
+  onOccasion,
   sides,
   onSides,
   day,
@@ -254,6 +256,8 @@ export function SidesStep({
   onBack,
 }: {
   mainId: string;
+  occasion: Occasion;
+  onOccasion: (occasion: Occasion) => void;
   sides: string[];
   onSides: (ids: string[]) => void;
   day: string | null;
@@ -268,6 +272,7 @@ export function SidesStep({
           Choose another main
         </Button>
       ) : null}
+      <OccasionPicker occasion={occasion} onOccasion={onOccasion} />
       <DayPicker day={day} today={today} onDay={onDay} />
       <SidePicker mainId={mainId} chosen={sides} onChange={onSides} />
     </>

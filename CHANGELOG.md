@@ -14,6 +14,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
   person's color stand out.
 - A meal's day is picked from Sunday-to-Saturday pills, with a line explaining them: each is the
   next such day, starting today. Tap it again to clear it; none picked means any day.
+- Add a meal lists every meal, with a search box on top. After you pick one, choose what it's for
+  (breakfast, lunch, dinner or a snack): it starts on whatever that meal was last planned as.
 
 ### Fixed
 

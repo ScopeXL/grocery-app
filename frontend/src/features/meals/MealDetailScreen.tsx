@@ -15,7 +15,7 @@ import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
 import { underlined } from "../../ui/styles";
-import { AddMealSheet } from "../plan/AddMealSheet";
+import { AddMealSheet, mainChoice } from "../plan/AddMealSheet";
 import { usePlan } from "../plan/usePlan";
 import { UsualSides } from "../plan/UsualSides";
 import { FavoriteButton } from "./MealsScreen";
@@ -211,7 +211,7 @@ export function MealDetailScreen({ dishId }: { dishId: string }) {
         <AddMealSheet
           open={planning}
           today={plan.data.today}
-          preset={{ id: meal.id, name: meal.name }}
+          preset={mainChoice(meal)}
           onClose={() => {
             setPlanning(false);
           }}

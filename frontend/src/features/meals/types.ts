@@ -13,15 +13,5 @@ export type PickerOut = Schemas["PickerOut"];
 export type KindOption = Schemas["KindOptionOut"];
 export type PreviewOut = Schemas["PreviewOut"];
 export type Role = DishOut["role"];
-export type Occasion = DishOut["occasions"][number];
-
-export const OCCASIONS: readonly { value: Occasion; label: string }[] = [
-  { value: "breakfast", label: "Breakfast" },
-  { value: "lunch", label: "Lunch" },
-  { value: "dinner", label: "Dinner" },
-  { value: "snack", label: "Snack" },
-];
-
-export function occasionLabel(value: Occasion): string {
-  return OCCASIONS.find((occasion) => occasion.value === value)?.label ?? value;
-}
+// Occasions belong to the planned meal now (ADR 0026); these stay until the editor drops them.
+export { OCCASIONS, occasionLabel, type Occasion } from "../plan/types";

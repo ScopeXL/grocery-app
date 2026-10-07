@@ -160,7 +160,7 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
   - the main, plus "with" its sides;
   - a day chip, if a day is set;
   - a scale chip, if not ×1;
-  - **Change**, which opens a sheet: swap the main, change sides, day, occasion, scale (×½, ×1, ×2), or remove (with Undo).
+  - **Change**, which opens a sheet: how much (×½, ×1, ×2), what it's for, the day, sides; then swap the main, or remove it (with Undo).
 - **Uses what you're buying:** up to three Mains that use leftovers of what the list already buys, each with its reason ("Taco salad uses your leftover lettuce, cheese and ground beef. Adds about $4.") and **Add**. Adding puts the Main on the plan without sides, so the total moves by about the amount shown.
 - **Each meal's cost:** the meal's share of what it uses, at today's prices and its scale ("about $9"), under its name.
 - **Total footer:** sticky; it updates as meals change. When the tally isn't zero, it adds "3 items have no price", which opens the List filtered to those lines.
@@ -169,10 +169,11 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
 
 ### 4.5 Add a meal (sheet)
 
-1. **Choose a main.** Search, then occasion chips: Dinner (selected), Breakfast, Lunch, Snack. Favorites come first, then the rest alphabetically. Each row shows the photo, name and "about $14".
-2. **Pick a day (optional).** Tapping a main moves to its step. Under "Day", with the choice read out beside it ("Any day", "Today", "Thu, Oct 8"), a short help line: "Optional: the day you'll make it. Each day is the next one coming up, starting today. None picked means any day." Then seven pills, Sun to Sat, with today's marked "today". Tap one to pick it; tap it again to clear it (ADR 0026).
-3. **Choose sides.** **Usual sides** first, as large toggles, then **All sides** with search. The bottom of the sheet has **Skip sides** and **Add to plan**.
-4. A toast says "Tacos added", with Undo.
+1. **Choose a main.** Every main is listed, with a search box on top that filters as you type. Favorites come first, then the rest alphabetically. Each row shows the photo, name and "about $14". No match: "Nothing matches “xyz”. Try another word."
+2. **Eat it for.** Tapping a main moves to its step, which starts with chips for Breakfast, Lunch, Dinner and Snack. The one chosen to begin with is what this main was last planned as, else Dinner (ADR 0026).
+3. **Pick a day (optional).** Under "Day", with the choice read out beside it ("Any day", "Today", "Thu, Oct 8"), a short help line: "Optional: the day you'll make it. Each day is the next one coming up, starting today. None picked means any day." Then seven pills, Sun to Sat, with today's marked "today". Tap one to pick it; tap it again to clear it (ADR 0026).
+4. **Choose sides.** **Usual sides** first, as large toggles, then **All sides** with search. The bottom of the sheet has **Skip sides** and **Add to plan**.
+5. A toast says "Tacos added", with Undo.
 
 ### 4.6 Meals (library)
 
@@ -390,7 +391,7 @@ Android's guide has the same three steps for Chrome: the ⋮ menu, **Install app
 ### 5.2 Plan a dinner (the success test, part 1)
 
 1. Plan → **Add a meal**.
-2. Tap **Tacos** (Dinner is preselected).
+2. Tap **Tacos** ("Eat it for" starts on Dinner, or on what Tacos was last planned as).
 3. Usual sides show first. Tap **Rice**.
 4. Optionally tap **Tue**, then **Add to plan**.
 5. Back on Plan: Tacos appears, and the total footer updates ("About $38").

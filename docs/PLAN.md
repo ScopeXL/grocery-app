@@ -51,7 +51,7 @@ The app uses these words consistently in the UI, code and docs. Internal identif
 | Item | `Item` (`items`) | Something the household buys, linked once to a Kroger product (photo, size, price, aisle) and reused by every dish that needs it |
 | Main, Side | `Dish` (`dishes`, `role` = `main`/`side`) | A dish with item lines and amounts. The Meals tab lists both |
 | Meal | `PlanMeal` (`plan_meals`) | One Main plus zero or more Sides, with an occasion, an optional day and a scale (×½, ×1, ×2) |
-| Occasion | `Occasion` (tag) | Dinner (default), Breakfast, Lunch or Snack. A tag on dishes and planned meals |
+| Occasion | `occasion` (on a planned meal) | Breakfast, Lunch, Dinner or Snack: what a planned meal is for, chosen when planning ("Eat it for"). It starts as what that main was last planned as, else Dinner (ADR 0026). Meals themselves carry none |
 | This week's plan | `Plan` (`plans`) | The meals currently planned. Only one plan is active |
 | Shopping list | `ShoppingList` (computed, never stored) | Built from the plan: lines merged across meals and rounded up to whole packages, plus extras, with have-it lines shown but not counted |
 | Extra | `PlanExtra` | Something added to the list that isn't tied to a meal (a Kroger item or plain text). Shows who added it |
@@ -74,7 +74,7 @@ The full reasoning for each decision is in the ADR it links to.
 | [0003](adr/0003-access-through-reverse-proxy.md) | Phones reach the app over HTTPS through the owner's existing reverse proxy; the app enforces its own login |
 | [0004](adr/0004-household-password-login.md) | One household password; per-device sessions; a "Who's using this?" picker; sign out other devices |
 | [0005](adr/0005-local-multi-arch-images.md) | Images are built locally with buildx (OrbStack) from `git archive` of a tag, for amd64 + arm64, and pushed as `scopexl/dinner-bell` |
-| [0006](adr/0006-plan-shape-sides-occasions.md) | The plan is a list with optional days; usual sides are learned; occasions are tags |
+| [0006](adr/0006-plan-shape-sides-occasions.md) | The plan is a list with optional days; usual sides are learned; occasions are tags (occasion part superseded by 0026) |
 | [0007](adr/0007-amounts-and-quantity-math.md) | Amounts are package parts, counts, or weight/volume with exact units only; quantities are `Fraction`; money is integer cents |
 | [0008](adr/0008-first-run-starts-empty.md) | The app starts empty, with a guided first dinner |
 | [0009](adr/0009-kroger-cart-in-m5.md) | Send to Kroger cart is in v1 (M5), on the production API; add-only, with a double-add guard |
@@ -92,6 +92,10 @@ The full reasoning for each decision is in the ADR it links to.
 | [0021](adr/0021-forward-only-migrations.md) | Migrations are forward-only and run at startup after a backup |
 | [0022](adr/0022-git-identity-and-commits.md) | Commits use the noreply identity; commit when green; push only on deploy |
 | [0023](adr/0023-ui-primitives-and-typescript-6.md) | UI primitives use platform features (no runtime style injection, so the strict CSP holds); TypeScript pinned to 6.0 |
+| [0024](adr/0024-cart-sends-one-item-at-a-time.md) | Cart sends go one item at a time; pound amounts stay in the Kroger app |
+| [0025](adr/0025-add-a-phone-with-a-code.md) | Add a phone with a one-time code, scanned or typed |
+| [0026](adr/0026-occasion-on-the-planned-meal.md) | What a meal is for is chosen when planning it; days are Sunday-to-Saturday pills |
+| [0027](adr/0027-crisper-type-ink-accent-motion.md) | Crisper type (16 px), an ink accent, compact targets, motion that answers taps (CSS only) |
 
 ---
 
@@ -249,7 +253,7 @@ A trip is a snapshot on purpose: later edits to meals or prices must not change 
 | Kroger | `GET kroger/products?q=` (3+ characters; short server-side cache), `GET kroger/account` (M5), `POST kroger/connect` (M5; returns the authorize URL), `GET kroger/callback` (M5; no session needed), `DELETE kroger/connection`. Sample mode only: `GET kroger/fake-authorize`, the demo sign-in page |
 | Items | `GET items?q=` (household items first), `POST items`, `PATCH items/{id}` (link product, correct size, each-weight, staple flag), archive and restore |
 | Dishes | `GET dishes?role=&occasion=&q=&favorite=`, `POST dishes`, `GET` / `PATCH dishes/{id}`, `PUT dishes/{id}/items`, `POST dishes/{id}/duplicate`, archive and restore, `PUT dishes/{id}/photo`, `GET` / `PUT dishes/{id}/usual-sides` |
-| Plan | `GET plan` (meals, the computed list, extras, usuals and totals, priced live), `POST plan/meals`, `PATCH plan/meals/{id}` (swap main, day, occasion, scale), `PUT plan/meals/{id}/sides`, `DELETE plan/meals/{id}` and `POST …/restore`, extras (`POST`, `PATCH`, `DELETE` and restore), `PUT plan/items/{itemId}` (have-it, quantity, product swap for this trip or always), `GET plan/items/{itemId}/alternatives` (with unit prices), `POST plan/new-week` and `POST plan/new-week/undo`, `GET plan/recommendations` (M4), `POST plan/repeat?from={planId or tripId}` (M3). Every change answers with the whole plan, so screens update from the response. Prices are fetched live on every read, so there is no refresh endpoint |
+| Plan | `GET plan` (meals, the computed list, extras, usuals and totals, priced live), `POST plan/meals` (occasion optional: the main's default, ADR 0026), `PATCH plan/meals/{id}` (swap main, day, occasion, scale), `PUT plan/meals/{id}/sides`, `DELETE plan/meals/{id}` and `POST …/restore`, extras (`POST`, `PATCH`, `DELETE` and restore), `PUT plan/items/{itemId}` (have-it, quantity, product swap for this trip or always), `GET plan/items/{itemId}/alternatives` (with unit prices), `POST plan/new-week` and `POST plan/new-week/undo`, `GET plan/recommendations` (M4), `POST plan/repeat?from={planId or tripId}` (M3). Every change answers with the whole plan, so screens update from the response. Prices are fetched live on every read, so there is no refresh endpoint |
 | Trips | `POST trips` (save the plan's list, or update its saved list: 201 or 200), `GET trips[?before=]` (active, then finished a page at a time), `GET trips/{id}[?since_version=N]`, `POST trips/{id}/ops` (batched, idempotent; §9.2), `POST trips/{id}/shop-again`, `GET trips/{id}/cart` and `POST trips/{id}/send-to-cart` (M5; §7.5). Walking order: `GET` / `PUT stores/active/sections`. `POST plan/repeat {trip_id}` plans a trip's meals again |
 | Events | `GET events?since=epoch:seq` (SSE; §9.3) |
 | Test only | `/_test/{reset,seed,drop-streams,revoke-sessions,fake-cart}`, available only when `DINNERBELL_TEST_MODE=1`. Startup refuses that flag unless `APP_BASE_URL` is localhost |

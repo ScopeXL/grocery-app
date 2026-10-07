@@ -14,20 +14,19 @@ import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { EmptyState } from "../../ui/EmptyState";
 import { Screen } from "../../ui/Screen";
-import { occasionLabel } from "../meals/types";
-import { AddMealSheet } from "./AddMealSheet";
+import { AddMealSheet, mainChoice, type MainChoice } from "./AddMealSheet";
 import { ChangeMealSheet } from "./ChangeMealSheet";
 import { MealPicture, MealThumb } from "./MealThumb";
 import { Suggestions } from "./Suggestions";
 import { LibraryPane, ListPane } from "./PlanPanes";
 import { TotalFooter } from "./TotalFooter";
-import { joinNames, scaleLabel, type PlannedMeal } from "./types";
+import { joinNames, occasionLabel, scaleLabel, type PlannedMeal } from "./types";
 import { usePlan, usePlanChange } from "./usePlan";
 
 export function PlanScreen() {
   const plan = usePlan();
   const [adding, setAdding] = useState(false);
-  const [preset, setPreset] = useState<{ id: string; name: string } | undefined>(undefined);
+  const [preset, setPreset] = useState<MainChoice | undefined>(undefined);
   const [changingId, setChangingId] = useState<string | null>(null);
 
   const undoNewWeek = usePlanChange(async (planId: string) =>
@@ -79,7 +78,7 @@ export function PlanScreen() {
         <aside className="hidden xl:block">
           <LibraryPane
             onAdd={(main) => {
-              setPreset({ id: main.id, name: main.name });
+              setPreset(mainChoice(main));
               setAdding(true);
             }}
           />
