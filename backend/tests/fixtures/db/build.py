@@ -4,7 +4,7 @@ Every release adds `tests/fixtures/db/<revision>.sql`: the schema at that releas
 synthetic rows in every table. `tests/test_migrations.py` replays each file and migrates it to
 head, so a new migration can't break a real household's data.
 
-    cd backend && uv run python -m tests.fixtures.db.build 202610070100
+    cd backend && uv run python -m tests.fixtures.db.build 202610070207
 
 Only synthetic values: "Sample Parent", location 99999001, UPCs 00000000000NN, made-up IDs.
 Seeds never change once their file is committed; a new release adds a new entry.
@@ -200,6 +200,63 @@ def _m2() -> list[Statement]:
     ]
 
 
+TRIP_DONE, TRIP_OPEN = (f"00000000-0000-7000-8000-00000000090{n}" for n in range(1, 3))
+EXAMPLE_IMAGE = "https://www.kroger.com/product/images/medium/front/0000000000001"
+
+
+def _m3() -> list[Statement]:
+    """0.4.0 (M3): a finished trip (with what was paid) and one being shopped, their items in
+    every state (one removed when the list was updated), and an applied phone action."""
+    trip_columns = (
+        "INSERT INTO trips (id, plan_id, store_id, status, status_ts, status_by_member_id, "
+        "created_by_member_id, created_at, estimate_cents, savings_cents, not_priced, "
+        "prices_as_of, actual_total_cents, finished_at, version, fingerprint, "
+        "product_cache_expires_at) VALUES "
+    )
+    item_columns = (
+        "INSERT INTO trip_items (id, trip_id, line_key, item_id, name, product_id, upc, "
+        "image_url, product_url, size_text, qty_text, quantity, unit, unit_cents, line_cents, "
+        "regular_cents, on_sale, sale_ends, section_key, section_label, section_order, "
+        "aisle_side, bay, used_by, warnings, position, state, state_ts, state_by_member_id, "
+        "note, note_ts, note_by_member_id, version, removed_at) VALUES "
+    )
+    return [
+        *_m2(),
+        "UPDATE app_meta SET last_boot_version = '0.4.0'",
+        trip_columns
+        + f"('{TRIP_DONE}', '{PLAN_OLD}', '{STORE}', 'finished', 1790000000000, '{P1}', "
+        f"'{P1}', '2026-09-29 15:00:00', 1234, 50, 0, '2026-09-29 15:00:00', 1199, "
+        "'2026-09-29 16:00:00', 4, '', NULL), "
+        f"('{TRIP_OPEN}', '{PLAN_NOW}', '{STORE}', 'active', 1791295200000, '{P1}', '{P1}', "
+        "'2026-10-06 14:00:00', 2096, 0, 1, '2026-10-06 14:00:00', NULL, NULL, 7, "
+        "'0f', NULL)",
+        item_columns + f"('00000000-0000-7000-8000-000000000911', '{TRIP_DONE}', '{OIL}', '{OIL}', "
+        "'Cooking oil', '0000000000003', '0000000000003', NULL, NULL, '48 fl oz', "
+        "'1 package, 48 fl oz', '1', 'package', 899, 899, 899, 0, NULL, NULL, NULL, 9900, "
+        f"NULL, 0, '[]', '[]', 0, 'done', 1790000000000, '{P1}', NULL, 0, NULL, 2, NULL), "
+        f"('00000000-0000-7000-8000-000000000921', '{TRIP_OPEN}', '{BEEF}', '{BEEF}', "
+        f"'Ground beef', '0000000000001', '0000000000001', '{EXAMPLE_IMAGE}', "
+        "'https://www.example.com/p/sample-ground-beef/0000000000001', '1 lb', "
+        "'2 packages, 1 lb each', '2', 'package', 499, 998, 1098, 1, '2026-10-10', "
+        "'cat:meat-seafood', 'Meat & Seafood', 9000, NULL, 0, "
+        f"""'[{{"meal_id": "{MEAL_1}", "name": "Tacos"}}]', '[]', 0, 'done', """
+        f"1791295300000, '{P1}', NULL, 0, NULL, 3, NULL), "
+        f"('00000000-0000-7000-8000-000000000922', '{TRIP_OPEN}', '{BANANAS}', '{BANANAS}', "
+        "'Bananas', '0000000000002', '0000000000002', NULL, NULL, NULL, '1 1/2 lb', '3/2', "
+        "'pound', 59, 89, 89, 0, NULL, 'cat:produce', 'Produce', 100, NULL, 0, '[]', "
+        """'["Low stock"]', 1, 'missed', 1791295400000, NULL, 'Ask at the counter', """
+        f"1791295400000, '{P1}', 5, NULL), "
+        f"('00000000-0000-7000-8000-000000000923', '{TRIP_OPEN}', 'extra:candles', NULL, "
+        "'Birthday candles', NULL, NULL, NULL, NULL, NULL, '1', '1', 'each', NULL, NULL, "
+        "NULL, 0, NULL, 'cat:other', 'Other', 9900, NULL, 0, '[]', '[]', 2, 'todo', 0, NULL, "
+        "NULL, 0, NULL, 6, '2026-10-06 14:30:00')",
+        "INSERT INTO applied_ops (op_id, trip_id, kind, client_id, member_id, client_ts, "
+        f"effective_ts, received_at, result, reason) VALUES ('op-sample-0001', '{TRIP_OPEN}', "
+        f"'item.set_state', 'phone-sample', '{P1}', 1791295300000, 1791295300000, "
+        "'2026-10-06 14:01:40', 'applied', NULL)",
+    ]
+
+
 # Synthetic rows to insert, per released revision (the tables that exist at that revision).
 SEEDS: dict[str, Callable[[], list[Statement]]] = {
     "202610061200": lambda: [
@@ -210,6 +267,7 @@ SEEDS: dict[str, Callable[[], list[Statement]]] = {
     ],
     "202610062123": _m1,
     "202610070100": _m2,
+    "202610070207": _m3,
 }
 
 
