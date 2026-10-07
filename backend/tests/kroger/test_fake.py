@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
 import pytest
 
@@ -79,3 +79,11 @@ def test_placeholder_photos_exist_only_for_fixture_products() -> None:
     svg = image_svg("0000000000001.svg")
     assert svg is not None and svg.startswith("<svg") and "Sample Whole Milk" in svg
     assert image_svg("0000000009999.svg") is None
+
+
+async def test_sales_move_with_the_clock() -> None:
+    later = FakeKroger(FakeClock(datetime(2026, 11, 20, 14, 0, tzinfo=UTC)))  # 45 days on
+    fetched = await later.get_product("0000000000003", "99999001")
+    product = fetched.data
+    assert product is not None and product.price is not None
+    assert product.price.expires == date(2026, 11, 24)  # written as 2026-10-10

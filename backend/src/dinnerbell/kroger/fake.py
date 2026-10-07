@@ -6,6 +6,10 @@ up. Product photos are small SVGs served by `/api/kroger/fake-images/…`.
 
 Two magic inputs exercise quiet states: the ZIP `00000` finds no stores, and the search term
 `dailylimit` behaves as if Kroger's daily limit were used up.
+
+Sale dates in the fixtures are written for FIXTURE_DAY and move with the clock, so the fake
+store's sales are always current: tests on a fixed clock see the dates as written, and e2e runs
+on the real clock see the same sales, as many days ahead.
 """
 
 from __future__ import annotations
@@ -13,7 +17,7 @@ from __future__ import annotations
 import json
 from collections.abc import Sequence
 from dataclasses import replace
-from datetime import timedelta
+from datetime import UTC, date, timedelta
 from decimal import Decimal
 from functools import cache
 from html import escape
@@ -26,6 +30,7 @@ from dinnerbell.kroger.client import Fetched, KrogerDailyLimitError
 from dinnerbell.kroger.parse import (
     Chain,
     Location,
+    Price,
     Product,
     parse_chains,
     parse_locations,
@@ -36,6 +41,7 @@ FIXTURES = Path(__file__).parent / "fixtures"
 IMAGE_BASE = "/api/kroger/fake-images"
 NO_STORES_ZIP = "00000"
 DAILY_LIMIT_TERM = "dailylimit"
+FIXTURE_DAY = date(2026, 10, 6)  # the day the fixtures' sale dates were written for
 
 
 class FakeKroger:
@@ -90,9 +96,12 @@ class FakeKroger:
 
     def _at(self, location_id: str, product: Product) -> Product:
         """Like Kroger, an unknown store gets no price, stock or aisle."""
-        if location_id in self._store_ids:
+        if location_id not in self._store_ids:
+            return replace(product, price=None, stock_level=None, in_store=None, aisles=())
+        days = timedelta(days=(self._clock.now().astimezone(UTC).date() - FIXTURE_DAY).days)
+        if product.price is None or not days:
             return product
-        return replace(product, price=None, stock_level=None, in_store=None, aisles=())
+        return replace(product, price=_moved(product.price, days))
 
     def _policy(self) -> CachePolicy:
         """Like Kroger (smoke test, 2026-10-06): no freshness headers, so nothing is kept."""
@@ -114,6 +123,14 @@ def image_svg(name: str) -> str | None:
         f'<rect x="60" y="40" width="120" height="150" rx="16" fill="hsl({hue} 40% 55%)"/>'
         '<text x="120" y="222" font-family="sans-serif" font-size="22" text-anchor="middle" '
         f'fill="hsl({hue} 50% 22%)">{label}</text></svg>'
+    )
+
+
+def _moved(price: Price, days: timedelta) -> Price:
+    return replace(
+        price,
+        effective=None if price.effective is None else price.effective + days,
+        expires=None if price.expires is None else price.expires + days,
     )
 
 
