@@ -50,6 +50,12 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 - In dark mode, Undo and Refresh on the messages at the bottom of the screen are readable again.
 - The bar above the tabs no longer tucks slightly under them.
 
+### Behind the scenes
+
+- On a phone, the plan no longer downloads the meal list that only shows on a big screen. Every
+  screen is also checked for typing fields an iPhone would zoom into and for buttons too small to
+  tap, and phones still on the previous version keep working until they refresh.
+
 ## [0.6.0] - 2026-10-07
 
 ### Added

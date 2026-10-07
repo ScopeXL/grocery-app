@@ -11,6 +11,7 @@ import { dayLabel } from "../../lib/days";
 import { mealPrice } from "../../lib/money";
 import { arrivals } from "../../lib/motion";
 import { showToast } from "../../lib/toast";
+import { useMediaQuery } from "../../lib/useMediaQuery";
 import { Button } from "../../ui/Button";
 import { EmptyState } from "../../ui/EmptyState";
 import { Screen } from "../../ui/Screen";
@@ -27,6 +28,8 @@ import { usePlan, usePlanChange } from "./usePlan";
 
 export function PlanScreen() {
   const plan = usePlan();
+  // Tailwind's xl breakpoint, where the plan gets its side panes.
+  const wide = useMediaQuery("(min-width: 80rem)");
   const [adding, setAdding] = useState(false);
   const [preset, setPreset] = useState<MainChoice | undefined>(undefined);
   const [changingId, setChangingId] = useState<string | null>(null);
@@ -79,14 +82,17 @@ export function PlanScreen() {
   return (
     <Screen title="This week" wide actions={hasAnything ? <TotalFooter plan={data} /> : undefined}>
       <div className="xl:grid xl:grid-cols-[17rem_minmax(0,1fr)_20rem] xl:items-start xl:gap-8">
-        <aside className="hidden xl:block">
-          <LibraryPane
-            onAdd={(main) => {
-              setPreset(mainChoice(main));
-              setAdding(true);
-            }}
-          />
-        </aside>
+        {/* Only where it shows: a phone shouldn't spend its signal fetching a hidden pane. */}
+        {wide ? (
+          <aside className="hidden xl:block">
+            <LibraryPane
+              onAdd={(main) => {
+                setPreset(mainChoice(main));
+                setAdding(true);
+              }}
+            />
+          </aside>
+        ) : null}
         <div>
           {data.meals.length === 0 ? (
             <EmptyState

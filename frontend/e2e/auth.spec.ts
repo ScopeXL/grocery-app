@@ -24,6 +24,9 @@ test("a wrong password says exactly what to do", async ({ page }) => {
 
 test("sign in, pick your name, and stay signed in", async ({ page }) => {
   await signIn(page);
+  // The plan's data is in before reloading: a reload that cuts off a request is a page error on
+  // WebKit (CLAUDE.md gotchas).
+  await expect(page.getByText("No meals planned yet.")).toBeVisible();
   await page.reload();
   await expect(page.getByRole("heading", { name: "This week" })).toBeVisible();
   await page.getByRole("link", { name: "More" }).click();
