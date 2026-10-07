@@ -83,6 +83,13 @@ function MealEditor({
   const [draft, setDraft] = useState<Draft>(() => restored ?? initial());
   const [adding, setAdding] = useState(false);
   const [picking, setPicking] = useState<{ item: ItemOut; line: DraftLine | null } | null>(null);
+  // Lines keep a copy of their item; its name may have changed since (a rename, or another phone).
+  const items = useQuery({
+    queryKey: qk.items(),
+    queryFn: async () => unwrap(await api.GET("/api/items")),
+  });
+  const names = new Map((items.data ?? []).map((item) => [item.id, item.name]));
+  const nameOf = (line: DraftLine) => names.get(line.item.id) ?? line.item.name;
 
   useEffect(() => {
     saveDraft(draftKey, draft);
@@ -147,7 +154,7 @@ function MealEditor({
   const removeLine = (line: DraftLine) => {
     const at = draft.lines.indexOf(line);
     update({ lines: draft.lines.filter((other) => other !== line) });
-    showToast(`Removed ${line.item.name}`, {
+    showToast(`Removed ${nameOf(line)}`, {
       label: "Undo",
       onAction: () => {
         setDraft((current) => {
@@ -240,7 +247,7 @@ function MealEditor({
                   <div className="flex items-center gap-3">
                     <ProductImage src={line.item.image_url} alt="" size={48} />
                     <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="text-body font-semibold">{line.item.name}</span>
+                      <span className="text-body font-semibold">{nameOf(line)}</span>
                       <span className="text-secondary text-ink-soft">{line.amount.text}</span>
                     </span>
                   </div>
@@ -248,7 +255,7 @@ function MealEditor({
                   <div className="flex gap-1 pl-12">
                     <Button
                       variant="quiet"
-                      aria-label={`Change ${line.item.name}`}
+                      aria-label={`Change ${nameOf(line)}`}
                       onClick={() => {
                         setPicking({ item: line.item, line });
                       }}
@@ -257,7 +264,7 @@ function MealEditor({
                     </Button>
                     <Button
                       variant="quiet-danger"
-                      aria-label={`Remove ${line.item.name}`}
+                      aria-label={`Remove ${nameOf(line)}`}
                       onClick={() => {
                         removeLine(line);
                       }}

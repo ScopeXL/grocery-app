@@ -241,6 +241,29 @@ async def test_a_main_is_planned_for_what_it_was_last_planned_for(
     assert [meal["occasion"] for meal in plan["meals"]] == ["lunch"]
 
 
+async def test_a_rename_reads_everywhere_but_a_saved_list_keeps_its_name(
+    cook: httpx.AsyncClient,
+) -> None:
+    ids = await taco_night(cook)
+    await plan_meal(cook, ids["tacos"])
+    saved = (await cook.post("/api/trips", headers=CSRF)).json()
+    path = f"/api/items/{ids['cheddar']}"
+    renamed = await cook.patch(path, json={"name": " Shredded   cheese "}, headers=CSRF)
+    assert renamed.status_code == 200, renamed.text
+    assert renamed.json()["name"] == "Shredded cheese"
+
+    lines = by_name((await cook.get("/api/plan")).json())
+    assert "Shredded cheese" in lines and "Shredded cheddar" not in lines
+    tacos = (await cook.get(f"/api/dishes/{ids['tacos']}")).json()
+    assert "Shredded cheese" in [ln["item"]["name"] for ln in tacos["lines"]]
+    trip = (await cook.get(f"/api/trips/{saved['id']}")).json()
+    assert "Shredded cheddar" in [entry["name"] for entry in trip["items"]]
+
+    for bad in ["", "   ", "x" * 81]:
+        refused = await cook.patch(path, json={"name": bad}, headers=CSRF)
+        assert refused.status_code == 422, bad
+
+
 async def test_only_mains_and_sides_in_their_places(cook: httpx.AsyncClient) -> None:
     ids = await taco_night(cook)
     wrong = await cook.post("/api/plan/meals", json={"main_id": ids["rice_side"]}, headers=CSRF)

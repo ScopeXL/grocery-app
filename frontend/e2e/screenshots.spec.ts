@@ -258,6 +258,12 @@ for (const scheme of ["light", "dark"] as const) {
     await expect(page.getByRole("dialog", { name: "Ground beef" })).toBeVisible();
     await settle(page);
     await page.screenshot({ path: `${dir}/line-sheet-${scheme}.png`, caret: "initial" });
+    const beefSheet = page.getByRole("dialog", { name: "Ground beef" });
+    await beefSheet.getByRole("button", { name: "Rename Ground beef" }).click();
+    await expect(beefSheet.getByLabel("What do you call it?")).toBeFocused();
+    await settle(page);
+    await page.screenshot({ path: `${dir}/rename-item-${scheme}.png`, caret: "initial" });
+    await beefSheet.getByRole("button", { name: "Cancel" }).click();
     await page
       .getByRole("dialog", { name: "Ground beef" })
       .getByRole("button", { name: "Swap product" })

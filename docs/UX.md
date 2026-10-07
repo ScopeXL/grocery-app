@@ -223,6 +223,7 @@ Then **Save meal** → toast "Meal saved". There's no "When do you eat it?": tha
 +--------------------------------------+
 | [product photo]  Shredded cheddar    |
 |                  8 oz bag            |
+|                  Rename              |
 |                                      |
 | How much does this meal use?         |
 |  [ 1/4 ] [ 1/2 ] [ 3/4 ] [ 1 ] [ 2 ] |
@@ -246,6 +247,8 @@ Then **Save meal** → toast "Meal saved". There's no "When do you eat it?": tha
 | Size couldn't be read | Parts only, plus **Fix size** |
 
 A live preview line shows the share and the cost.
+
+**Rename** (a quiet button under the item's facts) opens "What do you call it?" in place, full width, with **Save name** and **Cancel**. The new name shows on the list and in every meal that uses the item; a Saved list keeps the name it was saved with. The toast "Renamed to Shredded cheese" offers Undo.
 
 ### 4.11 Shopping list
 
@@ -290,7 +293,8 @@ A live preview line shows the share and the cost.
   - a quantity stepper, with a "you added 2" chip;
   - **Have it already**;
   - **Swap product**, listing alternatives with unit prices ("$0.25 per oz"), then **For this trip** or **Always use this**;
-  - **Open in Kroger**.
+  - **Open in Kroger**;
+  - **Rename**, as in the amount picker (§4.10). A plain-text extra has no Rename.
 - **Extras:** **Add something else** searches Kroger or takes plain text. The **Usuals** row offers one-tap re-adds of things added before. Every extra shows who added it. Lines no meal uses sit in Extras; an extra on a line a meal uses shows there as "Mia added 1 more".
 - **An unlinked item's sheet** offers **Choose a product** instead of Swap product.
 - **Bottom bar:**

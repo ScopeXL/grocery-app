@@ -16,6 +16,7 @@ import { Button } from "../../ui/Button";
 import { Chip } from "../../ui/Chip";
 import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
+import { RenameItem } from "./RenameItem";
 import type { AmountIn, AmountOut, ItemOut, KindOption, PickerOut } from "./types";
 
 const WEIGHT_UNITS = new Set(["oz", "lb", "g", "kg"]);
@@ -80,6 +81,7 @@ export function AmountPicker({
   });
 
   const data = picker.data;
+  const name = data?.item.name ?? item.name; // fresh after a rename
   const current = choice !== null && same(settled, choice) ? preview.data : undefined;
   const ready = current?.valid === true && current.amount !== null;
 
@@ -100,10 +102,10 @@ export function AmountPicker({
         </Button>
       }
     >
-      <header className="mb-4 flex items-center gap-3">
+      <header className="mb-4 grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3">
         <ProductImage src={data?.item.image_url ?? item.image_url} alt="" size={64} />
         <div className="flex flex-col">
-          <span className="text-row font-semibold">{item.name}</span>
+          <span className="text-row font-semibold">{name}</span>
           {data?.product ? (
             <span className="text-secondary text-ink-soft">{data.product.description}</span>
           ) : null}
@@ -113,6 +115,7 @@ export function AmountPicker({
             </span>
           ) : null}
         </div>
+        <RenameItem itemId={item.id} name={name} />
       </header>
 
       {picker.isError ? (

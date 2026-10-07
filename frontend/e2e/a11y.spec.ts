@@ -148,6 +148,9 @@ for (const scheme of ["light", "dark"] as const) {
         .click();
       await expect(page.getByRole("dialog")).toBeVisible();
       await check(page, "list line");
+      await page.getByRole("dialog").getByRole("button", { name: "Rename Black beans" }).click();
+      await expect(page.getByRole("dialog").getByLabel("What do you call it?")).toBeFocused();
+      await check(page, "rename an item");
       await page.getByRole("dialog").getByRole("button", { name: "Close" }).click();
 
       await page.getByRole("button", { name: "Add something else" }).click();

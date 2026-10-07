@@ -6,6 +6,11 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+### Added
+
+- Rename an item from its amount picker or from its line on the shopping list. The new name shows
+  in your meals and on this week's list, and Undo puts the old one back.
+
 ### Changed
 
 - Text is smaller and crisper, and buttons, pills and rows take less room, so screens fit more.

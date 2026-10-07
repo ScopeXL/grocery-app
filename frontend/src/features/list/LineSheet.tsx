@@ -16,6 +16,7 @@ import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
 import { underlined } from "../../ui/styles";
 import { ProductFacts } from "../meals/AddItemSheet";
+import { RenameItem } from "../meals/RenameItem";
 import type { Line } from "../plan/types";
 import { usePlanChange, useRemoveExtra } from "../plan/usePlan";
 import { usedByText } from "./LineRow";
@@ -105,9 +106,9 @@ function LineDetails({ line, onSwap }: { line: Line; onSwap: () => void }) {
 
   return (
     <>
-      <div className="mb-5 flex items-start gap-3">
+      <div className="mb-5 grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3">
         <ProductImage src={line.image_url} alt="" size={96} />
-        <div className="flex min-w-0 flex-col gap-0.5">
+        <div className="flex flex-col gap-0.5">
           <span className="text-body">{line.amount_text}</span>
           {line.cost_cents !== null ? (
             <span className="text-body font-semibold">{about(line.cost_cents)}</span>
@@ -135,6 +136,7 @@ function LineDetails({ line, onSwap }: { line: Line; onSwap: () => void }) {
             </span>
           ))}
         </div>
+        {itemId ? <RenameItem itemId={itemId} name={line.name} /> : null}
       </div>
 
       <h3 className="mb-2 text-body font-bold">How many to buy</h3>
