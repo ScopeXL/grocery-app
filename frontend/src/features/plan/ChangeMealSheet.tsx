@@ -12,7 +12,7 @@ import { Button } from "../../ui/Button";
 import { Chip } from "../../ui/Chip";
 import { Sheet } from "../../ui/Sheet";
 import { OCCASIONS } from "../meals/types";
-import { SidePicker } from "./AddMealSheet";
+import { SidePicker } from "./SidePicker";
 import { SCALES, type PlannedMeal } from "./types";
 import { usePlanChange, useRemoveMeal } from "./usePlan";
 
