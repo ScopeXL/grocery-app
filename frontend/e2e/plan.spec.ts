@@ -18,6 +18,40 @@ async function addMeal(page: Page, name: string, sides: string[] = []): Promise<
   await expect(page.getByText(`${name} added`)).toBeVisible();
 }
 
+test("a meal's day is a Sunday-to-Saturday pill, tapped again to clear", async ({ page }) => {
+  await signIn(page);
+  await seedTacoNight(page);
+  await page.getByRole("button", { name: "Add a meal" }).click();
+  await page
+    .getByRole("dialog", { name: "Add a meal" })
+    .getByRole("button", { name: "Tacos" })
+    .click();
+  const sheet = page.getByRole("dialog", { name: "Add Tacos" });
+  const days = sheet.getByRole("group", { name: "Day" });
+  await expect(days.getByRole("button")).toHaveCount(7);
+  await expect(days.getByRole("button").first()).toContainText("Sun");
+  await expect(sheet.getByText("Any day", { exact: true })).toBeVisible();
+  const today = days.getByRole("button", { name: /today/ });
+  await today.click();
+  await expect(today).toHaveAttribute("aria-pressed", "true");
+  await expect(sheet.getByText("Today", { exact: true })).toBeVisible();
+  await today.click();
+  await expect(today).toHaveAttribute("aria-pressed", "false");
+  await expect(sheet.getByText("Any day", { exact: true })).toBeVisible();
+  await today.click();
+  await sheet.getByRole("button", { name: "Skip sides" }).click();
+  await expect(page.getByRole("region", { name: "Tonight" })).toContainText("Tacos");
+
+  // In Change, tapping the chosen day again clears it, and Tacos leaves Tonight.
+  await page.getByRole("button", { name: "Change Tacos" }).click();
+  const change = page.getByRole("dialog", { name: "Change Tacos" });
+  await change.getByRole("group", { name: "Day" }).getByRole("button", { name: /today/ }).click();
+  await expect(change.getByText("Any day", { exact: true })).toBeVisible();
+  await change.getByRole("button", { name: "Close" }).click();
+  await expect(page.getByRole("region", { name: "Tonight" })).toHaveCount(0);
+  await expect(page.getByRole("list", { name: "This week's meals" })).toContainText("Tacos");
+});
+
 test("plan Tacos twice and Chili: the list merges, rounds and adds up", async ({ page }) => {
   await signIn(page);
   await seedTacoNight(page);

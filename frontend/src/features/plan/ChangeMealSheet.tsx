@@ -7,11 +7,11 @@ import { useId, useState } from "react";
 
 import { api, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
-import { dayChoices } from "../../lib/days";
 import { Button } from "../../ui/Button";
 import { Chip } from "../../ui/Chip";
 import { Sheet } from "../../ui/Sheet";
 import { OCCASIONS } from "../meals/types";
+import { DayPicker } from "./MealChoices";
 import { SidePicker } from "./SidePicker";
 import { SCALES, type PlannedMeal } from "./types";
 import { usePlanChange, useRemoveMeal } from "./usePlan";
@@ -89,21 +89,14 @@ export function ChangeMealSheet({
               ))}
             </div>
 
-            <h3 className="mb-2 text-body font-bold">Day</h3>
-            <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="Day">
-              {dayChoices(today).map((choice) => (
-                <Chip
-                  key={choice.value ?? "any"}
-                  on={meal.day === choice.value}
-                  disabled={busy}
-                  onClick={() => {
-                    update.mutate({ id: meal.id, body: { day: choice.value } });
-                  }}
-                >
-                  {choice.label}
-                </Chip>
-              ))}
-            </div>
+            <DayPicker
+              day={meal.day}
+              today={today}
+              disabled={busy}
+              onDay={(day) => {
+                update.mutate({ id: meal.id, body: { day } });
+              }}
+            />
 
             <h3 className="mb-2 text-body font-bold">Occasion</h3>
             <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="Occasion">

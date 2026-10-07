@@ -22,17 +22,37 @@ function weekday(day: string, style: "short" | "long"): string {
   return new Date(toUtc(day)).toLocaleDateString("en-US", { weekday: style, timeZone: "UTC" });
 }
 
-/** The chips for choosing a day: Any day, Today, then the next six days by name. */
-export function dayChoices(today: string): { value: string | null; label: string }[] {
-  const choices: { value: string | null; label: string }[] = [
-    { value: null, label: "Any day" },
-    { value: today, label: "Today" },
-  ];
-  for (let ahead = 1; ahead <= AHEAD; ahead++) {
-    const day = addDays(today, ahead);
-    choices.push({ value: day, label: weekday(day, "short") });
-  }
-  return choices;
+const WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+
+export interface DayPill {
+  value: string;
+  label: (typeof WEEK)[number];
+  today: boolean;
+}
+
+/**
+ * The day pills, Sunday to Saturday (UX §4.5, ADR 0026). Each is the next such day, today
+ * included: on a Wednesday, "Wed" is today and "Mon" is the Monday five days ahead.
+ */
+export function weekPills(today: string): DayPill[] {
+  const from = new Date(toUtc(today)).getUTCDay();
+  return WEEK.map((label, index) => ({
+    value: addDays(today, (index - from + 7) % 7),
+    label,
+    today: index === from,
+  }));
+}
+
+/** What the day picker reads out: "Any day", "Today", or "Thu, Oct 8". */
+export function dayReadout(day: string | null, today: string): string {
+  if (day === null) return "Any day";
+  if (day === today) return "Today";
+  return new Date(toUtc(day)).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
 }
 
 /** A planned day as a chip says it: "Today", "Tue", or "Mon, Oct 5" when it's not this week. */

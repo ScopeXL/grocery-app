@@ -12,6 +12,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
   Everything is still easy to tap: nothing is under 40 px, and shopping's checkboxes stay big.
 - The green is gone: buttons, links and selected choices are a dark ink, so sale tags and each
   person's color stand out.
+- A meal's day is picked from Sunday-to-Saturday pills, with a line explaining them: each is the
+  next such day, starting today. Tap it again to clear it; none picked means any day.
 
 ### Fixed
 

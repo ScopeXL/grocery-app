@@ -170,8 +170,8 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
 ### 4.5 Add a meal (sheet)
 
 1. **Choose a main.** Search, then occasion chips: Dinner (selected), Breakfast, Lunch, Snack. Favorites come first, then the rest alphabetically. Each row shows the photo, name and "about $14".
-2. **Choose sides.** Tapping a main moves to a sides step: **Usual sides** first, as large toggles, then **All sides** with search. The bottom of the sheet has **Skip** and **Add to plan**.
-3. **Pick a day (optional).** Chips for Any day (selected), Today, and the next six days by name.
+2. **Pick a day (optional).** Tapping a main moves to its step. Under "Day", with the choice read out beside it ("Any day", "Today", "Thu, Oct 8"), a short help line: "Optional: the day you'll make it. Each day is the next one coming up, starting today. None picked means any day." Then seven pills, Sun to Sat, with today's marked "today". Tap one to pick it; tap it again to clear it (ADR 0026).
+3. **Choose sides.** **Usual sides** first, as large toggles, then **All sides** with search. The bottom of the sheet has **Skip sides** and **Add to plan**.
 4. A toast says "Tacos added", with Undo.
 
 ### 4.6 Meals (library)
@@ -392,7 +392,7 @@ Android's guide has the same three steps for Chrome: the ⋮ menu, **Install app
 1. Plan → **Add a meal**.
 2. Tap **Tacos** (Dinner is preselected).
 3. Usual sides show first. Tap **Rice**.
-4. **Add to plan**. Optionally tap **Tue**.
+4. Optionally tap **Tue**, then **Add to plan**.
 5. Back on Plan: Tacos appears, and the total footer updates ("About $38").
 
 ### 5.3 Build and save the list

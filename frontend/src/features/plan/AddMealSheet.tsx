@@ -1,14 +1,13 @@
 /**
  * Add a meal (UX §4.5): choose a Main (search; occasion chips with Dinner chosen; favorites
- * first), then its Sides (the usual ones first, as large toggles, then all sides) and an
- * optional day. The toast "Tacos added" offers Undo.
+ * first), then an optional day (Sunday-to-Saturday pills) and its Sides (the usual ones first,
+ * as large toggles, then all sides). The toast "Tacos added" offers Undo.
  */
 import { useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
-import { dayChoices } from "../../lib/days";
 import { costLine } from "../../lib/money";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
@@ -16,6 +15,7 @@ import { Chip } from "../../ui/Chip";
 import { ProductImage } from "../../ui/ProductImage";
 import { Sheet } from "../../ui/Sheet";
 import { OCCASIONS, type DishCard, type Occasion } from "../meals/types";
+import { DayPicker } from "./MealChoices";
 import { SidePicker } from "./SidePicker";
 import { usePlanChange } from "./usePlan";
 
@@ -268,21 +268,8 @@ export function SidesStep({
           Choose another main
         </Button>
       ) : null}
+      <DayPicker day={day} today={today} onDay={onDay} />
       <SidePicker mainId={mainId} chosen={sides} onChange={onSides} />
-      <h3 className="mt-6 mb-2 text-body font-bold">Day</h3>
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Day">
-        {dayChoices(today).map((choice) => (
-          <Chip
-            key={choice.value ?? "any"}
-            on={day === choice.value}
-            onClick={() => {
-              onDay(choice.value);
-            }}
-          >
-            {choice.label}
-          </Chip>
-        ))}
-      </div>
     </>
   );
 }
