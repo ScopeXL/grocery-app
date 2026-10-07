@@ -6,6 +6,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-06
+
 ### Added
 
 - Choose your store by ZIP code, in a short first-run guide or later in Settings.
@@ -19,9 +21,8 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ### Behind the scenes
 
-- Sturdier releases: they check GitHub access before starting, can resume after a failed upload,
-  and the privacy check now also reads release tags.
-- Kroger's product details are used live and kept only as long as Kroger allows.
+- Sturdier releases and privacy checks; Kroger's product details are fetched live and never
+  stored, as Kroger's terms require.
 
 ## [0.1.0] - 2026-10-06
 
@@ -41,5 +42,7 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 - The first server, database, release pipeline and privacy checks.
 
-[Unreleased]: https://github.com/ScopeXL/grocery-app/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/ScopeXL/grocery-app/releases/tag/v0.1.0
+
+[Unreleased]: https://github.com/ScopeXL/grocery-app/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/ScopeXL/grocery-app/compare/v0.1.0...v0.2.0
