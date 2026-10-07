@@ -170,6 +170,10 @@ def share_text(a: Amount, item: Item, product: Product | None) -> str | None:
         return _weight_text(pounds)
     if result.each:  # a count of an item with no store product
         return _pieces_text(result.each)
+    if a.kind is not AmountKind.PACKAGES:
+        counted = _count_text(result.packages, size)
+        if counted is not None:
+            return counted
     return _package_text(result.packages, size)
 
 
@@ -397,6 +401,36 @@ def _package_nouns(size: PackageSize | Unparseable) -> tuple[str, str]:
     # In a multipack ("12 x 12 fl oz can") the container is each piece, not the package.
     noun = size.container if size.container and size.count is None else Container.PACKAGE
     return f"{label} {noun.value}", f"{noun.plural} of {label}"
+
+
+def _count_text(share: Fraction, size: PackageSize | Unparseable) -> str | None:
+    """Pieces of a pack of several: "2 of the 12", "All 12", "15 (about 1 1/4 packages of 12)".
+
+    Used for counts, and for measures that come to pieces (24 fl oz of a 12 x 12 fl oz pack is
+    "2 of the 12"). Whole and half pieces read exactly; anything else rounds to the nearest half
+    piece and says "About". None when the size isn't a pack of more than one piece.
+    """
+    if not isinstance(size, PackageSize) or size.count is None or size.count <= 1:
+        return None
+    pieces = share * size.count
+    if pieces < 1:
+        return _pieces_text(pieces)
+    exact = (pieces * 2).denominator == 1
+    shown = pieces if exact else Fraction(round_half_up(pieces * 2), 2)
+    about = "" if exact else "About "
+    total = to_mixed(size.count)
+    if shown < size.count:
+        return f"{about}{to_mixed(shown)} of the {total}"
+    if shown == size.count:
+        return f"About all {total}" if about else f"All {total}"
+    packs = shown / size.count
+    # A multipack's container names each piece ("12 x 12 fl oz can"), so it's a "package".
+    noun = Container.PACKAGE if size.measure is not None else size.container or Container.PACKAGE
+    if packs.denominator == 1:
+        many = f"{to_mixed(packs)} {noun.plural}"
+    else:
+        many = f"about {to_mixed(Fraction(round_half_up(packs * 8), 8))} {noun.plural}"
+    return f"{about}{to_mixed(shown)} ({many} of {total})"
 
 
 def _pieces_text(pieces: Fraction) -> str:
