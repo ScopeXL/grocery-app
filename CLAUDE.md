@@ -7,7 +7,7 @@ Dinner Bell is a household meal-planning and grocery-list PWA:
 
 It is built and maintained entirely by AI sessions. Most of its users aren't technical and use it on a phone, often in a store aisle with weak signal.
 
-**Status:** M0 to M3 shipped (0.4.0: shopping mode, offline and on several phones). M4 (savings) is next. See docs/PLAN.md §12 for what each milestone includes.
+**Status:** M0 to M4 shipped (0.5.0: meal suggestions and sales). M5 (polish and online ordering) is next. See docs/PLAN.md §12 for what each milestone includes.
 
 **Read first:**
 - [`docs/PLAN.md`](docs/PLAN.md): what we're building and how, plus milestones. It's long, so start from its contents list and read only the sections your task touches.

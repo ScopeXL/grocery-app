@@ -2,7 +2,7 @@
 
 This is the current plan for Dinner Bell, a household meal-planning and grocery-list PWA. It is the single source for what we are building and how. Decisions and their reasoning live in [`adr/`](adr/README.md). Screens, flows and visual design live in [`UX.md`](UX.md). Working rules for AI sessions live in [`../CLAUDE.md`](../CLAUDE.md).
 
-**Status:** M0 (foundation) shipped as 0.1.0, M1 (store, items and meals) as 0.2.0, M2 (plan and list) as 0.3.0 and M3 (shopping mode) as 0.4.0, all on 2026-10-06. M4 (savings) is next.
+**Status:** M0 (foundation) shipped as 0.1.0, M1 (store, items and meals) as 0.2.0, M2 (plan and list) as 0.3.0 and M3 (shopping mode) as 0.4.0, all on 2026-10-06, and M4 (savings) as 0.5.0 on 2026-10-07. M5 (polish and online ordering) is next.
 
 **Maintenance rule:** when a milestone ships, shrink its section to a one-line summary that points to the CHANGELOG. Keep this file about what is true now and what is left to do.
 
@@ -1883,18 +1883,7 @@ Shipped as 0.4.0 on 2026-10-06; the phone checklist passed, offline and on two p
 
 ### M4 Savings → 0.5.0
 
-**Scope**
-- `recommend` with the R test series and property 13.
-- On the Plan screen: the recommendations strip with plain-English reasons.
-- Sale tags with end dates; an On sale filter in Meals; cost per meal on the cards.
-
-**Acceptance**
-- The ranking, reason and tie tests pass.
-- e2e: adding a recommended meal moves the total by the amount shown (±$1, at display rounding).
-
-**Phone checklist**
-- [ ] Plan Tacos and see "Taco salad uses your leftover…". Add it, and the total moves by about the shown amount.
-- [ ] Filter meals by On sale.
+Shipped as 0.5.0 on 2026-10-07; the phone checklist passed with live Kroger prices. What it delivered is in the [CHANGELOG](../CHANGELOG.md); how suggestions are ranked is §8.4.
 
 ### M5 Polish and online ordering → 0.6.0
 
