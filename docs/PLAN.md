@@ -2,7 +2,7 @@
 
 This is the current plan for Dinner Bell, a household meal-planning and grocery-list PWA. It is the single source for what we are building and how. Decisions and their reasoning live in [`adr/`](adr/README.md). Screens, flows and visual design live in [`UX.md`](UX.md). Working rules for AI sessions live in [`../CLAUDE.md`](../CLAUDE.md).
 
-**Status:** M0 (foundation) shipped as 0.1.0, M1 (store, items and meals) as 0.2.0, M2 (plan and list) as 0.3.0 and M3 (shopping mode) as 0.4.0, all on 2026-10-06, and M4 (savings) as 0.5.0 on 2026-10-07. M5 (polish and online ordering) is next.
+**Status:** every planned milestone has shipped. M0 (foundation) as 0.1.0, M1 (store, items and meals) as 0.2.0, M2 (plan and list) as 0.3.0 and M3 (shopping mode) as 0.4.0, all on 2026-10-06; M4 (savings) as 0.5.0 and M5 (polish and online ordering) as 0.6.0 on 2026-10-07. 1.0.0 is the owner's call; ideas beyond v1 are in §15.
 
 **Maintenance rule:** when a milestone ships, shrink its section to a one-line summary that points to the CHANGELOG. Keep this file about what is true now and what is left to do.
 
@@ -1897,43 +1897,20 @@ Shipped as 0.5.0 on 2026-10-07; the phone checklist passed with live Kroger pric
 
 ### M5 Polish and online ordering → 0.6.0
 
-1.0.0 is the owner's call.
-
-**Scope**
-- **Kroger account:** Connect Kroger (auth code + PKCE + state; the encrypted, rotating refresh token).
-- **Send to Kroger cart:** pickup or delivery; the double-add guard; resending only the failed items.
-- **Onboarding:** first-run polish; the illustrated install guide (iPhone and Android); QR "Add a phone".
-- **Accessibility pass:** axe in e2e, labels, focus order, reduced motion, screen-reader announcements.
-- **Final review:** UX at both sizes; About and privacy; README polish.
-
-**Owner setup:** add the redirect URI (`<app URL>/api/kroger/callback`) to the Kroger app and `KROGER_REDIRECT_URI` to Portainer.
-
-**Acceptance**
-- OAuth e2e against the fake authorize endpoint.
-- Idempotency tests for cart sends.
-- Zero serious axe violations.
-- A family member who has never used the app completes the success test unaided.
-
-**Phone checklist**
-- [ ] Settings → Connect Kroger, and sign in to Kroger.
-- [ ] Send a saved list (pickup); open the Kroger app and confirm the items and the store.
-- [ ] Send again: the app says the items were already sent.
-- [ ] Add a new phone with the QR code.
-- [ ] Follow the iPhone install guide on a phone that has never used the app.
+Shipped as 0.6.0 on 2026-10-07; the phone checklist passed, with Connect Kroger and Send to Kroger cart on the production API. What it delivered is in the [CHANGELOG](../CHANGELOG.md); the cart is §7.5 and ADR 0024, adding a phone is §10.2 and ADR 0025. 1.0.0 is the owner's call.
 
 ---
 
 ## 13. Risks and unknowns
 
-Item numbers stay fixed because other sections cite them, so settled items leave gaps. M0's deploy settled 12 (the reverse proxy), 13 (the Docker host) and 17 (tooling versions); M1's smoke test settled 1 (batch pricing) and 2 (cache headers).
+Item numbers stay fixed because other sections cite them, so settled items leave gaps. M0's deploy settled 12 (the reverse proxy), 13 (the Docker host) and 17 (tooling versions); M1's smoke test settled 1 (batch pricing) and 2 (cache headers); M5's phone check settled 6 (Connect Kroger works on the production API with the registered callback address).
 
 | # | Risk or unknown | How it gets resolved |
 |---|---|---|
 | 3 | How strictly to read Kroger's terms (storing IDs, short caches, trip history, notice placement) | Conservative defaults in ADR 0016. An M1 read-through of the agreement; the owner accepts the approach or tightens it |
 | 4 | What a 429's body says, and whether token calls count against limits | Not provoked on purpose. The reset header is known (`ratelimit-reset`, docs/KROGER.md) and used when sent; the usage counter works either way |
-| 5 | The refresh-token lifetime ("6 months" vs "24 h"), and occasional missing rotation | M5: single-flight refresh with atomic storage, keeping the old token if none comes back; a "Reconnect Kroger" banner; token age logged at each refresh |
-| 6 | Kroger app registration details: redirect-URI matching rules, whether localhost is allowed, production access to `cart.basic:write` | Checked in the developer portal when registering the dedicated app before M1; recorded in `docs/KROGER.md` |
-| 7 | The cart fills whichever store is selected in the Kroger account. Does adding an existing UPC add to the quantity or replace it? | The Send sheet says so. One-item manual test in M5 |
+| 5 | The refresh-token lifetime ("6 months" vs "24 h"), and occasional missing rotation | Built in M5: single-flight refresh with atomic storage, keeping the old token if none comes back, and a "Reconnect Kroger" banner. The real lifetime shows in the logs (`kroger.refresh`, `token_age_h`) |
+| 7 | The cart fills whichever store is selected in the Kroger account. Does adding an existing UPC add to the quantity or replace it? And does a weight-sold item's quantity count pieces? | The Send sheet says which store. The double-add guard means the first question matters only for Send again anyway; pound amounts aren't sent (ADR 0024). Both answers go in docs/KROGER.md when seen |
 | 8 | Aisle data quality for fresh departments | Section = aisle number, else category, else the household's override. Real data is captured locally in M1 and never committed |
 | 9 | Variety in size strings; pricing loose produce by weight | The parser plus "Fix size"; a household each-weight with presets; Kroger's estimate only when sane; otherwise "no price" |
 | 10 | Product photos send no CORS headers (M1 probe), so the service worker's copies are opaque and may inflate storage quota; hotlink behaviour on phones | M3 device tests. Entry cap, `purgeOnQuotaError`, `persist()`, release on finish |
