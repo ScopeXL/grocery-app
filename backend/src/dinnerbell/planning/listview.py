@@ -23,9 +23,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from dinnerbell.catalog import service as items
 from dinnerbell.catalog.mapping import domain_item, domain_product, price_info, sale_end_day
 from dinnerbell.catalog.models import Item
-from dinnerbell.domain import listbuild
+from dinnerbell.domain import amounts, listbuild
 from dinnerbell.domain import models as domain
-from dinnerbell.domain.money import headline_parts
+from dinnerbell.domain.money import about_dollars, headline_parts
 from dinnerbell.domain.rational import to_text
 from dinnerbell.domain.sizes import PackageSize, size_label
 from dinnerbell.domain.totals import Totals
@@ -34,6 +34,7 @@ from dinnerbell.kroger.client import KrogerError
 from dinnerbell.kroger.errors import about_time, plain_message
 from dinnerbell.kroger.parse import Product
 from dinnerbell.meals.models import Dish, DishItem
+from dinnerbell.meals.schemas import CostOut
 from dinnerbell.meals.service import photo_url, stored_amount
 from dinnerbell.planning.models import (
     Plan,
@@ -393,6 +394,33 @@ def dish_ref(state: AppState, data: PlanData, dish_id: str, live: Live) -> DishR
     )
 
 
+def meal_cost(data: PlanData, meal: PlanMeal, live: Live) -> CostOut:
+    """What a planned meal uses, at today's prices and its scale: each line's share, never the
+    rounded-up packages (those belong to the list)."""
+    cents: int | None = None
+    unpriced = 0
+    for dish_id in (meal.main_id, *data.sides[meal.id]):
+        for line in data.lines[dish_id]:
+            row = data.items[line.item_id]
+            product = live.products.get(row.product_id) if row.product_id else None
+            target = domain_product(product, row, live.zone, live.now) if row.product_id else None
+            try:
+                cost = amounts.share_cost(
+                    stored_amount(line).scaled(meal.scale), domain_item(row), target, live.now
+                )
+            except domain.InvalidAmount:
+                cost = None
+            if cost is None:
+                unpriced += 1
+            else:
+                cents = (cents or 0) + cost
+    return CostOut(
+        about_dollars=about_dollars(cents) if cents is not None else None,
+        cents=cents,
+        unpriced=unpriced,
+    )
+
+
 def meal_out(state: AppState, data: PlanData, meal: PlanMeal, live: Live) -> PlannedMealOut:
     return PlannedMealOut(
         id=meal.id,
@@ -402,6 +430,7 @@ def meal_out(state: AppState, data: PlanData, meal: PlanMeal, live: Live) -> Pla
         occasion=meal.occasion,  # pyright: ignore[reportArgumentType]
         scale=SCALES.get(meal.scale, "1"),  # pyright: ignore[reportArgumentType]
         added_by=member_ref(data, meal.added_by_member_id),
+        cost=meal_cost(data, meal, live),
     )
 
 

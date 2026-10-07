@@ -47,3 +47,12 @@ export function dayLabel(day: string, today: string): string {
     timeZone: "UTC",
   });
 }
+
+/** A sale's last day as a tag says it: "Oct 14". */
+export function shortDay(day: string): string {
+  return new Date(toUtc(day)).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}

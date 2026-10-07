@@ -455,3 +455,22 @@ async def test_two_items_for_one_product_are_flagged_not_merged(cook: httpx.Asyn
     assert lines["Milk"]["warnings"] == ["Same product as Whole milk"]
     assert lines["Whole milk"]["warnings"] == ["Same product as Milk"]
     assert plan["totals"]["total_cents"] == 2 * 299  # both still count
+
+
+async def test_each_planned_meal_says_what_it_costs(cook: httpx.AsyncClient) -> None:
+    ids = await taco_night(cook)
+    plan = await plan_meal(cook, ids["tacos"], scale="2", side_ids=[ids["rice_side"]])
+    [meal] = plan["meals"]
+    # Shares, not packages: at x2 Tacos uses 2 lb of beef (2 x $4.99), all 12 shells ($2.29)
+    # and the whole cheddar bag ($2.50); Rice x2 uses half the $2.19 bag.
+    assert meal["cost"] == {"about_dollars": 16, "cents": 998 + 229 + 250 + 110, "unpriced": 0}
+
+
+async def test_meal_cards_say_what_is_on_sale(cook: httpx.AsyncClient) -> None:
+    ids = await taco_night(cook)
+    cards = {c["name"]: c for c in (await cook.get("/api/dishes", params={"role": "main"})).json()}
+    assert (cards["Tacos"]["on_sale"], cards["Tacos"]["sale_ends"]) == (True, "2026-10-10")
+    assert (cards["Chili"]["on_sale"], cards["Chili"]["sale_ends"]) == (True, "2026-10-10")
+    sides = (await cook.get("/api/dishes", params={"role": "side"})).json()
+    assert [(c["name"], c["on_sale"]) for c in sides] == [("Rice", False)]
+    assert ids  # both mains use the beef on sale

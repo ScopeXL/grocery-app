@@ -11,7 +11,7 @@ from typing import Annotated, Literal, Self
 from pydantic import BaseModel, Field, StringConstraints, model_validator
 
 from dinnerbell.catalog.schemas import ProductResult
-from dinnerbell.meals.schemas import Occasion
+from dinnerbell.meals.schemas import CostOut, Occasion
 
 MAX_SIDES = 6
 
@@ -49,6 +49,7 @@ class PlannedMealOut(BaseModel):
     occasion: Occasion
     scale: Scale
     added_by: MemberRef | None
+    cost: CostOut  # its dishes' shares at today's prices, at this scale ("about $9")
 
 
 class MealCreate(BaseModel):

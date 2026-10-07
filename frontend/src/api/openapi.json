@@ -500,6 +500,10 @@
             "title": "Occasions",
             "type": "array"
           },
+          "on_sale": {
+            "title": "On Sale",
+            "type": "boolean"
+          },
           "photo_url": {
             "anyOf": [
               {
@@ -518,6 +522,18 @@
             ],
             "title": "Role",
             "type": "string"
+          },
+          "sale_ends": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sale Ends"
           }
         },
         "required": [
@@ -529,6 +545,8 @@
           "photo_url",
           "item_images",
           "cost",
+          "on_sale",
+          "sale_ends",
           "archived"
         ],
         "title": "DishCard",
@@ -2526,6 +2544,9 @@
               }
             ]
           },
+          "cost": {
+            "$ref": "#/components/schemas/CostOut"
+          },
           "day": {
             "anyOf": [
               {
@@ -2579,7 +2600,8 @@
           "day",
           "occasion",
           "scale",
-          "added_by"
+          "added_by",
+          "cost"
         ],
         "title": "PlannedMealOut",
         "type": "object"

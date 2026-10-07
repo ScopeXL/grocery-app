@@ -1,5 +1,6 @@
 /**
- * The meal library (docs/UX.md §4.6): Mains or Sides, search, occasion chips and Favorites.
+ * The meal library (docs/UX.md §4.6): Mains or Sides, search, occasion chips, Favorites and
+ * On sale (something the meal uses is on sale at the store today).
  * Cards show the household's photo (cropped 4:3) or a strip of uncropped product photos.
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,6 +10,7 @@ import { useId, useState } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
+import { shortDay } from "../../lib/days";
 import { costLine } from "../../lib/money";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
@@ -24,6 +26,7 @@ export function MealsScreen({ role }: { role: Role }) {
   const [query, setQuery] = useState("");
   const [occasion, setOccasion] = useState<Occasion | null>(null);
   const [favorites, setFavorites] = useState(false);
+  const [onSale, setOnSale] = useState(false);
   const [archived, setArchived] = useState(false);
 
   const dishes = useQuery({
@@ -38,7 +41,8 @@ export function MealsScreen({ role }: { role: Role }) {
     (card) =>
       (!needle || card.name.toLowerCase().includes(needle)) &&
       (!occasion || card.occasions.includes(occasion)) &&
-      (!favorites || card.favorite),
+      (!favorites || card.favorite) &&
+      (!onSale || card.on_sale),
   );
   const noun = role === "main" ? "meal" : "side";
 
@@ -107,6 +111,14 @@ export function MealsScreen({ role }: { role: Role }) {
             >
               <Star aria-hidden="true" className="size-4" />
               Favorites
+            </Chip>
+            <Chip
+              on={onSale}
+              onClick={() => {
+                setOnSale(!onSale);
+              }}
+            >
+              On sale
             </Chip>
           </div>
         </>
@@ -181,6 +193,12 @@ export function MealCard({ card }: { card: DishCard }) {
         <div className="flex flex-1 flex-col py-2 pr-12 pl-3">
           <span className="text-body leading-tight font-semibold">{card.name}</span>
           <span className="text-secondary text-ink-soft">{cost.total}</span>
+          {card.on_sale ? (
+            <span className="mt-1 flex flex-wrap items-center gap-x-2 text-caption text-ink-soft">
+              <span className="rounded-full bg-lemon px-2 font-bold text-on-lemon">Sale</span>
+              {card.sale_ends ? `until ${shortDay(card.sale_ends)}` : null}
+            </span>
+          ) : null}
         </div>
       </Link>
       <div className="absolute right-0 bottom-0">

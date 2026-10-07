@@ -9,6 +9,7 @@ import { useState, type ReactNode } from "react";
 
 import { api, unwrap } from "../../api/client";
 import { dayLabel } from "../../lib/days";
+import { costLine } from "../../lib/money";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { EmptyState } from "../../ui/EmptyState";
@@ -239,6 +240,7 @@ function MealRow({
             with {joinNames(meal.sides.map((side) => side.name))}
           </span>
         ) : null}
+        <span className="text-secondary text-ink-soft">{costLine(meal.cost).total}</span>
         {tags.length > 0 ? <span className="mt-1 flex flex-wrap gap-2">{tags}</span> : null}
       </div>
       <Button

@@ -11,19 +11,25 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import delete, exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from dinnerbell.catalog import service as items
-from dinnerbell.catalog.mapping import confirmed_product, domain_item, domain_product
+from dinnerbell.catalog.mapping import (
+    confirmed_product,
+    domain_item,
+    domain_product,
+    price_info,
+    sale_end_day,
+)
 from dinnerbell.catalog.models import Item
 from dinnerbell.core.errors import AppError
 from dinnerbell.domain import amounts
 from dinnerbell.domain import models as domain
-from dinnerbell.domain.money import about_dollars
+from dinnerbell.domain.money import about_dollars, promo_valid
 from dinnerbell.domain.units import Unit
 from dinnerbell.kroger.client import KrogerError
 from dinnerbell.kroger.parse import Product
@@ -52,6 +58,16 @@ class Pricing:
 
     def target(self, row: Item) -> domain.Product | None:
         return domain_product(self.product(row), row, self.zone, self.now)
+
+    def sale(self, row: Item) -> tuple[bool, date | None] | None:
+        """(True, its last day) when the item's product is on sale today; else None."""
+        product = self.product(row)
+        if product is None or product.price is None:
+            return None
+        info = price_info(product.price, self.zone, self.now)
+        if info is None or not promo_valid(info, self.now):
+            return None
+        return True, sale_end_day(product.price, self.zone)
 
 
 async def pricing_for(state: AppState, rows: Iterable[Item]) -> Pricing:
@@ -202,6 +218,7 @@ async def cards(
             for line, row in zip(loaded.lines[dish.id], rows, strict=True)
         ]
         images = [line.item.image_url for line in lines if line.item.image_url]
+        sales = [sale for row in rows if (sale := pricing.sale(row)) is not None]
         out.append(
             DishCard(
                 id=dish.id,
@@ -212,6 +229,8 @@ async def cards(
                 photo_url=photo_url(dish.photo_id, thumb=True),
                 item_images=list(dict.fromkeys(images))[:CARD_IMAGES],
                 cost=cost_of(lines),
+                on_sale=bool(sales),
+                sale_ends=min((end for _on, end in sales if end is not None), default=None),
                 archived=dish.archived_at is not None,
             )
         )

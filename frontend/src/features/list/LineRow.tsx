@@ -5,6 +5,7 @@
  */
 import type { ReactNode } from "react";
 
+import { shortDay } from "../../lib/days";
 import { about } from "../../lib/money";
 import { ProductImage } from "../../ui/ProductImage";
 import { joinNames, type Line } from "../plan/types";
@@ -67,8 +68,9 @@ export function LineRow({
               </span>
             ) : null}
             {!had && line.sale ? (
-              <span className="rounded-full bg-lemon px-2 text-caption font-bold text-on-lemon">
-                Sale
+              <span className="flex items-center gap-1 text-caption text-ink-soft">
+                <span className="rounded-full bg-lemon px-2 font-bold text-on-lemon">Sale</span>
+                {line.sale.ends ? `until ${shortDay(line.sale.ends)}` : null}
               </span>
             ) : null}
             {!had && line.estimated_weight ? (

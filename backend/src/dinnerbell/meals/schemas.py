@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, StringConstraints
@@ -34,6 +35,8 @@ class DishCard(BaseModel):
     photo_url: str | None  # the household's photo (thumbnail), cropped 4:3 on cards
     item_images: list[str]  # up to 3 product photos, shown uncropped when there's no photo
     cost: CostOut
+    on_sale: bool  # something it uses is on sale at the store today
+    sale_ends: date | None  # the earliest last day of those sales, when Kroger says
     archived: bool
 
 

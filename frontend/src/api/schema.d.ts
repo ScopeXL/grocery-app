@@ -1156,6 +1156,8 @@ export interface components {
             name: string;
             /** Occasions */
             occasions: ("breakfast" | "lunch" | "dinner" | "snack")[];
+            /** On Sale */
+            on_sale: boolean;
             /** Photo Url */
             photo_url: string | null;
             /**
@@ -1163,6 +1165,8 @@ export interface components {
              * @enum {string}
              */
             role: "main" | "side";
+            /** Sale Ends */
+            sale_ends: string | null;
         };
         /** DishCreate */
         DishCreate: {
@@ -1739,6 +1743,7 @@ export interface components {
         /** PlannedMealOut */
         PlannedMealOut: {
             added_by: components["schemas"]["MemberRef"] | null;
+            cost: components["schemas"]["CostOut"];
             /** Day */
             day: string | null;
             /** Id */
