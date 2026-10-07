@@ -30,10 +30,12 @@ export function AddItemSheet({
   open,
   onClose,
   onPicked,
+  title = "Add an item",
 }: {
   open: boolean;
   onClose: () => void;
   onPicked: (item: ItemOut) => void;
+  title?: string;
 }) {
   const queryClient = useQueryClient();
   const inputId = useId();
@@ -72,7 +74,7 @@ export function AddItemSheet({
   return (
     <Sheet
       open={open}
-      title="Add an item"
+      title={title}
       onClose={() => {
         setText("");
         onClose();

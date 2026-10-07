@@ -27,7 +27,7 @@ function tokens(source: string): Record<string, string> {
 }
 
 const light = tokens(block(css, css.indexOf(":root")));
-const darkMedia = block(css, css.indexOf("@media (prefers-color-scheme: dark)"));
+const darkMedia = block(css, css.indexOf("(prefers-color-scheme: dark)"));
 const dark = { ...light, ...tokens(block(darkMedia, darkMedia.indexOf(":root"))) };
 
 function luminance(hex: string): number {

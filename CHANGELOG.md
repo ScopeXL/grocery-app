@@ -6,6 +6,24 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+### Added
+
+- Plan the week: add Mains with their Sides, set a day or leave it for any day, and make a
+  meal half or double. Tonight's dinner shows first.
+- Usual sides: Dinner Bell learns which Sides go with each Main, and you can change them.
+- The shopping list builds itself from the plan. What every meal needs is added up, then
+  rounded to whole packages once, grouped by aisle or by meal, with prices and sale tags.
+- The total at the bottom of Plan and List: what sales save, when prices were checked, and
+  which items have no price.
+- Check the pantry: staples like oil ask "Have it?" before they count toward the total.
+- Change how many to buy, or swap a product for this trip or for good, comparing prices per
+  ounce.
+- Extras like milk, from your store or as plain text, show who added them, and Usuals put back
+  what you add often in one tap.
+- Start a new week, with Undo. On a computer, see your meals, the plan and the list side by
+  side, and print the list in aisle order.
+- Plan changes appear on every phone within seconds.
+
 ## [0.2.0] - 2026-10-06
 
 ### Added

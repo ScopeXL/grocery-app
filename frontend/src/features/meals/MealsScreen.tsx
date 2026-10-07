@@ -5,13 +5,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Plus, Star } from "lucide-react";
-import { useId, useState, type ReactNode } from "react";
+import { useId, useState } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
 import { costLine } from "../../lib/money";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
+import { Chip } from "../../ui/Chip";
 import { EmptyState } from "../../ui/EmptyState";
 import { ProductImage } from "../../ui/ProductImage";
 import { Screen } from "../../ui/Screen";
@@ -154,27 +155,6 @@ export function MealsScreen({ role }: { role: Role }) {
         </Button>
       </div>
     </Screen>
-  );
-}
-
-function Chip({
-  on,
-  onClick,
-  children,
-}: {
-  on: boolean;
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={on}
-      onClick={onClick}
-      className="inline-flex min-h-12 items-center gap-1 rounded-full border-2 border-rule bg-paper px-4 text-secondary font-semibold aria-pressed:border-basil aria-pressed:bg-basil aria-pressed:text-on-basil"
-    >
-      {children}
-    </button>
   );
 }
 

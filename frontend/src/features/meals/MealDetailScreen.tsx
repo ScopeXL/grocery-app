@@ -1,12 +1,12 @@
 /**
- * One meal (docs/UX.md §4.7): photo, occasions, servings, notes or recipe link, and the item
- * lines with their amounts and shares of the cost. Archive offers Undo, never a confirmation.
- * "Add to plan" arrives with the plan in M2.
+ * One meal (docs/UX.md §4.7): photo, occasions, servings, notes or recipe link, the item lines
+ * with their amounts and shares of the cost, and a Main's usual sides. Add to plan opens the
+ * same sheet as the Plan screen, at the sides step. Archive offers Undo, never a confirmation.
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ChevronLeft, ExternalLink } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { api, errorMessage, unwrap } from "../../api/client";
 import { qk } from "../../api/keys";
@@ -14,12 +14,17 @@ import { about, costLine } from "../../lib/money";
 import { showToast } from "../../lib/toast";
 import { Button } from "../../ui/Button";
 import { ProductImage } from "../../ui/ProductImage";
+import { AddMealSheet } from "../plan/AddMealSheet";
+import { usePlan } from "../plan/usePlan";
+import { UsualSides } from "../plan/UsualSides";
 import { FavoriteButton } from "./MealsScreen";
 import { occasionLabel, type DishOut } from "./types";
 
 export function MealDetailScreen({ dishId }: { dishId: string }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const plan = usePlan();
+  const [planning, setPlanning] = useState(false);
   const dish = useQuery({
     queryKey: qk.dish(dishId),
     queryFn: async () =>
@@ -161,8 +166,21 @@ export function MealDetailScreen({ dishId }: { dishId: string }) {
         </div>
       </section>
 
+      {meal.role === "main" && !meal.archived ? <UsualSides mainId={meal.id} /> : null}
+
       <div className="flex flex-wrap gap-2">
+        {meal.role === "main" && !meal.archived ? (
+          <Button
+            disabled={!plan.data}
+            onClick={() => {
+              setPlanning(true);
+            }}
+          >
+            Add to plan
+          </Button>
+        ) : null}
         <Button
+          variant={meal.role === "main" && !meal.archived ? "secondary" : "primary"}
           onClick={() => void navigate({ to: "/meals/$dishId/edit", params: { dishId: meal.id } })}
         >
           Edit
@@ -188,6 +206,16 @@ export function MealDetailScreen({ dishId }: { dishId: string }) {
           </Button>
         ) : null}
       </div>
+      {plan.data ? (
+        <AddMealSheet
+          open={planning}
+          today={plan.data.today}
+          preset={{ id: meal.id, name: meal.name }}
+          onClose={() => {
+            setPlanning(false);
+          }}
+        />
+      ) : null}
     </main>
   );
 }

@@ -10,16 +10,19 @@ export function Screen({
   title,
   children,
   actions,
+  wide = false,
 }: {
   title: string;
   children: ReactNode;
   actions?: ReactNode;
+  /** Room for side panes at 1440 px (the Plan screen). */
+  wide?: boolean;
 }) {
   return (
     <main
       className={`mx-auto w-full max-w-3xl px-4 pt-[calc(env(safe-area-inset-top)+24px)] ${
-        actions ? "pb-56 lg:pb-32" : "pb-36 lg:pb-16"
-      }`}
+        actions ? "pb-72 lg:pb-44" : "pb-36 lg:pb-16"
+      } ${wide ? "xl:max-w-7xl xl:px-8" : ""}`}
     >
       <h1 className="mb-6 text-title font-extrabold">{title}</h1>
       {children}

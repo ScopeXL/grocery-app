@@ -36,6 +36,17 @@ describe("event router", () => {
     expect(spy).toHaveBeenCalled();
   });
 
+  it("refetches the plan when anything that feeds the list changes", () => {
+    const spy = vi.spyOn(client, "invalidateQueries");
+    const handle = createEventHandler(client, vi.fn());
+    for (const type of ["plan.changed", "dishes.changed", "items.changed"]) {
+      spy.mockClear();
+      handle({ type });
+      vi.advanceTimersByTime(250);
+      expect(spy).toHaveBeenCalledWith({ queryKey: ["plan"] });
+    }
+  });
+
   it("signs out on session.expired and refetches everything on resync", () => {
     const signedOut = vi.fn();
     const spy = vi.spyOn(client, "invalidateQueries");

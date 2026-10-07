@@ -13,4 +13,7 @@ export const qk = {
   items: () => ["items"] as const,
   picker: (itemId: string) => ["items", "picker", itemId] as const,
   productSearch: (term: string) => ["products", term] as const,
+  usualSides: (dishId: string) => ["dishes", "usual-sides", dishId] as const,
+  plan: () => ["plan"] as const,
+  alternatives: (itemId: string) => ["alternatives", itemId] as const,
 };

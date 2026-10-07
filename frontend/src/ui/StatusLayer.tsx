@@ -15,7 +15,7 @@ export function OfflinePill() {
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+8px)] z-30 flex justify-center"
+      className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+8px)] z-30 flex justify-center print:hidden"
     >
       {showOffline ? (
         <span className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-secondary font-semibold text-counter">
@@ -55,7 +55,7 @@ export function UpdatePrompt() {
 
   if (!needRefresh) return null;
   return (
-    <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-30 flex justify-center px-4 lg:bottom-6">
+    <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-30 flex justify-center px-4 print:hidden lg:bottom-6">
       <div className="flex items-center gap-3 rounded-button bg-ink py-2 pr-2 pl-4 text-counter">
         <span className="text-secondary font-semibold">A new version is ready.</span>
         <button
@@ -77,7 +77,7 @@ export function ToastRegion() {
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-40 flex flex-col items-center gap-2 px-4 lg:bottom-6"
+      className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-40 flex flex-col items-center gap-2 px-4 print:hidden lg:bottom-6"
     >
       {list.map((toast) => (
         <div

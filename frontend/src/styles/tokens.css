@@ -32,7 +32,8 @@
   --marker-plum: #7a2f6b;
 }
 
-@media (prefers-color-scheme: dark) {
+/* Screens only: paper is white, so a printed list always uses the light inks. */
+@media screen and (prefers-color-scheme: dark) {
   :root {
     --counter: #1a121e;
     --paper: #241a29;

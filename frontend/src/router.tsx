@@ -100,7 +100,7 @@ function SignedLayout() {
 function TabsLayout() {
   return (
     <>
-      <div className="lg:pl-60">
+      <div className="lg:pl-60 print:pl-0">
         <Outlet />
       </div>
       <TabBar />
@@ -237,7 +237,12 @@ const mealRoute = createRoute({
 const listRoute = createRoute({
   getParentRoute: () => tabsRoute,
   path: "/list",
-  component: ListScreen,
+  validateSearch: (search: Record<string, unknown>): { show?: "unpriced" } =>
+    search.show === "unpriced" ? { show: "unpriced" } : {},
+  component: function List() {
+    const { show } = listRoute.useSearch();
+    return <ListScreen show={show} />;
+  },
 });
 const moreRoute = createRoute({
   getParentRoute: () => tabsRoute,

@@ -21,7 +21,7 @@ async function settle(page: Page): Promise<void> {
 }
 
 /** A few synthetic meals so the library, detail and editor have something to show. */
-async function seedMeals(page: Page): Promise<string> {
+async function seedMeals(page: Page): Promise<{ tacos: string; chicken: string; rice: string }> {
   const item = async (name: string, product_id: string) => {
     const response = await page.request.post("/api/items", {
       data: { name, product_id },
@@ -59,13 +59,48 @@ async function seedMeals(page: Page): Promise<string> {
       line(salsa, "packages", "1/2"),
     ],
   });
-  await dish({
+  const chicken = await dish({
     name: "Sheet-pan chicken",
     role: "main",
     lines: [line(thighs, "measure", "2", "lb"), line(rice, "packages", "1/4")],
   });
-  await dish({ name: "Rice", role: "side", lines: [line(rice, "packages", "1/4")] });
-  return tacos;
+  const riceSide = await dish({
+    name: "Rice",
+    role: "side",
+    lines: [line(rice, "packages", "1/4")],
+  });
+  return { tacos, chicken, rice: riceSide };
+}
+
+/** This week: Tacos with Rice tonight, the chicken twice over, a staple and an extra. */
+async function seedPlan(page: Page, meals: { tacos: string; chicken: string; rice: string }) {
+  const post = async (path: string, data: unknown) =>
+    (await (await page.request.post(path, { data, headers: CSRF })).json()) as {
+      today: string;
+    };
+  const plan = (await (await page.request.get("/api/plan")).json()) as { today: string };
+  await post("/api/plan/meals", { main_id: meals.tacos, side_ids: [meals.rice], day: plan.today });
+  await post("/api/plan/meals", { main_id: meals.chicken, scale: "2" });
+  const oil = (await (
+    await page.request.post("/api/items", {
+      data: { name: "Olive oil", product_id: "0000000000013" },
+      headers: CSRF,
+    })
+  ).json()) as { id: string };
+  await page.request.patch(`/api/items/${oil.id}`, { data: { is_staple: true }, headers: CSRF });
+  await post("/api/plan/extras", { item_id: oil.id, quantity: "1" });
+  await page.request.put(`/api/plan/items/${oil.id}`, {
+    data: { have_it: null, always: false },
+    headers: CSRF,
+  });
+  const milk = (await (
+    await page.request.post("/api/items", {
+      data: { name: "Milk", product_id: "0000000000001" },
+      headers: CSRF,
+    })
+  ).json()) as { id: string };
+  await post("/api/plan/extras", { item_id: milk.id, quantity: "1" });
+  await post("/api/plan/extras", { text: "Birthday candles", quantity: "1" });
 }
 
 // Playwright's WebKit screenshot code injects an inline <style>, which our CSP blocks and
@@ -130,7 +165,8 @@ for (const scheme of ["light", "dark"] as const) {
     await shot("first-run-store");
 
     // The meal library, one meal, and the editor.
-    const tacos = await seedMeals(page);
+    const meals = await seedMeals(page);
+    const tacos = meals.tacos;
     await page.goto("/meals");
     await expect(page.getByText("Sheet-pan chicken")).toBeVisible();
     await shot("meals-cards");
@@ -154,5 +190,53 @@ for (const scheme of ["light", "dark"] as const) {
     await expect(picker).toContainText("About half the 8 oz bag");
     await settle(page);
     await page.screenshot({ path: `${dir}/amount-picker-${scheme}.png`, caret: "initial" });
+
+    // This week's plan, its sheets, and the list it builds.
+    await seedPlan(page, meals);
+    await page.goto("/");
+    await expect(page.getByRole("region", { name: "Tonight" })).toBeVisible();
+    await shot("plan-week");
+    await page.getByRole("button", { name: "Add a meal" }).click();
+    await expect(page.getByRole("dialog", { name: "Add a meal" })).toContainText("Tacos");
+    await settle(page);
+    await page.screenshot({ path: `${dir}/add-meal-${scheme}.png`, caret: "initial" });
+    await page
+      .getByRole("dialog", { name: "Add a meal" })
+      .getByRole("button", { name: /Tacos/ })
+      .click();
+    await expect(page.getByRole("dialog", { name: "Add Tacos" })).toContainText("Usual sides");
+    await page.screenshot({ path: `${dir}/add-meal-sides-${scheme}.png`, caret: "initial" });
+    await page
+      .getByRole("dialog", { name: "Add Tacos" })
+      .getByRole("button", { name: "Close" })
+      .click();
+    await page.getByRole("button", { name: "Change Sheet-pan chicken" }).click();
+    await expect(page.getByRole("dialog", { name: "Change Sheet-pan chicken" })).toBeVisible();
+    await page.screenshot({ path: `${dir}/change-meal-${scheme}.png`, caret: "initial" });
+    await page
+      .getByRole("dialog", { name: "Change Sheet-pan chicken" })
+      .getByRole("button", { name: "Close" })
+      .click();
+    await page.getByRole("link", { name: "List", exact: true }).click();
+    await expect(page.getByRole("region", { name: "Check the pantry" })).toBeVisible();
+    await shot("list-aisle");
+    await page.emulateMedia({ media: "print", colorScheme: scheme });
+    await shot("list-print");
+    await page.emulateMedia({ media: "screen", colorScheme: scheme });
+    await page.getByRole("button", { name: "By meal" }).click();
+    await expect(page.getByRole("region", { name: "Sheet-pan chicken" })).toBeVisible();
+    await shot("list-meal");
+    await page.getByRole("button", { name: "By aisle" }).click();
+    await page.getByRole("button", { name: /Ground beef/ }).click();
+    await expect(page.getByRole("dialog", { name: "Ground beef" })).toBeVisible();
+    await settle(page);
+    await page.screenshot({ path: `${dir}/line-sheet-${scheme}.png`, caret: "initial" });
+    await page
+      .getByRole("dialog", { name: "Ground beef" })
+      .getByRole("button", { name: "Swap product" })
+      .click();
+    await expect(page.getByRole("dialog", { name: "Ground beef" })).toContainText("per");
+    await settle(page);
+    await page.screenshot({ path: `${dir}/swap-${scheme}.png`, caret: "initial" });
   });
 }
