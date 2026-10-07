@@ -77,8 +77,8 @@ export function JoinScreen() {
             Put Dinner Bell on your home screen first
           </h1>
           <p className="text-body text-ink-soft">
-            On iPhone, the home-screen app keeps its own sign-in. Once it’s there, open it, tap Use
-            a code from another phone, and type:
+            On iPhone, the home-screen app keeps its own sign-in. Once it’s there, open it, tap{" "}
+            <strong>Use a code from another phone</strong>, and type:
           </p>
           <Code code={code} />
           <p className="mb-6 text-secondary text-ink-soft">

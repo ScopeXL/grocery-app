@@ -96,12 +96,14 @@ export function KrogerAccountSection() {
             <ShoppingCart aria-hidden="true" className="shrink-0 text-basil" />
             <div className="flex min-w-0 flex-1 flex-col">
               <span className="text-body font-semibold">Connected</span>
-              {data.connected_by ? (
-                <span className="text-secondary text-ink-soft">By {data.connected_by}</span>
-              ) : null}
-              {data.connected_at ? (
+              {data.connected_by || data.connected_at ? (
                 <span className="text-secondary text-ink-soft">
-                  {relativeTime(data.connected_at)}
+                  {[
+                    data.connected_by ? `By ${data.connected_by}` : null,
+                    data.connected_at ? relativeTime(data.connected_at) : null,
+                  ]
+                    .filter(Boolean)
+                    .join(", ")}
                 </span>
               ) : null}
             </div>

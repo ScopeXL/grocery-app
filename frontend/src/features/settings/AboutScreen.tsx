@@ -18,7 +18,11 @@ export function AboutScreen() {
             <li>Everything is stored on the server your household runs, nowhere else.</li>
             <li>No analytics, no tracking, no ads, and no third-party scripts.</li>
             <li>Product searches and your chosen store go to Kroger to show prices and aisles.</li>
-            <li>Settings lets you export everything at any time.</li>
+            <li>
+              If you connect a Kroger account, you sign in on Kroger’s own page. Dinner Bell keeps
+              that sign-in encrypted, and adds to your Kroger cart only when you tap Send.
+            </li>
+            <li>Settings lets you export everything at any time, or disconnect Kroger.</li>
           </ul>
         </div>
         <p className="text-secondary text-ink-soft">Open source under the MIT license.</p>

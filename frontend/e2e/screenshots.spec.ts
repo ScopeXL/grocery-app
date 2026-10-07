@@ -134,6 +134,13 @@ for (const scheme of ["light", "dark"] as const) {
     await page.goto("/sign-in");
     await expect(page.getByLabel("Household password")).toBeVisible();
     await page.screenshot({ path: `${dir}/sign-in-${scheme}.png`, caret: "initial" });
+    await page.getByRole("button", { name: "Use a code from another phone" }).click();
+    await page.getByLabel("Code from another phone").fill("ABCD 2345");
+    await page.screenshot({ path: `${dir}/sign-in-code-${scheme}.png`, caret: "initial" });
+    // A scanned Add-a-phone code (synthetic): WebKit shows the iPhone version.
+    await page.goto("/join#ABCD2345");
+    await expect(page.getByText("ABCD 2345")).toBeVisible();
+    await page.screenshot({ path: `${dir}/join-${scheme}.png`, fullPage: true, caret: "initial" });
     await page.goto("/install?from=more");
     await expect(
       page.getByRole("heading", { name: "Put Dinner Bell on your home screen" }),
@@ -261,6 +268,38 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByRole("button", { name: "Save list" }).click();
     await expect(page.getByRole("button", { name: "Start shopping" })).toBeVisible();
     await shot("list-saved");
+
+    // Send to Kroger cart: not connected yet, then Connect Kroger (the demo sign-in page), Add a
+    // phone, and the sheet before and after sending.
+    await page.getByRole("button", { name: "Send to Kroger cart" }).click();
+    const cart = page.getByRole("dialog", { name: "Send to Kroger cart" });
+    await expect(cart).toContainText("Connect your Kroger account");
+    await page.screenshot({ path: `${dir}/cart-not-connected-${scheme}.png`, caret: "initial" });
+    await cart.getByRole("button", { name: "Go to Settings" }).click();
+    await expect(page.getByRole("heading", { name: "Kroger account" })).toBeVisible();
+    await shot("settings-kroger");
+    await page.getByRole("button", { name: "Connect Kroger" }).click();
+    await expect(page.getByRole("heading", { name: "Demo sign-in" })).toBeVisible();
+    await page.getByRole("link", { name: "Allow", exact: true }).click();
+    await expect(page.getByText("Kroger connected")).toBeVisible();
+    await shot("settings-kroger-connected");
+    await page.getByRole("button", { name: "Add a phone" }).click();
+    await expect(page.getByTestId("join-code")).toBeVisible();
+    await page.screenshot({ path: `${dir}/add-phone-${scheme}.png`, caret: "initial" });
+    await page
+      .getByRole("dialog", { name: "Add a phone" })
+      .getByRole("button", { name: "Done" })
+      .click();
+    await page.getByRole("link", { name: "List", exact: true }).click();
+    await page.getByRole("button", { name: "Send to Kroger cart" }).click();
+    await expect(cart.getByRole("button", { name: /^Send \d+ items$/ })).toBeVisible();
+    await settle(page);
+    await page.screenshot({ path: `${dir}/cart-${scheme}.png`, caret: "initial" });
+    await cart.getByRole("button", { name: /^Send \d+ items$/ }).click();
+    await expect(cart.getByText(/^Added \d+ items to your Kroger cart\.$/)).toBeVisible();
+    await settle(page);
+    await page.screenshot({ path: `${dir}/cart-sent-${scheme}.png`, caret: "initial" });
+    await cart.getByRole("button", { name: "Close" }).click();
     await page.getByRole("button", { name: "Start shopping" }).click();
     await expect(page.getByRole("region", { name: "Get ready for the store" })).toBeVisible();
     await shot("shopping");

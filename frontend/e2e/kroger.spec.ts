@@ -25,7 +25,7 @@ async function connectKroger(page: Page): Promise<void> {
   await expect(page.getByRole("heading", { name: "Demo sign-in" })).toBeVisible();
   await page.getByRole("link", { name: "Allow", exact: true }).click();
   await expect(page.getByText("Kroger connected")).toBeVisible();
-  await expect(page.getByText("By Sample Parent", { exact: true })).toBeVisible();
+  await expect(page.getByText(/^By Sample Parent, /)).toBeVisible();
 }
 
 /** Tacos and Chili, saved as a list (through the API), then the List tab. */
