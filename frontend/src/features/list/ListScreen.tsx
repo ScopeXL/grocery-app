@@ -14,7 +14,7 @@ import { TotalFooter } from "../plan/TotalFooter";
 import type { Line, PlanOut } from "../plan/types";
 import { usePlan } from "../plan/usePlan";
 import { ExtrasSection } from "./ExtrasSection";
-import { amountText, LineRow } from "./LineRow";
+import { LineRow } from "./LineRow";
 import { LineSheet } from "./LineSheet";
 import { PantryCheck } from "./PantryCheck";
 
@@ -203,7 +203,7 @@ function PrintList({ lines }: { lines: Line[] }) {
                   className="inline-block size-4 shrink-0 border-2 border-ink"
                 />
                 <span className="font-semibold">{line.name}</span>
-                <span>{amountText(line)}</span>
+                <span>{line.amount_text}</span>
               </li>
             ))}
           </ul>

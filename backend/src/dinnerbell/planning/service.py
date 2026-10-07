@@ -342,6 +342,46 @@ async def drop_if_empty(session: AsyncSession, override: PlanItemOverride) -> No
         await session.delete(override)
 
 
+async def repeat_meals(
+    session: AsyncSession, plan: Plan, from_plan_id: str, member_id: str | None, now: datetime
+) -> int:
+    """Plan these meals again (UX §4.15): another week's Mains and Sides, at the same scale and
+    occasion, on any day. Archived dishes stay behind. Returns how many meals were added."""
+    meals = list(
+        await session.scalars(
+            select(PlanMeal)
+            .where(PlanMeal.plan_id == from_plan_id, PlanMeal.deleted_at.is_(None))
+            .order_by(PlanMeal.position)
+        )
+    )
+    added = 0
+    for meal in meals:
+        main = await session.get(Dish, meal.main_id)
+        if main is None or main.archived_at is not None:
+            continue
+        side_ids = list(
+            await session.scalars(
+                select(PlanMealSide.side_id)
+                .where(PlanMealSide.plan_meal_id == meal.id)
+                .order_by(PlanMealSide.position)
+            )
+        )
+        sides = [
+            side
+            for side in [await session.get(Dish, side_id) for side_id in side_ids]
+            if side is not None and side.archived_at is None
+        ]
+        body = MealCreate(
+            main_id=main.id,
+            side_ids=[side.id for side in sides],
+            occasion=meal.occasion,  # pyright: ignore[reportArgumentType]
+            scale=str(meal.scale),  # pyright: ignore[reportArgumentType]
+        )
+        await add_meal(session, plan, body, member_id, now)
+        added += 1
+    return added
+
+
 # ---- a new week -------------------------------------------------------------------------------
 
 

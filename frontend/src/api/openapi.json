@@ -1554,6 +1554,10 @@
       },
       "LineOut": {
         "properties": {
+          "amount_text": {
+            "title": "Amount Text",
+            "type": "string"
+          },
           "at_least": {
             "title": "At Least",
             "type": "boolean"
@@ -1688,7 +1692,7 @@
             ]
           },
           "section": {
-            "$ref": "#/components/schemas/SectionOut"
+            "$ref": "#/components/schemas/dinnerbell__planning__schemas__SectionOut"
           },
           "size_text": {
             "anyOf": [
@@ -1741,6 +1745,7 @@
           "product_url",
           "quantity",
           "quantity_text",
+          "amount_text",
           "unit",
           "computed",
           "extra",
@@ -1929,6 +1934,24 @@
         "title": "MealUpdate",
         "type": "object"
       },
+      "MealUseOut": {
+        "properties": {
+          "meal_id": {
+            "title": "Meal Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "meal_id",
+          "name"
+        ],
+        "title": "MealUseOut",
+        "type": "object"
+      },
       "MemberChoice": {
         "properties": {
           "member_id": {
@@ -2074,6 +2097,227 @@
         "title": "NewWeekUndo",
         "type": "object"
       },
+      "OpIn": {
+        "description": "One shopping action. Values are absolute (never toggles), so replays are harmless.\n\n`v` is the op schema version: the server keeps accepting every version ever shipped.",
+        "properties": {
+          "actual_total_cents": {
+            "anyOf": [
+              {
+                "maximum": 10000000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Total Cents"
+          },
+          "client_seq": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Client Seq",
+            "type": "integer"
+          },
+          "client_ts": {
+            "minimum": 0.0,
+            "title": "Client Ts",
+            "type": "integer"
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "maxLength": 36,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "kind": {
+            "maxLength": 32,
+            "title": "Kind",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "op_id": {
+            "maxLength": 36,
+            "minLength": 8,
+            "title": "Op Id",
+            "type": "string"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "v": {
+            "default": 1,
+            "title": "V",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "op_id",
+          "kind",
+          "client_ts"
+        ],
+        "title": "OpIn",
+        "type": "object"
+      },
+      "OpResultOut": {
+        "properties": {
+          "op_id": {
+            "title": "Op Id",
+            "type": "string"
+          },
+          "original": {
+            "anyOf": [
+              {
+                "enum": [
+                  "applied",
+                  "superseded",
+                  "rejected"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "status": {
+            "enum": [
+              "applied",
+              "superseded",
+              "duplicate",
+              "rejected"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op_id",
+          "status"
+        ],
+        "title": "OpResultOut",
+        "type": "object"
+      },
+      "OpsIn": {
+        "properties": {
+          "client_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Client Id",
+            "type": "string"
+          },
+          "known_version": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Known Version",
+            "type": "integer"
+          },
+          "ops": {
+            "items": {
+              "$ref": "#/components/schemas/OpIn"
+            },
+            "maxItems": 100,
+            "title": "Ops",
+            "type": "array"
+          }
+        },
+        "required": [
+          "client_id",
+          "ops"
+        ],
+        "title": "OpsIn",
+        "type": "object"
+      },
+      "OpsOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TripItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/OpResultOut"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "server_time": {
+            "title": "Server Time",
+            "type": "integer"
+          },
+          "trip": {
+            "$ref": "#/components/schemas/TripHeader"
+          },
+          "trip_id": {
+            "title": "Trip Id",
+            "type": "string"
+          },
+          "trip_status": {
+            "enum": [
+              "active",
+              "finished"
+            ],
+            "title": "Trip Status",
+            "type": "string"
+          },
+          "trip_version": {
+            "title": "Trip Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "trip_id",
+          "trip_version",
+          "trip_status",
+          "server_time",
+          "results",
+          "items",
+          "trip"
+        ],
+        "title": "OpsOut",
+        "type": "object"
+      },
       "PhotoOut": {
         "properties": {
           "height": {
@@ -2209,6 +2453,16 @@
           "totals": {
             "$ref": "#/components/schemas/TotalsOut"
           },
+          "trip": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanTripOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "usuals": {
             "items": {
               "$ref": "#/components/schemas/UsualOut"
@@ -2225,9 +2479,39 @@
           "extras",
           "usuals",
           "totals",
+          "trip",
           "prices_note"
         ],
         "title": "PlanOut",
+        "type": "object"
+      },
+      "PlanTripOut": {
+        "description": "The plan's saved list while it's being shopped (UX \u00a74.11's Start shopping).",
+        "properties": {
+          "done_count": {
+            "title": "Done Count",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "item_count": {
+            "title": "Item Count",
+            "type": "integer"
+          },
+          "stale": {
+            "title": "Stale",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "item_count",
+          "done_count",
+          "stale"
+        ],
+        "title": "PlanTripOut",
         "type": "object"
       },
       "PlannedMealOut": {
@@ -2501,6 +2785,20 @@
         "title": "ProductResult",
         "type": "object"
       },
+      "RepeatIn": {
+        "description": "Plan these meals again: the meals planned with this saved list.",
+        "properties": {
+          "trip_id": {
+            "title": "Trip Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "trip_id"
+        ],
+        "title": "RepeatIn",
+        "type": "object"
+      },
       "SaleOut": {
         "properties": {
           "ends": {
@@ -2527,27 +2825,22 @@
         "title": "SaleOut",
         "type": "object"
       },
-      "SectionOut": {
+      "SectionOrderIn": {
+        "description": "Every section of the store, in the order the household walks it.",
         "properties": {
-          "key": {
-            "title": "Key",
-            "type": "string"
-          },
-          "label": {
-            "title": "Label",
-            "type": "string"
-          },
-          "order": {
-            "title": "Order",
-            "type": "integer"
+          "ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500,
+            "title": "Ids",
+            "type": "array"
           }
         },
         "required": [
-          "key",
-          "label",
-          "order"
+          "ids"
         ],
-        "title": "SectionOut",
+        "title": "SectionOrderIn",
         "type": "object"
       },
       "SessionOut": {
@@ -2776,6 +3069,642 @@
         "title": "TotalsOut",
         "type": "object"
       },
+      "TripHeader": {
+        "properties": {
+          "actual_total_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Total Cents"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "done_count": {
+            "title": "Done Count",
+            "type": "integer"
+          },
+          "estimate_cents": {
+            "title": "Estimate Cents",
+            "type": "integer"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "item_count": {
+            "title": "Item Count",
+            "type": "integer"
+          },
+          "missed_count": {
+            "title": "Missed Count",
+            "type": "integer"
+          },
+          "not_priced": {
+            "title": "Not Priced",
+            "type": "integer"
+          },
+          "plan_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Id"
+          },
+          "prices_as_of": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prices As Of"
+          },
+          "savings_cents": {
+            "title": "Savings Cents",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "finished"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status By"
+          },
+          "status_ts": {
+            "title": "Status Ts",
+            "type": "integer"
+          },
+          "store_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Store Name"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "version",
+          "plan_id",
+          "store_name",
+          "created_at",
+          "created_by",
+          "estimate_cents",
+          "savings_cents",
+          "not_priced",
+          "prices_as_of",
+          "actual_total_cents",
+          "finished_at",
+          "status_by",
+          "status_ts",
+          "item_count",
+          "done_count",
+          "missed_count"
+        ],
+        "title": "TripHeader",
+        "type": "object"
+      },
+      "TripItemOut": {
+        "properties": {
+          "aisle_side": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aisle Side"
+          },
+          "bay": {
+            "title": "Bay",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "line_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Cents"
+          },
+          "line_key": {
+            "title": "Line Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "note_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note By"
+          },
+          "note_ts": {
+            "title": "Note Ts",
+            "type": "integer"
+          },
+          "on_sale": {
+            "title": "On Sale",
+            "type": "boolean"
+          },
+          "position": {
+            "title": "Position",
+            "type": "integer"
+          },
+          "product_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Url"
+          },
+          "qty_text": {
+            "title": "Qty Text",
+            "type": "string"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "string"
+          },
+          "regular_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regular Cents"
+          },
+          "removed": {
+            "title": "Removed",
+            "type": "boolean"
+          },
+          "sale_ends": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sale Ends"
+          },
+          "section_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section Key"
+          },
+          "section_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section Label"
+          },
+          "section_order": {
+            "title": "Section Order",
+            "type": "integer"
+          },
+          "size_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Text"
+          },
+          "state": {
+            "enum": [
+              "todo",
+              "done",
+              "missed"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "state_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State By"
+          },
+          "state_ts": {
+            "title": "State Ts",
+            "type": "integer"
+          },
+          "unit": {
+            "enum": [
+              "package",
+              "each",
+              "pound"
+            ],
+            "title": "Unit",
+            "type": "string"
+          },
+          "unit_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Cents"
+          },
+          "used_by": {
+            "items": {
+              "$ref": "#/components/schemas/MealUseOut"
+            },
+            "title": "Used By",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "line_key",
+          "item_id",
+          "name",
+          "image_url",
+          "product_url",
+          "size_text",
+          "qty_text",
+          "quantity",
+          "unit",
+          "unit_cents",
+          "line_cents",
+          "regular_cents",
+          "on_sale",
+          "sale_ends",
+          "section_key",
+          "section_label",
+          "section_order",
+          "aisle_side",
+          "bay",
+          "position",
+          "used_by",
+          "warnings",
+          "state",
+          "state_ts",
+          "state_by",
+          "note",
+          "note_ts",
+          "note_by",
+          "version",
+          "removed"
+        ],
+        "title": "TripItemOut",
+        "type": "object"
+      },
+      "TripOut": {
+        "properties": {
+          "actual_total_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Total Cents"
+          },
+          "complete": {
+            "title": "Complete",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "done_count": {
+            "title": "Done Count",
+            "type": "integer"
+          },
+          "estimate_cents": {
+            "title": "Estimate Cents",
+            "type": "integer"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "item_count": {
+            "title": "Item Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TripItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/MemberRef"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "missed_count": {
+            "title": "Missed Count",
+            "type": "integer"
+          },
+          "not_priced": {
+            "title": "Not Priced",
+            "type": "integer"
+          },
+          "plan_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Id"
+          },
+          "prices_as_of": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prices As Of"
+          },
+          "savings_cents": {
+            "title": "Savings Cents",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "finished"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status By"
+          },
+          "status_ts": {
+            "title": "Status Ts",
+            "type": "integer"
+          },
+          "store_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Store Name"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "version",
+          "plan_id",
+          "store_name",
+          "created_at",
+          "created_by",
+          "estimate_cents",
+          "savings_cents",
+          "not_priced",
+          "prices_as_of",
+          "actual_total_cents",
+          "finished_at",
+          "status_by",
+          "status_ts",
+          "item_count",
+          "done_count",
+          "missed_count",
+          "members",
+          "items",
+          "complete"
+        ],
+        "title": "TripOut",
+        "type": "object"
+      },
+      "TripsOut": {
+        "properties": {
+          "active": {
+            "items": {
+              "$ref": "#/components/schemas/TripHeader"
+            },
+            "title": "Active",
+            "type": "array"
+          },
+          "finished": {
+            "items": {
+              "$ref": "#/components/schemas/TripHeader"
+            },
+            "title": "Finished",
+            "type": "array"
+          },
+          "more": {
+            "title": "More",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "active",
+          "finished",
+          "more"
+        ],
+        "title": "TripsOut",
+        "type": "object"
+      },
       "UsedByOut": {
         "properties": {
           "dish_names": {
@@ -2973,6 +3902,53 @@
           "created"
         ],
         "title": "VersionOut",
+        "type": "object"
+      },
+      "dinnerbell__planning__schemas__SectionOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "order": {
+            "title": "Order",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "order"
+        ],
+        "title": "SectionOut",
+        "type": "object"
+      },
+      "dinnerbell__stores__schemas__SectionOut": {
+        "description": "One stop on the walk through the store (`aisle:12`, `cat:produce`).",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "label"
+        ],
+        "title": "SectionOut",
         "type": "object"
       }
     }
@@ -5116,6 +6092,47 @@
         ]
       }
     },
+    "/api/plan/repeat": {
+      "post": {
+        "operationId": "repeat_meals_api_plan_repeat_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RepeatIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Repeat Meals",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
     "/api/settings": {
       "get": {
         "operationId": "get_settings_api_settings_get",
@@ -5236,6 +6253,76 @@
         ]
       }
     },
+    "/api/stores/active/sections": {
+      "get": {
+        "description": "The store's walking order (UX \u00a74.16).",
+        "operationId": "get_sections_api_stores_active_sections_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/dinnerbell__stores__schemas__SectionOut"
+                  },
+                  "title": "Response Get Sections Api Stores Active Sections Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Sections",
+        "tags": [
+          "stores"
+        ]
+      },
+      "put": {
+        "description": "Save a new walking order. Lists being shopped re-sort to match, on every phone.",
+        "operationId": "put_sections_api_stores_active_sections_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SectionOrderIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/dinnerbell__stores__schemas__SectionOut"
+                  },
+                  "title": "Response Put Sections Api Stores Active Sections Put",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Sections",
+        "tags": [
+          "stores"
+        ]
+      }
+    },
     "/api/stores/search": {
       "get": {
         "operationId": "search_stores_api_stores_search_get",
@@ -5280,6 +6367,231 @@
         "summary": "Search Stores",
         "tags": [
           "stores"
+        ]
+      }
+    },
+    "/api/trips": {
+      "get": {
+        "operationId": "list_trips_api_trips_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "before",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Before"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Trips",
+        "tags": [
+          "shopping"
+        ]
+      },
+      "post": {
+        "description": "Save list (UX \u00a74.11), or bring the saved list up to date with the plan's list.",
+        "operationId": "save_list_api_trips_post",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Save List",
+        "tags": [
+          "shopping"
+        ]
+      }
+    },
+    "/api/trips/{trip_id}": {
+      "get": {
+        "operationId": "get_trip_api_trips__trip_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "trip_id",
+            "required": true,
+            "schema": {
+              "title": "Trip Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "since_version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Trip",
+        "tags": [
+          "shopping"
+        ]
+      }
+    },
+    "/api/trips/{trip_id}/ops": {
+      "post": {
+        "description": "A batch of shopping actions (PLAN \u00a79.2). Always 200 once the batch parses; each op says\nwhat became of it.",
+        "operationId": "apply_ops_api_trips__trip_id__ops_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "trip_id",
+            "required": true,
+            "schema": {
+              "title": "Trip Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Apply Ops",
+        "tags": [
+          "shopping"
+        ]
+      }
+    },
+    "/api/trips/{trip_id}/shop-again": {
+      "post": {
+        "description": "Shop this again (UX \u00a74.15): the same items as a new saved list, at today's prices.",
+        "operationId": "shop_again_api_trips__trip_id__shop_again_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "trip_id",
+            "required": true,
+            "schema": {
+              "title": "Trip Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Shop Again",
+        "tags": [
+          "shopping"
         ]
       }
     },

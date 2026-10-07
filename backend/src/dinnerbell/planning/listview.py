@@ -9,8 +9,9 @@
 
 from __future__ import annotations
 
+import hashlib
 from collections import defaultdict
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
 from fractions import Fraction
@@ -49,6 +50,7 @@ from dinnerbell.planning.schemas import (
     MemberRef,
     PlannedMealOut,
     PlanOut,
+    PlanTripOut,
     SaleOut,
     SectionOut,
     TotalsOut,
@@ -56,6 +58,7 @@ from dinnerbell.planning.schemas import (
     UsualOut,
 )
 from dinnerbell.planning.service import active_plan
+from dinnerbell.shopping.models import Trip, TripItem
 from dinnerbell.state import AppState
 from dinnerbell.stores.models import Store, StoreSection
 from dinnerbell.stores.service import active_store
@@ -79,6 +82,13 @@ class Usual:
 
 
 @dataclass(frozen=True, slots=True)
+class SavedList:
+    trip: Trip
+    items: int
+    done: int
+
+
+@dataclass(frozen=True, slots=True)
 class PlanData:
     plan: Plan | None
     meals: list[PlanMeal]  # not removed, in the order the Plan screen shows them
@@ -92,6 +102,7 @@ class PlanData:
     store: Store | None
     sections: dict[str, StoreSection]  # by key
     usuals: list[Usual]
+    trip: SavedList | None = None  # the plan's saved list, while it's being shopped
 
     def product_ids(self) -> list[str]:
         ids = {row.product_id for row in self.items.values() if row.product_id}
@@ -166,6 +177,36 @@ async def load(session: AsyncSession) -> PlanData:
         store,
         sections,
         await _usuals(session, plan),
+        await _saved_list(session, plan),
+    )
+
+
+async def _saved_list(session: AsyncSession, plan: Plan) -> SavedList | None:
+    trip = await session.scalar(
+        select(Trip)
+        .where(Trip.plan_id == plan.id, Trip.status == "active")
+        .order_by(Trip.created_at.desc())
+        .limit(1)
+    )
+    if trip is None:
+        return None
+    states = list(
+        await session.scalars(
+            select(TripItem.state).where(TripItem.trip_id == trip.id, TripItem.removed_at.is_(None))
+        )
+    )
+    return SavedList(trip, len(states), sum(1 for state in states if state != "todo"))
+
+
+def trip_out(data: PlanData, built: listbuild.ShoppingList) -> PlanTripOut | None:
+    saved = data.trip
+    if saved is None:
+        return None
+    return PlanTripOut(
+        id=saved.trip.id,
+        item_count=saved.items,
+        done_count=saved.done,
+        stale=saved.trip.fingerprint != fingerprint(built.lines),
     )
 
 
@@ -311,16 +352,13 @@ async def build(state: AppState) -> tuple[PlanData, Live, listbuild.ShoppingList
 
 async def plan_view(state: AppState, changed: str | None = None) -> PlanOut:
     data, live, built = await build(state)
-    names = {meal.id: data.dishes[meal.main_id].name for meal in data.meals}
-    twins = _twins(built.lines)
-    described = [
-        line_out(state, data, live, line, names, twins.get(line.key, ())) for line in built.lines
-    ]
+    described = describe(state, data, live, built)
     return PlanOut(
         id=data.plan.id if data.plan else None,
         today=live.now.astimezone(state.settings.zone).date(),
         meals=[meal_out(state, data, meal, live) for meal in data.meals],
-        lines=in_walking_order(described),
+        lines=[line for line, _placement in described],
+        trip=trip_out(data, built),
         extras=[extra_out(state, data, live, extra, built.lines) for extra in data.extras],
         usuals=[usual_out(state, usual) for usual in data.usuals],
         totals=totals_out(built.totals, state.settings.zone),
@@ -396,12 +434,14 @@ class Placement:
     side: str | None = None  # "L" or "R", within an aisle
 
 
-def place(data: PlanData, row: Item | None, product: Product | None) -> Placement:
+def place(
+    sections: Mapping[str, StoreSection], row: Item | None, product: Product | None
+) -> Placement:
     """PLAN §7.3: the household's choice, else the aisle, else the first department the store
     has a section for, else Other. Aisles without a section walk in number order."""
 
     def known(key: str) -> Placement | None:
-        section = data.sections.get(key)
+        section = sections.get(key)
         return Placement(key, section.label, section.sort_index) if section else None
 
     if row is not None and row.section_override_key:
@@ -412,7 +452,7 @@ def place(data: PlanData, row: Item | None, product: Product | None) -> Placemen
         aisle = product.aisle
         if aisle is not None and aisle.number is not None and aisle.number > 0:
             key = f"aisle:{aisle.number}"
-            section = data.sections.get(key)
+            section = sections.get(key)
             label = section.label if section else f"Aisle {aisle.number}"
             order = section.sort_index if section else AISLE_ORDER + aisle.number
             side = aisle.side if aisle.side in ("L", "R") else None
@@ -436,12 +476,7 @@ def _warnings(
     out: list[str] = []
     if twins:  # two items for one product: say so, never merge them (PLAN §8.8)
         out.append(f"Same product as {_join(twins)}")
-    if product is not None and product.in_store is False:
-        out.append("Not sold at your store")
-    elif product is not None and product.stock_level == "TEMPORARILY_OUT_OF_STOCK":
-        out.append("Out of stock")
-    elif product is not None and product.stock_level == "LOW":
-        out.append("Low stock")
+    out.extend(stock_warnings(product))
     if domain.Flag.HAVE_IT in flags:
         return out
     if domain.Flag.NEEDS_EACH_WEIGHT in flags:
@@ -455,6 +490,26 @@ def _warnings(
     if line.cost_cents is None and (row is None or row.product_id is None or product is not None):
         out.append("No price")
     return out
+
+
+def stock_warnings(product: Product | None) -> list[str]:
+    if product is None:
+        return []
+    if product.in_store is False:
+        return ["Not sold at your store"]
+    if product.stock_level == "TEMPORARILY_OUT_OF_STOCK":
+        return ["Out of stock"]
+    if product.stock_level == "LOW":
+        return ["Low stock"]
+    return []
+
+
+def amount_text(quantity_text: str, unit: str, size_text: str | None, quantity: str) -> str:
+    """ "2 boxes, 16 oz each", "1 bag, 8 oz", "1 1/2 lb", "at least 1 package"."""
+    if unit != "package" or not size_text or quantity_text.startswith("at least"):
+        return quantity_text
+    many = quantity not in ("0", "1")
+    return f"{quantity_text}, {size_text}{' each' if many else ''}"
 
 
 def _join(names: Sequence[str]) -> str:
@@ -489,7 +544,7 @@ def line_out(
     product = live.products.get(line.product_id) if line.product_id else None
     override = data.overrides.get(line.item_id) if line.item_id else None
     size = line.size
-    placement = place(data, row, product)
+    placement = place(data.sections, row, product)
     extras = [
         LineExtraOut(
             id=extra.id,
@@ -513,6 +568,12 @@ def line_out(
         product_url=product_url(data.store, product),
         quantity=to_text(line.quantity),
         quantity_text=listbuild.quantity_text(line, size),
+        amount_text=amount_text(
+            listbuild.quantity_text(line, size),
+            line.unit.value,
+            size_label(size) if isinstance(size, PackageSize) else None,
+            to_text(line.quantity),
+        ),
         unit=line.unit.value,  # pyright: ignore[reportArgumentType]
         computed=to_text(line.computed),
         extra=to_text(line.extra),
@@ -549,7 +610,9 @@ def _needed(amounts: Sequence[domain.Amount]) -> str | None:
     return f"{' and '.join(parts)} needed"
 
 
-def in_walking_order(described: Iterable[tuple[LineOut, Placement]]) -> list[LineOut]:
+def in_walking_order(
+    described: Iterable[tuple[LineOut, Placement]],
+) -> list[tuple[LineOut, Placement]]:
     """Sections in the store's order, then shelf position, then name. An aisle whose lines are
     all on one side says so: "Aisle 12, left side"."""
     ordered = sorted(
@@ -559,7 +622,7 @@ def in_walking_order(described: Iterable[tuple[LineOut, Placement]]) -> list[Lin
     sides: dict[str, set[str | None]] = defaultdict(set)
     for _line, placement in ordered:
         sides[placement.key].add(placement.side)
-    out: list[LineOut] = []
+    out: list[tuple[LineOut, Placement]] = []
     for line, placement in ordered:
         side = next(iter(sides[placement.key])) if len(sides[placement.key]) == 1 else None
         if side is not None and placement.key.startswith("aisle:"):
@@ -567,8 +630,34 @@ def in_walking_order(described: Iterable[tuple[LineOut, Placement]]) -> list[Lin
             line = line.model_copy(
                 update={"section": line.section.model_copy(update={"label": label})}
             )
-        out.append(line)
+        out.append((line, placement))
     return out
+
+
+def describe(
+    state: AppState, data: PlanData, live: Live, built: listbuild.ShoppingList
+) -> list[tuple[LineOut, Placement]]:
+    """Every line as the List shows it, in walking order, with where it sits in the store."""
+    names = {meal.id: data.dishes[meal.main_id].name for meal in data.meals}
+    twins = _twins(built.lines)
+    return in_walking_order(
+        line_out(state, data, live, line, names, twins.get(line.key, ())) for line in built.lines
+    )
+
+
+def shoppable(line: listbuild.Line) -> bool:
+    """Lines a saved list keeps: not ones the household has, nor ones set to zero."""
+    return not line.have_it and line.quantity > 0
+
+
+def fingerprint(lines: Iterable[listbuild.Line]) -> str:
+    """What the list asks to buy, so a saved list can tell when the plan's list has changed."""
+    parts = sorted(
+        f"{line.key}|{to_text(line.quantity)}|{line.unit.value}|{line.product_id or ''}"
+        for line in lines
+        if shoppable(line)
+    )
+    return hashlib.sha256("\n".join(parts).encode()).hexdigest()
 
 
 def extra_out(

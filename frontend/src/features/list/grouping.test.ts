@@ -12,6 +12,7 @@ function line(name: string, section: string, extra: Partial<Line> = {}): Line {
     product_url: null,
     quantity: "1",
     quantity_text: "1 package",
+    amount_text: "1 package",
     unit: "package",
     computed: "1",
     extra: "0",

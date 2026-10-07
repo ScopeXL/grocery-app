@@ -17,7 +17,7 @@ import { Sheet } from "../../ui/Sheet";
 import { ProductFacts } from "../meals/AddItemSheet";
 import type { Line } from "../plan/types";
 import { usePlanChange, useRemoveExtra } from "../plan/usePlan";
-import { amountText, usedByText } from "./LineRow";
+import { usedByText } from "./LineRow";
 
 const UNIT_WORDS: Record<Line["unit"], string> = { package: "", each: "", pound: " lb" };
 
@@ -107,7 +107,7 @@ function LineDetails({ line, onSwap }: { line: Line; onSwap: () => void }) {
       <div className="mb-5 flex items-start gap-3">
         <ProductImage src={line.image_url} alt="" size={96} />
         <div className="flex min-w-0 flex-col gap-0.5">
-          <span className="text-body">{amountText(line)}</span>
+          <span className="text-body">{line.amount_text}</span>
           {line.cost_cents !== null ? (
             <span className="text-body font-semibold">{about(line.cost_cents)}</span>
           ) : null}

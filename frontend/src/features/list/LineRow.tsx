@@ -9,13 +9,6 @@ import { about } from "../../lib/money";
 import { ProductImage } from "../../ui/ProductImage";
 import { joinNames, type Line } from "../plan/types";
 
-/** "2 boxes, 16 oz each", "1 bag, 8 oz", "1 1/2 lb", "at least 1 package". */
-export function amountText(line: Line): string {
-  if (line.unit !== "package" || !line.size_text || line.at_least) return line.quantity_text;
-  const many = line.quantity !== "1" && line.quantity !== "0";
-  return `${line.quantity_text}, ${line.size_text}${many ? " each" : ""}`;
-}
-
 export function usedByText(line: Line): string | null {
   const names = [...new Set(line.used_by.map((use) => use.name))];
   return names.length > 0 ? `for ${joinNames(names)}` : null;
@@ -58,7 +51,7 @@ export function LineRow({
           >
             {line.name}
           </span>
-          <span className="text-body">{amountText(line)}</span>
+          <span className="text-body">{line.amount_text}</span>
           {line.needed_text ? (
             <span className="text-secondary text-ink-soft">{line.needed_text}</span>
           ) : null}

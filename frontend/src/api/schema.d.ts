@@ -802,6 +802,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/plan/repeat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Repeat Meals */
+        post: operations["repeat_meals_api_plan_repeat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/settings": {
         parameters: {
             query?: never;
@@ -838,6 +855,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/stores/active/sections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Sections
+         * @description The store's walking order (UX §4.16).
+         */
+        get: operations["get_sections_api_stores_active_sections_get"];
+        /**
+         * Put Sections
+         * @description Save a new walking order. Lists being shopped re-sort to match, on every phone.
+         */
+        put: operations["put_sections_api_stores_active_sections_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/stores/search": {
         parameters: {
             query?: never;
@@ -849,6 +890,85 @@ export interface paths {
         get: operations["search_stores_api_stores_search_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trips": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Trips */
+        get: operations["list_trips_api_trips_get"];
+        put?: never;
+        /**
+         * Save List
+         * @description Save list (UX §4.11), or bring the saved list up to date with the plan's list.
+         */
+        post: operations["save_list_api_trips_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trips/{trip_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Trip */
+        get: operations["get_trip_api_trips__trip_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trips/{trip_id}/ops": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply Ops
+         * @description A batch of shopping actions (PLAN §9.2). Always 200 once the batch parses; each op says
+         *     what became of it.
+         */
+        post: operations["apply_ops_api_trips__trip_id__ops_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trips/{trip_id}/shop-again": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Shop Again
+         * @description Shop this again (UX §4.15): the same items as a new saved list, at today's prices.
+         */
+        post: operations["shop_again_api_trips__trip_id__shop_again_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1320,6 +1440,8 @@ export interface components {
         };
         /** LineOut */
         LineOut: {
+            /** Amount Text */
+            amount_text: string;
             /** At Least */
             at_least: boolean;
             /** Computed */
@@ -1355,7 +1477,7 @@ export interface components {
             /** Regular Cents */
             regular_cents: number | null;
             sale: components["schemas"]["SaleOut"] | null;
-            section: components["schemas"]["SectionOut"];
+            section: components["schemas"]["dinnerbell__planning__schemas__SectionOut"];
             /** Size Text */
             size_text: string | null;
             /** Staple */
@@ -1424,6 +1546,13 @@ export interface components {
             /** Scale */
             scale?: ("1/2" | "1" | "2") | null;
         };
+        /** MealUseOut */
+        MealUseOut: {
+            /** Meal Id */
+            meal_id: string;
+            /** Name */
+            name: string;
+        };
         /** MemberChoice */
         MemberChoice: {
             /** Member Id */
@@ -1470,6 +1599,83 @@ export interface components {
             /** Plan Id */
             plan_id: string;
         };
+        /**
+         * OpIn
+         * @description One shopping action. Values are absolute (never toggles), so replays are harmless.
+         *
+         *     `v` is the op schema version: the server keeps accepting every version ever shipped.
+         */
+        OpIn: {
+            /** Actual Total Cents */
+            actual_total_cents?: number | null;
+            /**
+             * Client Seq
+             * @default 0
+             */
+            client_seq: number;
+            /** Client Ts */
+            client_ts: number;
+            /** Item Id */
+            item_id?: string | null;
+            /** Kind */
+            kind: string;
+            /** Note */
+            note?: string | null;
+            /** Op Id */
+            op_id: string;
+            /** State */
+            state?: string | null;
+            /**
+             * V
+             * @default 1
+             */
+            v: number;
+        };
+        /** OpResultOut */
+        OpResultOut: {
+            /** Op Id */
+            op_id: string;
+            /** Original */
+            original?: ("applied" | "superseded" | "rejected") | null;
+            /** Reason */
+            reason?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "applied" | "superseded" | "duplicate" | "rejected";
+        };
+        /** OpsIn */
+        OpsIn: {
+            /** Client Id */
+            client_id: string;
+            /**
+             * Known Version
+             * @default 0
+             */
+            known_version: number;
+            /** Ops */
+            ops: components["schemas"]["OpIn"][];
+        };
+        /** OpsOut */
+        OpsOut: {
+            /** Items */
+            items: components["schemas"]["TripItemOut"][];
+            /** Results */
+            results: components["schemas"]["OpResultOut"][];
+            /** Server Time */
+            server_time: number;
+            trip: components["schemas"]["TripHeader"];
+            /** Trip Id */
+            trip_id: string;
+            /**
+             * Trip Status
+             * @enum {string}
+             */
+            trip_status: "active" | "finished";
+            /** Trip Version */
+            trip_version: number;
+        };
         /** PhotoOut */
         PhotoOut: {
             /** Height */
@@ -1512,8 +1718,23 @@ export interface components {
              */
             today: string;
             totals: components["schemas"]["TotalsOut"];
+            trip: components["schemas"]["PlanTripOut"] | null;
             /** Usuals */
             usuals: components["schemas"]["UsualOut"][];
+        };
+        /**
+         * PlanTripOut
+         * @description The plan's saved list while it's being shopped (UX §4.11's Start shopping).
+         */
+        PlanTripOut: {
+            /** Done Count */
+            done_count: number;
+            /** Id */
+            id: string;
+            /** Item Count */
+            item_count: number;
+            /** Stale */
+            stale: boolean;
         };
         /** PlannedMealOut */
         PlannedMealOut: {
@@ -1590,6 +1811,14 @@ export interface components {
              */
             sold_by: "unit" | "weight";
         };
+        /**
+         * RepeatIn
+         * @description Plan these meals again: the meals planned with this saved list.
+         */
+        RepeatIn: {
+            /** Trip Id */
+            trip_id: string;
+        };
         /** SaleOut */
         SaleOut: {
             /** Ends */
@@ -1597,14 +1826,13 @@ export interface components {
             /** Savings Cents */
             savings_cents: number;
         };
-        /** SectionOut */
-        SectionOut: {
-            /** Key */
-            key: string;
-            /** Label */
-            label: string;
-            /** Order */
-            order: number;
+        /**
+         * SectionOrderIn
+         * @description Every section of the store, in the order the household walks it.
+         */
+        SectionOrderIn: {
+            /** Ids */
+            ids: string[];
         };
         /** SessionOut */
         SessionOut: {
@@ -1675,6 +1903,182 @@ export interface components {
             /** Total Text */
             total_text: string;
         };
+        /** TripHeader */
+        TripHeader: {
+            /** Actual Total Cents */
+            actual_total_cents: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created By */
+            created_by: string | null;
+            /** Done Count */
+            done_count: number;
+            /** Estimate Cents */
+            estimate_cents: number;
+            /** Finished At */
+            finished_at: string | null;
+            /** Id */
+            id: string;
+            /** Item Count */
+            item_count: number;
+            /** Missed Count */
+            missed_count: number;
+            /** Not Priced */
+            not_priced: number;
+            /** Plan Id */
+            plan_id: string | null;
+            /** Prices As Of */
+            prices_as_of: string | null;
+            /** Savings Cents */
+            savings_cents: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "finished";
+            /** Status By */
+            status_by: string | null;
+            /** Status Ts */
+            status_ts: number;
+            /** Store Name */
+            store_name: string | null;
+            /** Version */
+            version: number;
+        };
+        /** TripItemOut */
+        TripItemOut: {
+            /** Aisle Side */
+            aisle_side: string | null;
+            /** Bay */
+            bay: number;
+            /** Id */
+            id: string;
+            /** Image Url */
+            image_url: string | null;
+            /** Item Id */
+            item_id: string | null;
+            /** Line Cents */
+            line_cents: number | null;
+            /** Line Key */
+            line_key: string;
+            /** Name */
+            name: string;
+            /** Note */
+            note: string | null;
+            /** Note By */
+            note_by: string | null;
+            /** Note Ts */
+            note_ts: number;
+            /** On Sale */
+            on_sale: boolean;
+            /** Position */
+            position: number;
+            /** Product Url */
+            product_url: string | null;
+            /** Qty Text */
+            qty_text: string;
+            /** Quantity */
+            quantity: string;
+            /** Regular Cents */
+            regular_cents: number | null;
+            /** Removed */
+            removed: boolean;
+            /** Sale Ends */
+            sale_ends: string | null;
+            /** Section Key */
+            section_key: string | null;
+            /** Section Label */
+            section_label: string | null;
+            /** Section Order */
+            section_order: number;
+            /** Size Text */
+            size_text: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "todo" | "done" | "missed";
+            /** State By */
+            state_by: string | null;
+            /** State Ts */
+            state_ts: number;
+            /**
+             * Unit
+             * @enum {string}
+             */
+            unit: "package" | "each" | "pound";
+            /** Unit Cents */
+            unit_cents: number | null;
+            /** Used By */
+            used_by: components["schemas"]["MealUseOut"][];
+            /** Version */
+            version: number;
+            /** Warnings */
+            warnings: string[];
+        };
+        /** TripOut */
+        TripOut: {
+            /** Actual Total Cents */
+            actual_total_cents: number | null;
+            /** Complete */
+            complete: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created By */
+            created_by: string | null;
+            /** Done Count */
+            done_count: number;
+            /** Estimate Cents */
+            estimate_cents: number;
+            /** Finished At */
+            finished_at: string | null;
+            /** Id */
+            id: string;
+            /** Item Count */
+            item_count: number;
+            /** Items */
+            items: components["schemas"]["TripItemOut"][];
+            /** Members */
+            members: components["schemas"]["MemberRef"][];
+            /** Missed Count */
+            missed_count: number;
+            /** Not Priced */
+            not_priced: number;
+            /** Plan Id */
+            plan_id: string | null;
+            /** Prices As Of */
+            prices_as_of: string | null;
+            /** Savings Cents */
+            savings_cents: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "finished";
+            /** Status By */
+            status_by: string | null;
+            /** Status Ts */
+            status_ts: number;
+            /** Store Name */
+            store_name: string | null;
+            /** Version */
+            version: number;
+        };
+        /** TripsOut */
+        TripsOut: {
+            /** Active */
+            active: components["schemas"]["TripHeader"][];
+            /** Finished */
+            finished: components["schemas"]["TripHeader"][];
+            /** More */
+            more: boolean;
+        };
         /** UsedByOut */
         UsedByOut: {
             /** Dish Names */
@@ -1738,6 +2142,27 @@ export interface components {
             revision: string;
             /** Version */
             version: string;
+        };
+        /** SectionOut */
+        dinnerbell__planning__schemas__SectionOut: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Order */
+            order: number;
+        };
+        /**
+         * SectionOut
+         * @description One stop on the walk through the store (`aisle:12`, `cat:produce`).
+         */
+        dinnerbell__stores__schemas__SectionOut: {
+            /** Id */
+            id: string;
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
         };
     };
     responses: never;
@@ -3313,6 +3738,39 @@ export interface operations {
             };
         };
     };
+    repeat_meals_api_plan_repeat_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RepeatIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_settings_api_settings_get: {
         parameters: {
             query?: never;
@@ -3419,6 +3877,59 @@ export interface operations {
             };
         };
     };
+    get_sections_api_stores_active_sections_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["dinnerbell__stores__schemas__SectionOut"][];
+                };
+            };
+        };
+    };
+    put_sections_api_stores_active_sections_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SectionOrderIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["dinnerbell__stores__schemas__SectionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     search_stores_api_stores_search_get: {
         parameters: {
             query: {
@@ -3437,6 +3948,156 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StoreOption"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_trips_api_trips_get: {
+        parameters: {
+            query?: {
+                before?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_list_api_trips_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripOut"];
+                };
+            };
+        };
+    };
+    get_trip_api_trips__trip_id__get: {
+        parameters: {
+            query?: {
+                since_version?: number | null;
+            };
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apply_ops_api_trips__trip_id__ops_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    shop_again_api_trips__trip_id__shop_again_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripOut"];
                 };
             };
             /** @description Validation Error */

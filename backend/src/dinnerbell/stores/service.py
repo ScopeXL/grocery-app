@@ -15,6 +15,7 @@ from dinnerbell.stores.models import Store, StoreSection
 from dinnerbell.stores.schemas import StoreOption, StoreOut
 
 SEARCH_LIMIT = 20
+WALK_STEP = 100
 
 # The default walk: Produce first, then Bakery and Deli, the aisles in ascending order (sort
 # indexes 1000 + the aisle number, created when an aisle first appears), then Meat & Seafood,
@@ -79,6 +80,26 @@ async def seed_sections(session: AsyncSession, store: Store) -> None:
             session.add(
                 StoreSection(store_id=store.id, key=key, label=label, sort_index=sort_index)
             )
+
+
+async def sections(session: AsyncSession, store: Store) -> list[StoreSection]:
+    found = await session.scalars(
+        select(StoreSection)
+        .where(StoreSection.store_id == store.id, StoreSection.hidden.is_(False))
+        .order_by(StoreSection.sort_index, StoreSection.label)
+    )
+    return list(found)
+
+
+async def reorder(session: AsyncSession, store: Store, ids: list[str]) -> dict[str, int]:
+    """Set the walking order: sections take places 100 apart, so an aisle seen later can sit
+    between two of them. Returns each section key's new place."""
+    current = {section.id: section for section in await sections(session, store)}
+    if sorted(ids) != sorted(current):
+        raise AppError(409, "sections_changed", "The store's sections just changed. Try again.")
+    for position, section_id in enumerate(ids, start=1):
+        current[section_id].sort_index = position * WALK_STEP
+    return {section.key: section.sort_index for section in current.values()}
 
 
 async def active_store(session: AsyncSession) -> Store | None:

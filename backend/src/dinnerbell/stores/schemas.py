@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from pydantic import BaseModel, StringConstraints
+from pydantic import BaseModel, Field, StringConstraints
 
 ZipCode = Annotated[str, StringConstraints(strip_whitespace=True, pattern=r"^\d{5}$")]
 LocationId = Annotated[
@@ -29,3 +29,17 @@ class ActiveStoreOut(BaseModel):
 
 class ChooseStore(BaseModel):
     location_id: LocationId
+
+
+class SectionOut(BaseModel):
+    """One stop on the walk through the store (`aisle:12`, `cat:produce`)."""
+
+    id: str
+    key: str
+    label: str
+
+
+class SectionOrderIn(BaseModel):
+    """Every section of the store, in the order the household walks it."""
+
+    ids: list[str] = Field(max_length=500)

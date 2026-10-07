@@ -167,6 +167,7 @@ class LineOut(BaseModel):
     product_url: str | None  # "Open in Kroger"
     quantity: str  # what to buy, in `unit`
     quantity_text: str  # "2 boxes", "1 3/4 lb", "at least 1 package"
+    amount_text: str  # with the size: "2 boxes, 16 oz each", "1 bag, 8 oz"
     unit: PurchaseUnitName
     computed: str  # what the plan alone asks for, before the household's change
     extra: str  # how much the extras add
@@ -201,6 +202,15 @@ class TotalsOut(BaseModel):
     not_priced_text: str | None  # "3 items have no price"
 
 
+class PlanTripOut(BaseModel):
+    """The plan's saved list while it's being shopped (UX §4.11's Start shopping)."""
+
+    id: str
+    item_count: int
+    done_count: int  # checked off or couldn't find
+    stale: bool  # the plan's list has changed since it was saved ("Update saved list")
+
+
 class PlanOut(BaseModel):
     id: str | None  # None until something is planned
     today: date  # in the household's time zone, for Tonight and the day chips
@@ -209,6 +219,7 @@ class PlanOut(BaseModel):
     extras: list[ExtraOut]
     usuals: list[UsualOut]
     totals: TotalsOut
+    trip: PlanTripOut | None  # the saved list for this plan, if there is one
     prices_note: str | None  # why prices are missing right now, in plain English
     changed: str | None = None  # what this request added or changed (a meal, extra or plan id)
 
@@ -236,6 +247,12 @@ class ItemOverrideIn(BaseModel):
 
 class NewWeekUndo(BaseModel):
     plan_id: str
+
+
+class RepeatIn(BaseModel):
+    """Plan these meals again: the meals planned with this saved list."""
+
+    trip_id: str
 
 
 class AlternativeOut(BaseModel):

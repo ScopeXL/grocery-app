@@ -40,6 +40,8 @@ from dinnerbell.meals.router import router as meals_router
 from dinnerbell.meta.router import router as meta_router
 from dinnerbell.meta.testing import router as testing_router
 from dinnerbell.planning.router import router as planning_router
+from dinnerbell.shopping import service as shopping_service
+from dinnerbell.shopping.router import router as shopping_router
 from dinnerbell.state import AppState
 from dinnerbell.stores.router import router as stores_router
 from dinnerbell.web.csrf import CSRFGuard
@@ -145,7 +147,14 @@ def create_app(
 
         state.jobs.every("nightly-backup", BACKUP_CHECK_INTERVAL_S, state.backups.tick)
         state.jobs.every("kroger-cache-purge", CACHE_PURGE_INTERVAL_S, purge_kroger_cache)
+
+        async def tidy_trips() -> None:
+            async with db.write() as tx:
+                await shopping_service.clear_kroger_copies(tx.session, the_clock.now())
+                await shopping_service.prune_ops(tx.session, the_clock.now())
+
         state.jobs.every("orphan-photos", PHOTO_PURGE_INTERVAL_S, purge_orphan_photos)
+        state.jobs.every("tidy-trips", CACHE_PURGE_INTERVAL_S, tidy_trips)
         app.state.dinnerbell = state
         state.started = True
         log.info("app.started", version=build_info().version, revision=build_info().revision)
@@ -179,6 +188,7 @@ def create_app(
     app.include_router(items_router)
     app.include_router(meals_router)
     app.include_router(planning_router)
+    app.include_router(shopping_router)
     app.include_router(events_router)
     if settings.dinnerbell_test_mode:
         app.include_router(testing_router)

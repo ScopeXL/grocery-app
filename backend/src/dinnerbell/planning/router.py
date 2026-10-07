@@ -34,10 +34,12 @@ from dinnerbell.planning.schemas import (
     MealUpdate,
     NewWeekUndo,
     PlanOut,
+    RepeatIn,
     SidesIn,
     UsualSideOut,
     UsualSidesIn,
 )
+from dinnerbell.shopping.models import Trip
 from dinnerbell.state import AppState, StateDep
 
 router = APIRouter(prefix="/api", tags=["planning"])
@@ -287,6 +289,23 @@ async def undo_new_week(body: NewWeekUndo, state: StateDep, session: SessionDep)
         await service.undo_new_week(tx.session, body.plan_id)
         tx.publish(PLAN_CHANGED)
     return await listview.plan_view(state, changed=body.plan_id)
+
+
+@router.post("/plan/repeat")
+async def repeat_meals(body: RepeatIn, state: StateDep, session: SessionDep) -> PlanOut:
+    now = state.clock.now()
+    async with state.db.write() as tx:
+        trip = await tx.session.get(Trip, body.trip_id)
+        if trip is None or trip.plan_id is None:
+            raise AppError(404, "trip_not_found", "That trip has no meals to plan again.")
+        plan = await service.ensure_plan(tx.session, now)
+        member_id = await service.member_for(tx.session, session.device_id)
+        added = await service.repeat_meals(tx.session, plan, trip.plan_id, member_id, now)
+        if not added:
+            raise AppError(409, "no_meals", "Those meals aren't in your library anymore.")
+        tx.publish(PLAN_CHANGED)
+        tx.publish("dishes.changed")
+    return await listview.plan_view(state)
 
 
 # ---- usual sides ------------------------------------------------------------------------------
