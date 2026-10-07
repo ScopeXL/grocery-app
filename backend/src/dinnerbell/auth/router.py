@@ -2,14 +2,24 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from fastapi import APIRouter, Request, Response
-from sqlalchemy import select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from dinnerbell.auth import join
 from dinnerbell.auth.deps import SessionDep, clear_session_cookie, set_session_cookie
-from dinnerbell.auth.models import Device
+from dinnerbell.auth.models import Device, JoinCode
 from dinnerbell.auth.password import device_label, password_matches
-from dinnerbell.auth.schemas import DeviceOut, LoginIn, MemberChoice, SessionOut
+from dinnerbell.auth.schemas import (
+    DeviceOut,
+    JoinCodeOut,
+    JoinIn,
+    LoginIn,
+    MemberChoice,
+    SessionOut,
+)
 from dinnerbell.auth.sessions import SessionToken, day_number
 from dinnerbell.core.errors import AppError
 from dinnerbell.core.logging import get_logger
@@ -38,9 +48,7 @@ def _client_ip(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
-@router.post("/login")
-async def login(body: LoginIn, request: Request, response: Response, state: StateDep) -> SessionOut:
-    ip = _client_ip(request)
+def _check_rate(state: AppState, ip: str) -> None:
     wait = state.limiter.retry_after_seconds(ip)
     if wait is not None:
         minutes = max(1, round(wait / 60))
@@ -50,6 +58,26 @@ async def login(body: LoginIn, request: Request, response: Response, state: Stat
             f"Too many tries. Wait {minutes} minute{'s' if minutes != 1 else ''}.",
             headers={"Retry-After": str(wait)},
         )
+
+
+async def _new_device(
+    session: AsyncSession, state: AppState, request: Request, response: Response, now: datetime
+) -> Device:
+    """A signed-in device, and its cookie."""
+    device = Device(label=device_label(request.headers.get("user-agent")), last_seen_at=now)
+    session.add(device)
+    await session.flush()
+    state.auth.known_devices.add(device.id)
+    state.auth.last_seen_written[device.id] = now
+    token = SessionToken(device.id, state.auth.epoch, day_number(now))
+    set_session_cookie(response, state.settings, state.codec.encode(token))
+    return device
+
+
+@router.post("/login")
+async def login(body: LoginIn, request: Request, response: Response, state: StateDep) -> SessionOut:
+    ip = _client_ip(request)
+    _check_rate(state, ip)
     if not password_matches(body.password, state.settings.app_password):
         state.limiter.record_failure(ip)
         log.info("auth.login_failed")
@@ -57,15 +85,75 @@ async def login(body: LoginIn, request: Request, response: Response, state: Stat
     state.limiter.record_success(ip)
     now = state.clock.now()
     async with state.db.write() as tx:
-        device = Device(label=device_label(request.headers.get("user-agent")), last_seen_at=now)
-        tx.session.add(device)
-        await tx.session.flush()
-        state.auth.known_devices.add(device.id)
-        state.auth.last_seen_written[device.id] = now
-        token = SessionToken(device.id, state.auth.epoch, day_number(now))
-        set_session_cookie(response, state.settings, state.codec.encode(token))
+        device = await _new_device(tx.session, state, request, response, now)
         log.info("auth.login", device=device.id)
         return await session_out(tx.session, device.id)
+
+
+@router.post("/join-codes", status_code=201)
+async def make_join_code(state: StateDep, session: SessionDep) -> JoinCodeOut:
+    """Add a phone: a one-time code for another phone to sign in with (auth/join.py)."""
+    code = join.new_code()
+    now = state.clock.now()
+    secret = state.settings.app_secret_key.get_secret_value()
+    async with state.db.write() as tx:
+        await tx.session.execute(
+            delete(JoinCode).where(
+                JoinCode.created_by_device_id == session.device_id, JoinCode.used_at.is_(None)
+            )
+        )
+        tx.session.add(
+            JoinCode(
+                code_hash=join.code_hash(secret, code),
+                created_by_device_id=session.device_id,
+                created_at=now,
+                expires_at=now + join.CODE_TTL,
+            )
+        )
+    log.info("auth.join_code_made", device=session.device_id)
+    return JoinCodeOut(
+        code=code,
+        display=join.display(code),
+        url=f"{state.settings.app_base_url}/join#{code}",
+        expires_at=now + join.CODE_TTL,
+    )
+
+
+@router.post("/join")
+async def join_with_code(
+    body: JoinIn, request: Request, response: Response, state: StateDep
+) -> SessionOut:
+    """Sign in a new phone with a code from a signed-in one. Wrong codes count as wrong
+    passwords do, so codes can't be guessed."""
+    ip = _client_ip(request)
+    _check_rate(state, ip)
+    code = join.normalize(body.code)
+    now = state.clock.now()
+    secret = state.settings.app_secret_key.get_secret_value()
+    async with state.db.write() as tx:
+        row = await tx.session.get(JoinCode, join.code_hash(secret, code)) if code else None
+        maker = row.created_by_device_id if row else None
+        if (
+            row is not None
+            and row.used_at is None
+            and row.expires_at > now
+            and maker in state.auth.known_devices
+            and maker not in state.auth.revoked_devices
+        ):
+            device = await _new_device(tx.session, state, request, response, now)
+            row.used_at = now
+            row.used_by_device_id = device.id
+            log.info("auth.joined", device=device.id, added_by=maker)
+            state.limiter.record_success(ip)
+            return await session_out(tx.session, device.id)
+    state.limiter.record_failure(ip)
+    log.info("auth.join_failed")
+    raise AppError(
+        401,
+        "join_code_invalid",
+        "That code didn't work. A code works once, for 10 minutes. Make a new one on the other "
+        "phone.",
+    )
 
 
 @router.get("/session")

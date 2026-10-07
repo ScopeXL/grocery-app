@@ -23,6 +23,7 @@ class KeyPurpose(StrEnum):
     KROGER_TOKENS = "kroger-tokens-v1"
     PASSWORD_FINGERPRINT = "password-fp-v1"  # noqa: S105 - a key label, not a password
     KEY_CHECK = "key-check-v1"
+    JOIN_CODE = "join-code-v1"
 
 
 def derive_key(secret: str, purpose: KeyPurpose) -> bytes:

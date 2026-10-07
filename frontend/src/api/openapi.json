@@ -1713,6 +1713,49 @@
         "title": "ItemUpdate",
         "type": "object"
       },
+      "JoinCodeOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "display",
+          "url",
+          "expires_at"
+        ],
+        "title": "JoinCodeOut",
+        "type": "object"
+      },
+      "JoinIn": {
+        "properties": {
+          "code": {
+            "maxLength": 40,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "JoinIn",
+        "type": "object"
+      },
       "KindOptionOut": {
         "properties": {
           "kind": {
@@ -4514,6 +4557,70 @@
           }
         },
         "summary": "Sign Out Device",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/join": {
+      "post": {
+        "description": "Sign in a new phone with a code from a signed-in one. Wrong codes count as wrong\npasswords do, so codes can't be guessed.",
+        "operationId": "join_with_code_api_auth_join_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Join With Code",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/join-codes": {
+      "post": {
+        "description": "Add a phone: a one-time code for another phone to sign in with (auth/join.py).",
+        "operationId": "make_join_code_api_auth_join_codes_post",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JoinCodeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Make Join Code",
         "tags": [
           "auth"
         ]

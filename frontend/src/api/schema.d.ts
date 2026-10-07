@@ -123,6 +123,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Join With Code
+         * @description Sign in a new phone with a code from a signed-in one. Wrong codes count as wrong
+         *     passwords do, so codes can't be guessed.
+         */
+        post: operations["join_with_code_api_auth_join_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/join-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Make Join Code
+         * @description Add a phone: a one-time code for another phone to sign in with (auth/join.py).
+         */
+        post: operations["make_join_code_api_auth_join_codes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/login": {
         parameters: {
             query?: never;
@@ -1610,6 +1651,25 @@ export interface components {
             /** Size Text */
             size_text?: string | null;
         };
+        /** JoinCodeOut */
+        JoinCodeOut: {
+            /** Code */
+            code: string;
+            /** Display */
+            display: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Url */
+            url: string;
+        };
+        /** JoinIn */
+        JoinIn: {
+            /** Code */
+            code: string;
+        };
         /** KindOptionOut */
         KindOptionOut: {
             /**
@@ -2569,6 +2629,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    join_with_code_api_auth_join_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JoinIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    make_join_code_api_auth_join_codes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JoinCodeOut"];
                 };
             };
         };

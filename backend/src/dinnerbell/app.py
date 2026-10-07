@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from sqlalchemy import select
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from dinnerbell.auth import join as auth_join
 from dinnerbell.auth.models import Device
 from dinnerbell.auth.ratelimit import LoginLimiter
 from dinnerbell.auth.router import router as auth_router
@@ -176,6 +177,7 @@ def create_app(
                 await shopping_service.prune_ops(tx.session, now)
                 await shopping_cart.prune(tx.session, now)
                 await kroger_account.prune_states(tx.session, now)
+                await auth_join.prune(tx.session, now)
 
         state.jobs.every("orphan-photos", PHOTO_PURGE_INTERVAL_S, purge_orphan_photos)
         state.jobs.every("tidy-trips", CACHE_PURGE_INTERVAL_S, tidy_trips)
