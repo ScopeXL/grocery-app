@@ -6,6 +6,32 @@ Everything that changes in Dinner Bell, written in plain English. The format fol
 
 ## [Unreleased]
 
+### Added
+
+- Send a saved list straight to your Kroger cart, for pickup or delivery, then check out in
+  the Kroger app. Connect your Kroger account once in Settings. Each item goes once; anything
+  that didn't go can be sent again on its own; items sold by the pound are listed for you to
+  add in the Kroger app.
+- Add a phone without the password: Settings shows a QR code to scan, or a code to type on the
+  new phone's sign-in screen. On an iPhone it works in the home-screen app too.
+- The install guide shows a drawing for each step on iPhone and Android, including the newer
+  iPhone Safari layout.
+
+### Changed
+
+- The first-run guide ends on this week's plan.
+- About & privacy explains what connecting a Kroger account means.
+
+### Fixed
+
+- Screen readers announce the Mains and Sides switch correctly, and long sheets scroll with a
+  keyboard.
+
+### Behind the scenes
+
+- Every main screen is checked for accessibility problems in light and dark; Kroger's sign-in
+  is stored encrypted and renewed by itself.
+
 ## [0.5.0] - 2026-10-07
 
 ### Added

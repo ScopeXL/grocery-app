@@ -220,9 +220,10 @@ frontend/
 | `trips` | id, plan_id? (none for Shop this again), store_id, status + status_ts + status_by, created_by, created_at, estimate_cents, savings_cents, not_priced, prices_as_of, actual_total_cents?, finished_at?, version (gapless), fingerprint (the list it was saved from), product_cache_expires_at | Status is last-writer-wins (§9). One active saved list per plan: saving again updates it |
 | `trip_items` | id, trip_id, line_key (item id or `extra:<id>`), item_id?, name, product_id?, upc?, image_url?, product_url?, size_text?, qty_text, quantity, unit, unit_cents?, line_cents?, regular_cents?, on_sale, sale_ends?, section_key?, section_label?, section_order, aisle_side?, bay, used_by (JSON), warnings (JSON), position; state + state_ts + state_by; note + note_ts + note_by; version; removed_at? | Frozen snapshot apart from state and note, which are separate last-writer-wins fields. Updating the saved list refreshes the snapshot, keeps states and notes, and marks to-do lines no longer needed as removed (with a new version, so phones hear it) |
 | `applied_ops` | op_id (PK), trip_id, kind, client_id, member_id, client_ts, effective_ts, received_at, result, reason | Makes ops idempotent; pruned after 60 days |
-| `kroger_tokens` (1 row) | access_enc, access_expires_at, refresh_enc, refresh_obtained_at, scope, connected_by, status (`connected`/`needs_reconnect`), version | Fernet-encrypted (§10). Always present; empty until connected |
-| `kroger_oauth_states` | state, code_verifier, device_id, expires_at, used_at | M5 |
-| `cart_sends` | id, trip_id, trip_item_id, upc, quantity, modality, sent_at, outcome (`added`/`failed`/`unknown`) | Guards against double-adds |
+| `kroger_tokens` (1 row) | status (`disconnected`/`connected`/`needs_reconnect`), access_enc, access_expires_at, refresh_enc, refresh_obtained_at, scope, connected_by_member_id, connected_at, version | Fernet-encrypted (§10.7). Always present; empty until connected. `version` guards refreshes against a Disconnect (§7.5) |
+| `kroger_oauth_states` | state_hash, code_verifier, device_id, created_at, expires_at, used_at | One Connect in progress: single-use, 10 minutes. The state is stored hashed |
+| `cart_sends` | id, trip_id, trip_item_id, upc, quantity (whole units), modality, sent_at, sent_by_member_id, outcome (`added`/`failed`/`unknown`), reason | Guards against double-adds. Written `unknown` before the call, settled after. Kept a week, or a day after the trip is finished |
+| `join_codes` | code_hash (HMAC), created_by_device_id, created_at, expires_at, used_at, used_by_device_id | Add a phone (§10.2): single-use, 10 minutes |
 | `kroger_api_usage` | api, window_started_at, calls, blocked_until?, last_429_at?, probe_backoff_s? | Tracks the daily limits; `probe_backoff_s` is the current wait while probing an unknown window |
 
 A trip is a snapshot on purpose: later edits to meals or prices must not change a list someone is shopping from.
@@ -241,17 +242,17 @@ A trip is a snapshot on purpose: later edits to meals or prices must not change 
 | Area | Endpoints |
 |---|---|
 | Meta | `GET health` (public; 200 only after startup completes and `SELECT 1` succeeds), `GET version` (public: version, revision, created), `GET admin/diagnostics` (signed in: schema revision, Kroger mode, backup state, resolved client IP and forwarded headers) |
-| Auth | `POST auth/login`, `POST auth/logout`, `GET auth/session`, `PUT auth/member` (stores the member on the device), `GET auth/devices`, `DELETE auth/devices/{id}`, `POST auth/devices/sign-out-others` |
-| Household | `GET` / `PATCH settings`; members `GET`, `POST`, `PATCH`, archive; `GET export` |
+| Auth | `POST auth/login`, `POST auth/logout`, `GET auth/session`, `PUT auth/member` (stores the member on the device), `GET auth/devices`, `DELETE auth/devices/{id}`, `POST auth/devices/sign-out-others`, `POST auth/join-codes` (Add a phone, M5), `POST auth/join` (sign in with a code; counts against the login limits) |
+| Household | `GET` / `PATCH settings` (household name, the cart's pickup-or-delivery default); members `GET`, `POST`, `PATCH`, archive; `GET export` |
 | Backups | `GET admin/backups`, `POST admin/backups/run`, `GET admin/backups/{name}` (download) |
 | Stores | `GET stores/search?zip=`, `PUT stores/active`, `GET` / `PUT stores/{id}/sections` |
-| Kroger | `GET kroger/products?q=` (3+ characters; short server-side cache), `POST kroger/connect` (M5; returns the authorize URL), `GET kroger/callback` (M5), `DELETE kroger/connection` |
+| Kroger | `GET kroger/products?q=` (3+ characters; short server-side cache), `GET kroger/account` (M5), `POST kroger/connect` (M5; returns the authorize URL), `GET kroger/callback` (M5; no session needed), `DELETE kroger/connection`. Sample mode only: `GET kroger/fake-authorize`, the demo sign-in page |
 | Items | `GET items?q=` (household items first), `POST items`, `PATCH items/{id}` (link product, correct size, each-weight, staple flag), archive and restore |
 | Dishes | `GET dishes?role=&occasion=&q=&favorite=`, `POST dishes`, `GET` / `PATCH dishes/{id}`, `PUT dishes/{id}/items`, `POST dishes/{id}/duplicate`, archive and restore, `PUT dishes/{id}/photo`, `GET` / `PUT dishes/{id}/usual-sides` |
 | Plan | `GET plan` (meals, the computed list, extras, usuals and totals, priced live), `POST plan/meals`, `PATCH plan/meals/{id}` (swap main, day, occasion, scale), `PUT plan/meals/{id}/sides`, `DELETE plan/meals/{id}` and `POST …/restore`, extras (`POST`, `PATCH`, `DELETE` and restore), `PUT plan/items/{itemId}` (have-it, quantity, product swap for this trip or always), `GET plan/items/{itemId}/alternatives` (with unit prices), `POST plan/new-week` and `POST plan/new-week/undo`, `GET plan/recommendations` (M4), `POST plan/repeat?from={planId or tripId}` (M3). Every change answers with the whole plan, so screens update from the response. Prices are fetched live on every read, so there is no refresh endpoint |
-| Trips | `POST trips` (save the plan's list, or update its saved list: 201 or 200), `GET trips[?before=]` (active, then finished a page at a time), `GET trips/{id}[?since_version=N]`, `POST trips/{id}/ops` (batched, idempotent; §9.2), `POST trips/{id}/shop-again`, `POST trips/{id}/send-to-cart` (M5). Walking order: `GET` / `PUT stores/active/sections`. `POST plan/repeat {trip_id}` plans a trip's meals again |
+| Trips | `POST trips` (save the plan's list, or update its saved list: 201 or 200), `GET trips[?before=]` (active, then finished a page at a time), `GET trips/{id}[?since_version=N]`, `POST trips/{id}/ops` (batched, idempotent; §9.2), `POST trips/{id}/shop-again`, `GET trips/{id}/cart` and `POST trips/{id}/send-to-cart` (M5; §7.5). Walking order: `GET` / `PUT stores/active/sections`. `POST plan/repeat {trip_id}` plans a trip's meals again |
 | Events | `GET events?since=epoch:seq` (SSE; §9.3) |
-| Test only | `/_test/{reset,seed,drop-streams,revoke-sessions}`, available only when `DINNERBELL_TEST_MODE=1`. Startup refuses that flag unless `APP_BASE_URL` is localhost |
+| Test only | `/_test/{reset,seed,drop-streams,revoke-sessions,fake-cart}`, available only when `DINNERBELL_TEST_MODE=1`. Startup refuses that flag unless `APP_BASE_URL` is localhost |
 
 Finishing and reopening a trip are ops (`trip.finish` and `trip.reopen`), so they work offline.
 
@@ -429,31 +430,38 @@ These were verified on 2026-10-06 against Kroger's developer docs, FAQ, Terms an
 ### 7.5 Cart and account linking (M5)
 
 **Connect Kroger** (Settings)
-1. `POST /api/kroger/connect` creates a `kroger_oauth_states` row: a 32-byte `state`, a 64-byte PKCE verifier, the device, and a 10-minute expiry. It returns the authorize URL (`scope=cart.basic:write`, S256 challenge, `state`, `banner` from the store's chain).
+1. `POST /api/kroger/connect` creates a `kroger_oauth_states` row: a 32-byte `state` (stored hashed), a 64-byte PKCE verifier, the device, and a 10-minute expiry. It returns the authorize URL (`scope=cart.basic:write`, S256 challenge, `state`).
+   - Kroger's optional `banner` parameter is left out: the values it accepts aren't documented, and a wrong one could break the sign-in page. Kroger's own page shows instead.
+   - Without `KROGER_REDIRECT_URI` (live mode), Connect answers 409 and Settings says the server isn't set up for it.
 2. The SPA navigates there. Kroger redirects to `KROGER_REDIRECT_URI`, which must equal `APP_BASE_URL + "/api/kroger/callback"` and be registered on the Kroger app.
 3. `GET /api/kroger/callback` checks the `state` row exists and is unexpired, and marks it used before anything else.
-   - If a session cookie is present, it must belong to the device that started the flow.
+   - If a session cookie is present, it must belong to the device that started the flow, and that device must still be signed in.
    - A missing session is tolerated: iOS can finish the flow in a different cookie jar, and the single-use, 256-bit state is the capability.
-   - It then exchanges the code (Basic auth + `code_verifier`) and redirects with 303 to `/settings?kroger=connected` (or `=failed`).
+   - It then exchanges the code (Basic auth + `code_verifier`) and redirects with 303 to `/settings?kroger=connected` (or `denied`, `expired`, `failed`). With no session it goes to `/kroger-done?result=…` instead, a public page that says what happened.
+4. **Sample mode** sends the phone to a demo sign-in page (`/api/kroger/fake-authorize`) with Allow and Don't allow. The fake still checks what Kroger would: single-use codes, the PKCE verifier, rotating refresh tokens, and 30-minute access tokens.
 
 **Tokens**
 - Access and refresh tokens are stored Fernet-encrypted in `kroger_tokens`.
-- **Refresh is single-flight.** It re-reads the row inside the lock, then:
+- The access token is refreshed when under 5 minutes remain, so a whole list of adds never runs out half-way. A 401 from the cart drops the access token, so the next send refreshes it first.
+- **Refresh is single-flight.** It re-reads the row inside the lock, calls Kroger outside any write transaction, then:
   - On 200: stores the new access token and the new refresh token in one `BEGIN IMMEDIATE` update, guarded by `version`. If no new refresh token comes back, it keeps the old one and logs `refresh_not_rotated`.
   - On `invalid_grant`: sets `needs_reconnect`, wipes the tokens, publishes `settings.changed`, and Settings shows a "Reconnect Kroger" banner.
   - On an ambiguous failure: keeps the token and backs off.
 - Every refresh logs the token's age, to settle the real lifetime.
 - **Disconnect** deletes the tokens and any OAuth states.
 
-**Send to cart** (a saved list)
-1. A sheet asks "Pickup or delivery?" (defaulting to the household setting). It says: "Items go to the store chosen in your Kroger account. Review and check out in the Kroger app."
-2. It lists the lines that have a UPC; unlinked lines are listed as "not sent".
-3. Sending writes `cart_sends` rows with `outcome=unknown`, then calls `PUT /cart/add` in chunks.
-   - A 204 marks the chunk `added`.
-   - A 4xx marks it `failed`, with the reason.
-   - A timeout leaves it `unknown`.
-4. The result reads "Added 27 items to your Kroger cart." It lists failed or unknown items with a **Send these again** button covering only those.
-5. Items already marked `added` are never re-sent automatically. A deliberate "Send again anyway" exists, behind a second confirmation sheet; it is the one place where confirming beats undo, because cart adds can't be undone.
+**Send to cart** (a saved list, from the List or the trip; `shopping/cart.py`, ADR 0024)
+1. A sheet asks "Pickup or delivery?" (defaulting to the household setting). It says: "Items go to the store chosen in your Kroger account. You'll review and check out in the Kroger app."
+2. **What can go:** lines linked to a store product (a UPC), bought in whole packages or pieces. Plain-text extras and pound amounts are listed under "Add these in the Kroger app": the cart takes whole units, and Kroger's docs don't say how it counts a weight.
+3. **Sending, one item per call,** in list order, one at a time:
+   - Each item's `cart_sends` row is written `unknown` before its call goes out, then settled: a 204 → `added`; a 4xx → `failed`, with the reason; a timeout, a dropped connection or a 5xx → `unknown` ("check your Kroger cart"). A crash in between leaves `unknown`, which is the truth.
+   - A refused item fails alone; the next one goes.
+   - Sending stops at the first sign the rest would fail too: Kroger refusing the account (401) or the app (403), its daily limit (429), Kroger unreachable, or no answer. The rest simply weren't sent and stay "Not sent yet".
+   - Nothing is retried automatically.
+4. The result reads "Added 27 items to your Kroger cart." Items that didn't go are listed first, with **Send these again** covering only those. The sheet follows along while items go out ("3 items to go"), on every phone.
+5. **The double-add guard:** items marked `added` or `unknown` are never sent again without a deliberate tap. **Send again anyway** sits behind a second confirmation sheet; it is the one place where confirming beats undo, because cart adds can't be undone.
+6. One send per saved list at a time (409 otherwise), claimed before anything awaits; the in-memory claim is safe because one process serves the API (ADR 0002).
+7. `cart_sends` rows are kept a week, or a day after the trip is finished: Kroger's terms ask that customer cart data go once shopping is done.
 
 ### 7.6 Smoke test and fixtures
 
@@ -1394,7 +1402,7 @@ ADR 0004 covers this.
   - `app_meta.password_fp = HMAC(k_pwfp, password)`.
   - If it changes at boot, `auth_epoch` increments, and every session dies.
   - Settings also offers **Sign out all devices** (an epoch bump) and per-device revoke.
-- **Keys:** HKDF-SHA256 subkeys from `APP_SECRET_KEY` (32+ characters), with info strings `session-v1`, `kroger-tokens-v1`, `password-fp-v1` and `key-check-v1`.
+- **Keys:** HKDF-SHA256 subkeys from `APP_SECRET_KEY` (32+ characters), with info strings `session-v1`, `kroger-tokens-v1`, `password-fp-v1`, `key-check-v1` and `join-code-v1`.
 - **Session cookie:**
   - Named `__Host-dinnerbell`; plain `dinnerbell` on http localhost, for tests only.
   - Value `v1.<device_id>.<epoch>.<mac128>`. It's valid only when the MAC verifies, the device isn't revoked, and the epoch matches.
@@ -1403,9 +1411,11 @@ ADR 0004 covers this.
 - **Devices** are `devices(id, label, member_id, created_at, last_seen_at, revoked_at)`.
   - "Who's using this?" is stored with `PUT /api/auth/member`, so attribution comes from the device row.
   - Settings lists devices with **Sign out other devices**.
-- **QR join** (M5):
-  - A signed-in phone shows a QR code for `/join#<token>`: a single-use, 5-minute token stored hashed.
-  - The new phone signs in without typing the password.
+- **Add a phone** (M5, ADR 0025):
+  - A signed-in phone (Settings → Add a phone) shows a one-time code twice: as a QR code for `/join#<code>`, and in letters ("4F7K 9QX2").
+  - The code is 8 characters from an alphabet without look-alikes (no 0, O, 1, I or L). It is single-use, lasts 10 minutes, and is stored as an HMAC under `join-code-v1`. A new code retires the phone's older unused one, and a code stops working if its phone is signed out.
+  - The new phone scans it (the fragment never reaches a server log) or types it on the sign-in screen under **Use a code from another phone**. On an iPhone in Safari, the join page suggests installing first and typing the code in the home-screen app, which keeps its own sign-in.
+  - Wrong codes count against the login limits (§10.4), so a code can't be guessed in its 10 minutes.
 
 ### 10.3 CSRF
 

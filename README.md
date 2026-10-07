@@ -2,12 +2,13 @@
 
 A household meal-planning and grocery app, built for phones:
 
-- **Plan the week's dinners.** Mains, sides, and the occasional breakfast or snack.
-- **Get one shared shopping list.** Built automatically from the plan, with an estimated total from your chosen Kroger store.
-- **Shop it aisle by aisle.** The list works offline and syncs live between family members' phones.
-- **Or order online.** Send the list to your Kroger cart for pickup or delivery.
+- **Plan the week's dinners.** Mains, sides, and the occasional breakfast or snack. Dinner Bell suggests meals that use what you're already buying.
+- **Get one shared shopping list.** Built automatically from the plan, rounded to whole packages, with an estimated total and sale prices from your chosen Kroger store.
+- **Shop it aisle by aisle.** The list works offline in the store and syncs live between family members' phones.
+- **Or order online.** Send the list to your Kroger cart for pickup or delivery; nothing is ever added twice by accident.
+- **Easy for the whole family.** One household password, or a QR code from a phone that's already signed in.
 
-**Status:** the first release (0.1.0) is being built (milestone M0).
+**Status:** in everyday use by its household. [CHANGELOG.md](CHANGELOG.md) lists what each release added.
 
 ## Documentation
 
@@ -18,7 +19,9 @@ A household meal-planning and grocery app, built for phones:
 
 ## Self-hosting
 
-Dinner Bell ships as one Docker image, `scopexl/dinner-bell`, with all state on a `/data` volume and all configuration in environment variables. See [Deploying](docs/DEPLOY.md), [Restoring a backup](docs/RESTORE.md) and [Releasing](docs/RELEASING.md).
+Dinner Bell ships as one Docker image, `scopexl/dinner-bell`, with all state on a `/data` volume and all configuration in environment variables. See [Deploying](docs/DEPLOY.md), [Kroger setup](docs/KROGER.md) (product data, and Connect Kroger for the cart), [Restoring a backup](docs/RESTORE.md) and [Releasing](docs/RELEASING.md).
+
+Without Kroger keys it runs in sample mode, with made-up products, which is how it's developed and tested.
 
 ## Not affiliated with Kroger
 

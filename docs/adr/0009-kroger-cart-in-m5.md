@@ -1,6 +1,6 @@
 # ADR 0009: Send to Kroger cart is in v1 (M5), on the production API
 
-- **Status:** Accepted (the owner's answers to the open questions)
+- **Status:** Accepted (the owner's answers to the open questions); details refined by ADR 0024
 - **Date:** 2026-10-06
 
 ## Context

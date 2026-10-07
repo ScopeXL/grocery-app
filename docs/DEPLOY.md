@@ -25,6 +25,7 @@ household-specific goes into Portainer's stack variables, never into this reposi
    | `TZ` | Your time zone, e.g. `America/New_York` |
    | `TRUSTED_PROXIES` | Your reverse proxy's IP or Docker network (see step 3). Leave empty for now |
    | `KROGER_MODE` | `fake` until Kroger is set up (docs/KROGER.md) |
+   | `KROGER_REDIRECT_URI` | For Connect Kroger (send lists to the Kroger cart): `APP_BASE_URL` followed by `/api/kroger/callback`, e.g. `https://dinner.example.com/api/kroger/callback`. Register the same address on the Kroger app (docs/KROGER.md) |
 
 4. **Deploy the stack.** The container turns **healthy** within about a minute.
 

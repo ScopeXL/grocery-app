@@ -72,7 +72,7 @@ This document covers every screen at phone size, the main flows step by step, em
 
 **Installed app (PWA)**
 - **Icon, name and splash:** a proper icon, the name "Dinner Bell", and a splash screen.
-- **Install guide:** Settings → Install the app has an illustrated guide for iPhone and Android.
+- **Install guide:** More → Install the app has an illustrated guide for iPhone and Android.
 - **iPhone in a normal Safari tab:** the guide appears *before* sign-in (§5.1).
 
 ## 4. Screens
@@ -94,6 +94,8 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
 |                                      |
 |  Ask whoever set up Dinner Bell      |
 |  for the password.                   |
+|                                      |
+|  Use a code from another phone       |
 +--------------------------------------+
 ```
 
@@ -101,6 +103,8 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
 - **Errors:**
   - "That password didn't match. Try again."
   - "Too many tries. Wait 10 minutes."
+- **Use a code from another phone** swaps the password for one large field that takes the 8-character code from Add a phone (§5.6), in any case, with or without the space. Below it: "On a phone that's already signed in, open More, then Settings, then Add a phone." **Use the password instead** swaps back.
+  - A wrong code: "That code didn't work. A code works once, for 10 minutes. Make a new one on the other phone." Wrong codes count as wrong passwords.
 - After sign-in, the phone is remembered for about a year.
 
 ### 4.2 Who's using this?
@@ -357,8 +361,8 @@ Trips · Settings · Who's using this · Install the app · About and privacy. E
 | Store | Name and address; **Change store** (ZIP search) |
 | Store walking order | The section list with up/down buttons per row; a drag handle as a shortcut |
 | Household | Members (add, rename, color); household name |
-| Kroger account (M5) | **Connect Kroger** / **Disconnect**; Pickup or Delivery default; a "Reconnect Kroger" banner when needed |
-| Devices | This phone, plus other signed-in devices with "last used"; **Sign out other devices** |
+| Kroger account (M5) | Before connecting: one line on what it's for, and **Connect Kroger**. Connected: "Connected", "By Mia", when; **Disconnect** (its toast offers **Connect again**); and "Send lists for" Pickup / Delivery, the default the send sheet starts with. A lemon "Kroger signed Dinner Bell out." banner with **Reconnect Kroger** when Kroger refuses the account. Sample mode adds: "the Kroger sign-in is a demo, and nothing reaches a real cart." |
+| Devices | This phone, plus other signed-in devices with "last used"; **Add a phone** (§5.6); **Sign out other devices** |
 | Data | **Export all data**; last backup time, and a banner if older than 36 h |
 | Connection | "Live updates: connected" (or the quiet polling note); diagnostics for the owner |
 | Install the app | The illustrated guide |
@@ -369,9 +373,14 @@ Trips · Settings · Who's using this · Install the app · About and privacy. E
 ### 5.1 First visit on a phone
 
 **iPhone, normal Safari tab**
-1. The app opens on the **Install the app** guide: Share → Add to Home Screen.
-2. It explains in one line that the installed app keeps its own sign-in.
+1. The app opens on the **Install the app** guide, three numbered steps, each beside a small line drawing of the phone with the spot to tap circled in a basil marker loop:
+   1. Tap **Share**; on newer iPhones, tap ••• next to the address first.
+   2. Tap **Add to Home Screen** (scroll down, or tap View More, if it isn't showing), then **Add**.
+   3. Open Dinner Bell from the home screen.
+2. It explains that the installed app keeps its own sign-in: the household password once more, or a code from a phone that's already signed in (§5.6).
 3. **Continue in Safari** is always available.
+
+Android's guide has the same three steps for Chrome: the ⋮ menu, **Install app** (or Add to Home screen) then **Install**, and open it.
 
 **Then, on every phone:**
 1. Sign in with the household password.
@@ -404,12 +413,22 @@ Trips · Settings · Who's using this · Install the app · About and privacy. E
 
 ### 5.5 Send to Kroger cart (M5)
 
-1. Saved list → **Send to Kroger cart**.
-2. The sheet asks "Pickup or delivery?" and says: "Items go to the store chosen in your Kroger account. You'll review and check out in the Kroger app."
-3. It lists what will be sent, and any items that can't be (no product link).
-4. **Send 27 items** → "Added 27 items to your Kroger cart."
-5. Any failures are listed with **Send these again**, which sends only those.
-6. Items already sent are marked and are never re-sent automatically.
+1. Saved list → **Send to Kroger cart**: on the List under Start shopping, or on the trip in Trips. It shows once a Kroger account is connected or can be; without one, the sheet says to connect it in Settings and offers **Go to Settings**.
+2. The sheet asks "Pickup or delivery?" (the Settings default chosen) and says: "Items go to the store chosen in your Kroger account. You'll review and check out in the Kroger app."
+3. It lists what goes ("Going to your cart") and what can't, under "Add these in the Kroger app": items with no store product ("Not linked to a store product") and pound amounts ("Sold by the pound").
+4. **Send 27 items** → "Sending to your Kroger cart: 12 items to go", with a progress bar → "Added 27 items to your Kroger cart."
+5. Anything that didn't go is listed first, under "Didn't go", with its reason, and **Send these again** sends only those. If Kroger didn't answer, the row says to look in the Kroger cart before sending it again.
+6. Items already sent show under "In your Kroger cart" with "Sent by Mia, 5 minutes ago", and are never sent again by themselves. Opening the sheet again says "Everything here is already in your Kroger cart." **Send again anyway** opens a second sheet, "Send again?", whose buttons are **Send 27 items again** and **Keep my cart as it is**: the one confirmation in the app, because a cart add can't be undone (§1).
+7. Every phone with the sheet open follows along while items go out.
+
+### 5.6 Add a phone (M5)
+
+1. On a signed-in phone: More → Settings → **Add a phone**.
+2. The sheet shows a QR code, then "Or, on the new phone's sign-in screen, tap Use a code from another phone and type:" and the code in large letters ("4F7K 9QX2"). "It works once, for the next 10 minutes." After 10 minutes: "That code has run out." with **Make a new code**.
+3. The new phone scans the code with its camera, which opens Dinner Bell's join page:
+   - **Android, a computer, or the installed app:** "Sign in with a code", the code, and **Sign in on this phone** → "Who's using this?"
+   - **iPhone in Safari:** "Put Dinner Bell on your home screen first", because the home-screen app keeps its own sign-in. Then: open it, tap **Use a code from another phone**, and type the code (shown again, and still on the other phone). **Show me how** opens the install guide; **Sign in here in Safari instead** stays available.
+4. Or, on the new phone's sign-in screen, tap **Use a code from another phone** and type the code.
 
 ## 6. Empty and quiet states
 
@@ -431,6 +450,7 @@ Trips · Settings · Who's using this · Install the app · About and privacy. E
 | Syncing | "Syncing 3…" |
 | Sign-in expired | A tappable "Sign in to sync" |
 | Kroger daily limit reached | "Store search is paused until about 3:40 PM — your list still works." |
+| Kroger signed Dinner Bell out | A lemon banner in Settings, "Kroger signed Dinner Bell out.", with **Reconnect Kroger**. The send sheet points there too |
 | No price on some items | "3 items have no price", which opens the List filtered to those lines |
 | Update available | A small "New version · Refresh" pill. Never shown during shopping, and never while changes are waiting to sync |
 | Screen can't stay on | A one-time tip: "Your screen may dim while you shop. Settings → Display & Brightness → Auto-Lock" (iPhone) or "Display → Screen timeout" (Android) |

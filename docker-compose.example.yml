@@ -13,6 +13,7 @@ services:
       KROGER_MODE: ${KROGER_MODE:-fake}
       KROGER_CLIENT_ID: ${KROGER_CLIENT_ID:-}
       KROGER_CLIENT_SECRET: ${KROGER_CLIENT_SECRET:-}
+      KROGER_REDIRECT_URI: ${KROGER_REDIRECT_URI:-} # Connect Kroger: APP_BASE_URL + /api/kroger/callback
     volumes:
       - dinnerbell_data:/data # a named volume: correct ownership with no extra steps
     ports:

@@ -1,6 +1,6 @@
 # ADR 0004: One household password, per-device sessions, "Who's using this?"
 
-- **Status:** Accepted (the owner's answer to the open question)
+- **Status:** Accepted (the owner's answer to the open question); the QR join is refined by ADR 0025
 - **Date:** 2026-10-06
 
 ## Context

@@ -31,3 +31,5 @@ Each record covers one decision: the context, what was decided, and the conseque
 | [0021](0021-forward-only-migrations.md) | Forward-only migrations at startup, after a backup | — |
 | [0022](0022-git-identity-and-commits.md) | Noreply commit identity; commit when green; push only on deploy | — |
 | [0023](0023-ui-primitives-and-typescript-6.md) | UI primitives without runtime style injection; TypeScript 6 | — |
+| [0024](0024-cart-sends-one-item-at-a-time.md) | Cart sends go one item at a time; pound amounts stay in the Kroger app | — |
+| [0025](0025-add-a-phone-with-a-code.md) | Add a phone with a one-time code, scanned or typed | — |
