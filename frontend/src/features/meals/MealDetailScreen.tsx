@@ -1,5 +1,5 @@
 /**
- * One meal (docs/UX.md §4.7): photo, occasions, servings, notes or recipe link, the item lines
+ * One meal (docs/UX.md §4.7): photo, servings, notes or recipe link, the item lines
  * with their amounts and shares of the cost, and a Main's usual sides. Add to plan opens the
  * same sheet as the Plan screen, at the sides step. Archive offers Undo, never a confirmation.
  */
@@ -19,7 +19,7 @@ import { AddMealSheet, mainChoice } from "../plan/AddMealSheet";
 import { usePlan } from "../plan/usePlan";
 import { UsualSides } from "../plan/UsualSides";
 import { FavoriteButton } from "./MealsScreen";
-import { occasionLabel, type DishOut } from "./types";
+import type { DishOut } from "./types";
 
 export function MealDetailScreen({ dishId }: { dishId: string }) {
   const navigate = useNavigate();
@@ -112,7 +112,6 @@ export function MealDetailScreen({ dishId }: { dishId: string }) {
 
       <div className="mb-5 flex flex-col gap-1 text-secondary text-ink-soft">
         <span>{meal.role === "main" ? "Main" : "Side"}</span>
-        <span>{meal.occasions.map(occasionLabel).join(", ")}</span>
         {meal.servings ? <span>Serves {String(meal.servings)}</span> : null}
       </div>
 

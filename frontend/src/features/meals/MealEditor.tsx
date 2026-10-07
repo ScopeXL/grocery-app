@@ -17,79 +17,17 @@ import { ProductImage } from "../../ui/ProductImage";
 import { underlined } from "../../ui/styles";
 import { AddItemSheet } from "./AddItemSheet";
 import { AmountPicker } from "./AmountPicker";
-import { uploadPhoto } from "./photos";
 import {
-  OCCASIONS,
-  type AmountOut,
-  type DishOut,
-  type ItemOut,
-  type Occasion,
-  type Role,
-} from "./types";
-
-interface DraftLine {
-  key: string;
-  item: ItemOut;
-  amount: AmountOut;
-}
-
-interface Draft {
-  name: string;
-  role: Role | null;
-  occasions: Occasion[];
-  servings: string;
-  notes: string;
-  recipeUrl: string;
-  photoId: string | null;
-  lines: DraftLine[];
-  step: number;
-}
-
-const STEP_COUNT = 5;
-
-function emptyDraft(role: Role | undefined): Draft {
-  return {
-    name: "",
-    role: role ?? null,
-    occasions: ["dinner"],
-    servings: "",
-    notes: "",
-    recipeUrl: "",
-    photoId: null,
-    lines: [],
-    step: 0,
-  };
-}
-
-function fromDish(dish: DishOut): Draft {
-  return {
-    name: dish.name,
-    role: dish.role,
-    occasions: dish.occasions,
-    servings: dish.servings === null ? "" : String(dish.servings),
-    notes: dish.notes ?? "",
-    recipeUrl: dish.recipe_url ?? "",
-    photoId: dish.photo_id,
-    lines: dish.lines.map((line) => ({ key: line.id, item: line.item, amount: line.amount })),
-    step: STEP_COUNT - 1,
-  };
-}
-
-/** A draft from an older app version, or a corrupted one, is dropped rather than trusted. */
-function asDraft(value: unknown): Draft | null {
-  if (typeof value !== "object" || value === null) return null;
-  const draft = value as Partial<Draft>;
-  const valid =
-    typeof draft.name === "string" &&
-    (draft.role === null || draft.role === "main" || draft.role === "side") &&
-    Array.isArray(draft.occasions) &&
-    Array.isArray(draft.lines) &&
-    typeof draft.step === "number" &&
-    typeof draft.servings === "string" &&
-    typeof draft.notes === "string" &&
-    typeof draft.recipeUrl === "string";
-  return valid ? (value as Draft) : null;
-}
+  asDraft,
+  emptyDraft,
+  fromDish,
+  STEP,
+  STEP_COUNT,
+  type Draft,
+  type DraftLine,
+} from "./draft";
+import { uploadPhoto } from "./photos";
+import type { ItemOut, Role } from "./types";
 
 function lineBody(lines: DraftLine[]) {
   return lines.map((line) => ({
@@ -158,7 +96,6 @@ function MealEditor({
     mutationFn: async () => {
       const fields = {
         name: draft.name.trim(),
-        occasions: draft.occasions,
         servings: draft.servings ? Number(draft.servings) : null,
         notes: draft.notes.trim() || null,
         recipe_url: draft.recipeUrl.trim() || null,
@@ -256,7 +193,7 @@ function MealEditor({
         </p>
       ) : null}
 
-      {show(0) ? (
+      {show(STEP.name) ? (
         <Step title="What do you call it?">
           <NameField
             value={draft.name}
@@ -268,7 +205,7 @@ function MealEditor({
         </Step>
       ) : null}
 
-      {show(1) ? (
+      {show(STEP.role) ? (
         <Step title="Is it a main or a side?">
           <div className="grid gap-3 sm:grid-cols-2">
             {(
@@ -282,7 +219,7 @@ function MealEditor({
                 type="button"
                 aria-pressed={draft.role === value}
                 onClick={() => {
-                  update({ role: value, step: editing ? draft.step : 2 });
+                  update({ role: value, step: editing ? draft.step : STEP.items });
                 }}
                 className="flex min-h-16 flex-col items-start justify-center rounded-button border-2 border-rule bg-paper px-4 py-3 text-left aria-pressed:border-accent"
               >
@@ -294,33 +231,7 @@ function MealEditor({
         </Step>
       ) : null}
 
-      {show(2) ? (
-        <Step title="When do you eat it?">
-          <div className="flex flex-wrap gap-2">
-            {OCCASIONS.map((occasion) => {
-              const on = draft.occasions.includes(occasion.value);
-              return (
-                <button
-                  key={occasion.value}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => {
-                    const occasions = on
-                      ? draft.occasions.filter((value) => value !== occasion.value)
-                      : [...draft.occasions, occasion.value];
-                    update({ occasions: occasions.length ? occasions : draft.occasions });
-                  }}
-                  className="min-h-12 rounded-full border-2 border-rule bg-paper px-4 text-body font-semibold aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent"
-                >
-                  {occasion.label}
-                </button>
-              );
-            })}
-          </div>
-        </Step>
-      ) : null}
-
-      {show(3) ? (
+      {show(STEP.items) ? (
         <Step title="What goes in it?">
           {draft.lines.length > 0 ? (
             <ul className="mb-3 overflow-hidden rounded-tile border border-rule bg-paper">
@@ -374,7 +285,7 @@ function MealEditor({
         </Step>
       ) : null}
 
-      {show(4) ? (
+      {show(STEP.extras) ? (
         <Step title="Anything else? (optional)">
           <Extras draft={draft} update={update} />
         </Step>
@@ -400,7 +311,10 @@ function MealEditor({
             <Button
               block
               className="flex-1"
-              disabled={(step === 0 && !draft.name.trim()) || (step === 1 && draft.role === null)}
+              disabled={
+                (step === STEP.name && !draft.name.trim()) ||
+                (step === STEP.role && draft.role === null)
+              }
               onClick={next}
             >
               Next

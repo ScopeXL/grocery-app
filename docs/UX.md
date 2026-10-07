@@ -177,7 +177,7 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
 
 ### 4.6 Meals (library)
 
-- A **Mains / Sides** switch, a search field, occasion filter chips, a **Favorites** toggle and an **On sale** toggle (meals using something on sale today). Cards with something on sale show a Sale tag and its last day, beside the text, never on a photo.
+- A **Mains / Sides** switch, a search field, a **Favorites** toggle and an **On sale** toggle (meals using something on sale today). Cards with something on sale show a Sale tag and its last day, beside the text, never on a photo.
 - **Cards:**
   - Two per row on phones, more on desktop.
   - Each shows the meal photo (cropped 4:3) or an item strip, the name, "about $14" and a star.
@@ -186,19 +186,20 @@ Every screen is drawn here at phone size (390×844). The wireframes show structu
 
 ### 4.7 Meal detail
 
-- The photo, name, occasion tags, servings, and notes or a recipe link (which opens in a new tab).
+- The photo, name, servings, and notes or a recipe link (which opens in a new tab). A meal has no occasion of its own: what it's for is chosen when it's planned (ADR 0026).
 - **Items:** one row per item with the product photo, item name, amount ("½ bag", "6 oz", "3") and its share of the cost.
 - **Usual sides** (for Mains) are editable: add, remove, pin.
 - **Buttons:** **Add to plan** (primary), Edit, Duplicate, Archive (with an Undo toast).
 
 ### 4.8 Create or edit a meal (guided; drafts save automatically)
 
+Four steps ("Step 2 of 4"):
 1. **Name:** "What do you call it?"
-2. **Main or side:** two large buttons, each with a one-line explanation.
-3. **When do you eat it?** Occasion chips, with Dinner preselected; several can be chosen.
-4. **Items:** "Add an item" opens the add-item flow (§4.9). Each item line shows its photo, name and amount, with Change and Remove.
-5. **Extras (optional):** a photo (camera or library), servings, and notes or a recipe link.
-6. **Save meal** → toast "Meal saved".
+2. **Main or side:** two large buttons, each with a one-line explanation. Tapping one moves straight on.
+3. **Items:** "Add an item" opens the add-item flow (§4.9). Each item line shows its photo, name and amount, with Change and Remove.
+4. **Anything else? (optional):** a photo (camera or library), servings, and notes or a recipe link.
+
+Then **Save meal** → toast "Meal saved". There's no "When do you eat it?": that's chosen when the meal is planned (ADR 0026). A draft saved before this change picks up at the same step.
 
 ### 4.9 Add an item
 

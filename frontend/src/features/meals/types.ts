@@ -13,5 +13,3 @@ export type PickerOut = Schemas["PickerOut"];
 export type KindOption = Schemas["KindOptionOut"];
 export type PreviewOut = Schemas["PreviewOut"];
 export type Role = DishOut["role"];
-// Occasions belong to the planned meal now (ADR 0026); these stay until the editor drops them.
-export { OCCASIONS, occasionLabel, type Occasion } from "../plan/types";

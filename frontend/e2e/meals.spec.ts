@@ -45,12 +45,7 @@ test("first run: choose a store, add Tacos with four items and a photo, archive 
   await expect(page.getByRole("heading", { name: "New meal" })).toBeVisible();
   await page.getByLabel("Meal name").fill("Tacos");
   await page.getByRole("button", { name: "Next" }).click();
-  await page.getByRole("button", { name: /^Main/ }).click();
-  await expect(page.getByRole("button", { name: "Dinner" })).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
-  await page.getByRole("button", { name: "Next" }).click();
+  await page.getByRole("button", { name: /^Main/ }).click(); // straight on to its items
 
   // Part of a package, with a live preview of the share and its cost.
   await addItem(page, "cheddar", "Sample Shredded Cheddar Cheese");
@@ -85,7 +80,7 @@ test("first run: choose a store, add Tacos with four items and a photo, archive 
   }
   await page.getByRole("button", { name: "Next" }).click();
 
-  // Step 3 of the meal: a photo, then save.
+  // The last step of the meal ("Anything else?"): a photo, then save.
   await page.getByLabel("Choose a photo").setInputFiles({
     name: "tacos.png",
     mimeType: "image/png",
@@ -143,7 +138,6 @@ test("searching shows quiet states, never an error wall", async ({ page }) => {
   await page.getByLabel("Meal name").fill("Anything");
   await page.getByRole("button", { name: "Next" }).click();
   await page.getByRole("button", { name: /^Main/ }).click();
-  await page.getByRole("button", { name: "Next" }).click();
   await page.getByRole("button", { name: "Add an item" }).click();
   const sheet = page.getByRole("dialog", { name: "Add an item" });
   await sheet.getByLabel("What do you need?").fill("xyzzy");

@@ -1,5 +1,5 @@
 /**
- * The meal library (docs/UX.md §4.6): Mains or Sides, search, occasion chips, Favorites and
+ * The meal library (docs/UX.md §4.6): Mains or Sides, search, Favorites and
  * On sale (something the meal uses is on sale at the store today).
  * Cards show the household's photo (cropped 4:3) or a strip of uncropped product photos.
  */
@@ -19,13 +19,12 @@ import { EmptyState } from "../../ui/EmptyState";
 import { ProductImage } from "../../ui/ProductImage";
 import { Screen } from "../../ui/Screen";
 import { Segmented, segmentOption } from "../../ui/Segmented";
-import { OCCASIONS, type DishCard, type Occasion, type Role } from "./types";
+import type { DishCard, Role } from "./types";
 
 export function MealsScreen({ role }: { role: Role }) {
   const navigate = useNavigate();
   const searchId = useId();
   const [query, setQuery] = useState("");
-  const [occasion, setOccasion] = useState<Occasion | null>(null);
   const [favorites, setFavorites] = useState(false);
   const [onSale, setOnSale] = useState(false);
   const [archived, setArchived] = useState(false);
@@ -41,7 +40,6 @@ export function MealsScreen({ role }: { role: Role }) {
   const shown = all.filter(
     (card) =>
       (!needle || card.name.toLowerCase().includes(needle)) &&
-      (!occasion || card.occasions.includes(occasion)) &&
       (!favorites || card.favorite) &&
       (!onSale || card.on_sale),
   );
@@ -89,17 +87,6 @@ export function MealsScreen({ role }: { role: Role }) {
             className="mb-3 min-h-12 w-full rounded-button border-2 border-rule bg-paper px-4 text-body"
           />
           <div className="mb-5 flex flex-wrap gap-2">
-            {OCCASIONS.map((item) => (
-              <Chip
-                key={item.value}
-                on={occasion === item.value}
-                onClick={() => {
-                  setOccasion(occasion === item.value ? null : item.value);
-                }}
-              >
-                {item.label}
-              </Chip>
-            ))}
             <Chip
               on={favorites}
               onClick={() => {
