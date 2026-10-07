@@ -1008,6 +1008,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/trips/{trip_id}/cart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Cart
+         * @description What Send to Kroger cart would send, and what became of anything already sent.
+         */
+        get: operations["get_cart_api_trips__trip_id__cart_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/trips/{trip_id}/ops": {
         parameters: {
             query?: never;
@@ -1023,6 +1043,27 @@ export interface paths {
          *     what became of it.
          */
         post: operations["apply_ops_api_trips__trip_id__ops_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trips/{trip_id}/send-to-cart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send To Cart
+         * @description Send to Kroger cart (UX §5.5): one item at a time, never retried automatically, and
+         *     nothing already sent goes again unless the person confirmed it (shopping/cart.py).
+         */
+        post: operations["send_to_cart_api_trips__trip_id__send_to_cart_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1149,6 +1190,82 @@ export interface components {
             schedule: string;
             /** Stale */
             stale: boolean;
+        };
+        /** CartLineOut */
+        CartLineOut: {
+            /** Image Url */
+            image_url: string | null;
+            /** Name */
+            name: string;
+            /** Note */
+            note: string | null;
+            /** Qty Text */
+            qty_text: string;
+            /** Quantity */
+            quantity: number | null;
+            /** Sent At */
+            sent_at: string | null;
+            /** Sent By */
+            sent_by: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ready" | "sending" | "added" | "failed" | "unknown" | "cannot_send";
+            /** Trip Item Id */
+            trip_item_id: string;
+        };
+        /** CartOut */
+        CartOut: {
+            /**
+             * Account
+             * @enum {string}
+             */
+            account: "disconnected" | "connected" | "needs_reconnect";
+            /** Demo */
+            demo: boolean;
+            /** Lines */
+            lines: components["schemas"]["CartLineOut"][];
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "PICKUP" | "DELIVERY";
+            /** Sending */
+            sending: boolean;
+            /** Trip Id */
+            trip_id: string;
+        };
+        /** CartResultOut */
+        CartResultOut: {
+            /** Added */
+            added: number;
+            cart: components["schemas"]["CartOut"];
+            /** Failed */
+            failed: number;
+            /** Message */
+            message: string;
+            /** Not Sent */
+            not_sent: number;
+            /** Skipped */
+            skipped: number;
+            /** Unknown */
+            unknown: number;
+        };
+        /** CartSendIn */
+        CartSendIn: {
+            /**
+             * Again
+             * @default false
+             */
+            again: boolean;
+            /** Item Ids */
+            item_ids: string[];
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "PICKUP" | "DELIVERY";
         };
         /** ChooseStore */
         ChooseStore: {
@@ -4248,6 +4365,37 @@ export interface operations {
             };
         };
     };
+    get_cart_api_trips__trip_id__cart_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CartOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     apply_ops_api_trips__trip_id__ops_post: {
         parameters: {
             query?: never;
@@ -4270,6 +4418,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OpsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_to_cart_api_trips__trip_id__send_to_cart_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CartSendIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CartResultOut"];
                 };
             };
             /** @description Validation Error */

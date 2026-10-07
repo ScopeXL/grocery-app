@@ -26,6 +26,7 @@ from typing import Any, cast
 
 from cryptography.fernet import Fernet, InvalidToken
 from sqlalchemy import CursorResult, delete, update
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from dinnerbell.auth.models import Device
 from dinnerbell.core.clock import Clock
@@ -96,6 +97,11 @@ def state_hash(state: str) -> str:
 def code_challenge(verifier: str) -> str:
     """PKCE S256: base64url(sha256(verifier)), without padding (RFC 7636)."""
     return b64url(hashlib.sha256(verifier.encode()).digest())
+
+
+async def prune_states(session: AsyncSession, now: datetime) -> None:
+    """Connects nobody finished: gone once their 10 minutes are up."""
+    await session.execute(delete(KrogerOAuthState).where(KrogerOAuthState.expires_at <= now))
 
 
 def wiped(status: AccountStatus) -> dict[str, object]:
@@ -219,6 +225,16 @@ class KrogerAccount:
             tx.publish("settings.changed")
         self._backoff_until = None
         log.info("kroger.disconnected")
+
+    async def forget_access(self) -> None:
+        """Kroger refused the access token: the next use refreshes it (and a refused refresh
+        then asks to reconnect)."""
+        async with self._db.write() as tx:
+            await tx.session.execute(
+                update(KrogerToken)
+                .where(KrogerToken.id == 1, KrogerToken.status == AccountStatus.CONNECTED.value)
+                .values(access_expires_at=None, version=KrogerToken.version + 1)
+            )
 
     # ---- using the account ----------------------------------------------------------------
 

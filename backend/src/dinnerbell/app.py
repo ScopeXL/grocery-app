@@ -27,6 +27,7 @@ from dinnerbell.events.hub import EventHub
 from dinnerbell.events.router import router as events_router
 from dinnerbell.household.models import AppMeta
 from dinnerbell.household.router import router as household_router
+from dinnerbell.kroger import account as kroger_account
 from dinnerbell.kroger.account import KrogerAccount
 from dinnerbell.kroger.catalog import ProductCatalog
 from dinnerbell.kroger.client import KrogerApi
@@ -42,6 +43,7 @@ from dinnerbell.meals.router import router as meals_router
 from dinnerbell.meta.router import router as meta_router
 from dinnerbell.meta.testing import router as testing_router
 from dinnerbell.planning.router import router as planning_router
+from dinnerbell.shopping import cart as shopping_cart
 from dinnerbell.shopping import service as shopping_service
 from dinnerbell.shopping.router import router as shopping_router
 from dinnerbell.state import AppState
@@ -169,8 +171,11 @@ def create_app(
 
         async def tidy_trips() -> None:
             async with db.write() as tx:
-                await shopping_service.clear_kroger_copies(tx.session, the_clock.now())
-                await shopping_service.prune_ops(tx.session, the_clock.now())
+                now = the_clock.now()
+                await shopping_service.clear_kroger_copies(tx.session, now)
+                await shopping_service.prune_ops(tx.session, now)
+                await shopping_cart.prune(tx.session, now)
+                await kroger_account.prune_states(tx.session, now)
 
         state.jobs.every("orphan-photos", PHOTO_PURGE_INTERVAL_S, purge_orphan_photos)
         state.jobs.every("tidy-trips", CACHE_PURGE_INTERVAL_S, tidy_trips)

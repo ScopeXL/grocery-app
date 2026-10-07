@@ -138,3 +138,53 @@ class OpsOut(BaseModel):
     results: list[OpResultOut]
     items: list[TripItemOut]  # every item with a version above `known_version`
     trip: TripHeader  # the header as it is now
+
+
+# ---- sending a saved list to the Kroger cart (PLAN §7.5, UX §5.5) ------------------------------
+
+CartModality = Literal["PICKUP", "DELIVERY"]
+# ready: can go, not sent yet. sending: in this send, not settled yet. added: in the Kroger cart.
+# failed: Kroger said no (safe to send again). unknown: no clear answer, so it may be in the
+# cart. cannot_send: not linked to a store product, or bought by the pound.
+CartLineStatus = Literal["ready", "sending", "added", "failed", "unknown", "cannot_send"]
+
+
+class CartLineOut(BaseModel):
+    trip_item_id: str
+    name: str
+    image_url: str | None
+    qty_text: str  # "2 boxes, 16 oz each"
+    quantity: int | None  # how many go to the cart; None when it can't go
+    status: CartLineStatus
+    note: str | None  # why it can't go, or what happened when it was sent
+    sent_at: datetime | None
+    sent_by: str | None  # a member's name
+
+
+class CartOut(BaseModel):
+    trip_id: str
+    account: Literal["disconnected", "connected", "needs_reconnect"]
+    demo: bool  # sample mode: nothing reaches a real cart
+    modality: CartModality  # the household's default
+    sending: bool  # a send of this list is running now
+    lines: list[CartLineOut]  # in the list's order
+
+
+class CartSendIn(BaseModel):
+    modality: CartModality
+    item_ids: Annotated[
+        list[Annotated[str, StringConstraints(max_length=36)]], Field(min_length=1, max_length=300)
+    ]
+    # "Send again anyway": items already added, or maybe added, go again (UX §1: the one
+    # place a confirmation beats Undo, because a cart add can't be taken back).
+    again: bool = False
+
+
+class CartResultOut(BaseModel):
+    added: int
+    failed: int
+    unknown: int
+    skipped: int  # already sent, so left out
+    not_sent: int  # sending stopped before these went
+    message: str  # "Added 27 items to your Kroger cart."
+    cart: CartOut

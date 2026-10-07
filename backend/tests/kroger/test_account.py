@@ -87,21 +87,6 @@ async def other_browser(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
         yield http
 
 
-@pytest.fixture
-def events(app: FastAPI) -> list[tuple[str, dict[str, Any]]]:
-    state = app_state(app)
-    seen: list[tuple[str, dict[str, Any]]] = []
-    original = state.db.publisher
-
-    def record(event_type: str, payload: dict[str, Any]) -> None:
-        seen.append((event_type, payload))
-        if original is not None:
-            original(event_type, payload)
-
-    state.db.publisher = record
-    return seen
-
-
 # ---- connecting -------------------------------------------------------------------------------
 
 

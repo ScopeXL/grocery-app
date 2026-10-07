@@ -34,6 +34,8 @@ class AppState:
     kroger: KrogerApi
     account: KrogerAccount
     jobs: Jobs = field(default_factory=Jobs)
+    # Items still to settle in each running send to the Kroger cart, by trip (shopping/cart.py)
+    cart_sending: dict[str, set[str]] = field(default_factory=dict[str, set[str]])
     started: bool = False
 
 

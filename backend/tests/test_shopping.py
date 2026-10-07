@@ -9,7 +9,6 @@ from datetime import timedelta
 from typing import Any
 
 import httpx
-import pytest
 from fastapi import FastAPI
 from sqlalchemy import select
 
@@ -17,38 +16,11 @@ from dinnerbell.core.clock import FakeClock
 from dinnerbell.shopping import service as shopping
 from dinnerbell.state import AppState
 from dinnerbell.stores.models import StoreSection
-from tests.support import CSRF, login
+from tests.support import CSRF
 from tests.test_meals import item
 from tests.test_planning import MILK, by_name, plan_meal, taco_night
 
 NOW_MS = 1791295200000  # 2026-10-06T14:00:00Z
-
-
-@pytest.fixture
-async def shopper(client: httpx.AsyncClient) -> httpx.AsyncClient:
-    await login(client)
-    await client.put("/api/stores/active", json={"location_id": "99999001"}, headers=CSRF)
-    member = (
-        await client.post("/api/members", json={"name": "Sample Parent"}, headers=CSRF)
-    ).json()
-    await client.put("/api/auth/member", json={"member_id": member["id"]}, headers=CSRF)
-    return client
-
-
-@pytest.fixture
-def events(app: FastAPI) -> list[tuple[str, dict[str, Any]]]:
-    """Every event published after a commit, in order."""
-    state: AppState = app.state.dinnerbell
-    seen: list[tuple[str, dict[str, Any]]] = []
-    original = state.db.publisher
-
-    def record(event_type: str, payload: dict[str, Any]) -> None:
-        seen.append((event_type, payload))
-        if original is not None:
-            original(event_type, payload)
-
-    state.db.publisher = record
-    return seen
 
 
 async def save(client: httpx.AsyncClient) -> dict[str, Any]:

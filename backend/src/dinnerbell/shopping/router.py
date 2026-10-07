@@ -22,9 +22,18 @@ from dinnerbell.kroger.client import KrogerError
 from dinnerbell.kroger.parse import Product
 from dinnerbell.planning import listview
 from dinnerbell.planning.service import member_for
-from dinnerbell.shopping import again, ops, service
+from dinnerbell.shopping import again, cart, ops, service
 from dinnerbell.shopping.models import TripItem
-from dinnerbell.shopping.schemas import MAX_OPS_BYTES, OpsIn, OpsOut, TripOut, TripsOut
+from dinnerbell.shopping.schemas import (
+    MAX_OPS_BYTES,
+    CartOut,
+    CartResultOut,
+    CartSendIn,
+    OpsIn,
+    OpsOut,
+    TripOut,
+    TripsOut,
+)
 from dinnerbell.state import AppState, StateDep
 from dinnerbell.stores.models import StoreSection
 from dinnerbell.stores.service import active_store
@@ -101,6 +110,24 @@ async def apply_ops(
         items=out.items,
         trip=service.header_of(out),
     )
+
+
+@router.get("/trips/{trip_id}/cart")
+async def get_cart(trip_id: str, state: StateDep, session: SessionDep) -> CartOut:
+    """What Send to Kroger cart would send, and what became of anything already sent."""
+    async with state.db.read() as db:
+        return await cart.cart_out(state, db, await service.get_trip(db, trip_id))
+
+
+@router.post("/trips/{trip_id}/send-to-cart")
+async def send_to_cart(
+    trip_id: str, body: CartSendIn, state: StateDep, session: SessionDep
+) -> CartResultOut:
+    """Send to Kroger cart (UX §5.5): one item at a time, never retried automatically, and
+    nothing already sent goes again unless the person confirmed it (shopping/cart.py)."""
+    async with state.db.read() as db:
+        member_id = await member_for(db, session.device_id)
+    return await cart.send(state, trip_id, body, member_id)
 
 
 @router.post("/trips/{trip_id}/shop-again", status_code=201)

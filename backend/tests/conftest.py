@@ -12,6 +12,7 @@ import shutil
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import httpx
 import pytest
@@ -21,7 +22,8 @@ from dinnerbell.app import create_app
 from dinnerbell.core.clock import FakeClock
 from dinnerbell.core.config import Settings
 from dinnerbell.db import migrate
-from tests.support import BASE_URL, ENV_NAMES, ENV_PREFIXES, make_settings
+from dinnerbell.state import AppState
+from tests.support import BASE_URL, CSRF, ENV_NAMES, ENV_PREFIXES, login, make_settings
 
 
 @pytest.fixture(autouse=True)
@@ -69,3 +71,38 @@ async def client(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url=BASE_URL) as http:
         yield http
+
+
+@pytest.fixture
+async def shopper(client: httpx.AsyncClient) -> httpx.AsyncClient:
+    """Signed in, with the sample store chosen and "Sample Parent" picked for this phone."""
+    await login(client)
+    await client.put("/api/stores/active", json={"location_id": "99999001"}, headers=CSRF)
+    member = (
+        await client.post("/api/members", json={"name": "Sample Parent"}, headers=CSRF)
+    ).json()
+    await client.put("/api/auth/member", json={"member_id": member["id"]}, headers=CSRF)
+    return client
+
+
+@pytest.fixture
+def events(app: FastAPI) -> list[tuple[str, dict[str, Any]]]:
+    """Every event published, in order (after commit, for those sent from a transaction)."""
+    state: AppState = app.state.dinnerbell
+    seen: list[tuple[str, dict[str, Any]]] = []
+    original = state.db.publisher
+
+    def record(event_type: str, payload: dict[str, Any]) -> None:
+        seen.append((event_type, payload))
+        if original is not None:
+            original(event_type, payload)
+
+    state.db.publisher = record
+    original_hub = state.hub.publish
+
+    def record_direct(event_type: str, payload: dict[str, Any] | None = None) -> None:
+        seen.append((event_type, payload or {}))
+        original_hub(event_type, payload)
+
+    state.hub.publish = record_direct  # pyright: ignore[reportAttributeAccessIssue]
+    return seen

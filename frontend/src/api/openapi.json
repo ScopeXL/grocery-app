@@ -259,6 +259,228 @@
         "title": "BackupStatusOut",
         "type": "object"
       },
+      "CartLineOut": {
+        "properties": {
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "qty_text": {
+            "title": "Qty Text",
+            "type": "string"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity"
+          },
+          "sent_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sent At"
+          },
+          "sent_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sent By"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "sending",
+              "added",
+              "failed",
+              "unknown",
+              "cannot_send"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "trip_item_id": {
+            "title": "Trip Item Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "trip_item_id",
+          "name",
+          "image_url",
+          "qty_text",
+          "quantity",
+          "status",
+          "note",
+          "sent_at",
+          "sent_by"
+        ],
+        "title": "CartLineOut",
+        "type": "object"
+      },
+      "CartOut": {
+        "properties": {
+          "account": {
+            "enum": [
+              "disconnected",
+              "connected",
+              "needs_reconnect"
+            ],
+            "title": "Account",
+            "type": "string"
+          },
+          "demo": {
+            "title": "Demo",
+            "type": "boolean"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/CartLineOut"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "modality": {
+            "enum": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "sending": {
+            "title": "Sending",
+            "type": "boolean"
+          },
+          "trip_id": {
+            "title": "Trip Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "trip_id",
+          "account",
+          "demo",
+          "modality",
+          "sending",
+          "lines"
+        ],
+        "title": "CartOut",
+        "type": "object"
+      },
+      "CartResultOut": {
+        "properties": {
+          "added": {
+            "title": "Added",
+            "type": "integer"
+          },
+          "cart": {
+            "$ref": "#/components/schemas/CartOut"
+          },
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "not_sent": {
+            "title": "Not Sent",
+            "type": "integer"
+          },
+          "skipped": {
+            "title": "Skipped",
+            "type": "integer"
+          },
+          "unknown": {
+            "title": "Unknown",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "added",
+          "failed",
+          "unknown",
+          "skipped",
+          "not_sent",
+          "message",
+          "cart"
+        ],
+        "title": "CartResultOut",
+        "type": "object"
+      },
+      "CartSendIn": {
+        "properties": {
+          "again": {
+            "default": false,
+            "title": "Again",
+            "type": "boolean"
+          },
+          "item_ids": {
+            "items": {
+              "maxLength": 36,
+              "type": "string"
+            },
+            "maxItems": 300,
+            "minItems": 1,
+            "title": "Item Ids",
+            "type": "array"
+          },
+          "modality": {
+            "enum": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "title": "Modality",
+            "type": "string"
+          }
+        },
+        "required": [
+          "modality",
+          "item_ids"
+        ],
+        "title": "CartSendIn",
+        "type": "object"
+      },
       "ChooseStore": {
         "properties": {
           "location_id": {
@@ -6743,6 +6965,49 @@
         ]
       }
     },
+    "/api/trips/{trip_id}/cart": {
+      "get": {
+        "description": "What Send to Kroger cart would send, and what became of anything already sent.",
+        "operationId": "get_cart_api_trips__trip_id__cart_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "trip_id",
+            "required": true,
+            "schema": {
+              "title": "Trip Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Cart",
+        "tags": [
+          "shopping"
+        ]
+      }
+    },
     "/api/trips/{trip_id}/ops": {
       "post": {
         "description": "A batch of shopping actions (PLAN \u00a79.2). Always 200 once the batch parses; each op says\nwhat became of it.",
@@ -6791,6 +7056,59 @@
           }
         },
         "summary": "Apply Ops",
+        "tags": [
+          "shopping"
+        ]
+      }
+    },
+    "/api/trips/{trip_id}/send-to-cart": {
+      "post": {
+        "description": "Send to Kroger cart (UX \u00a75.5): one item at a time, never retried automatically, and\nnothing already sent goes again unless the person confirmed it (shopping/cart.py).",
+        "operationId": "send_to_cart_api_trips__trip_id__send_to_cart_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "trip_id",
+            "required": true,
+            "schema": {
+              "title": "Trip Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartSendIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResultOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Send To Cart",
         "tags": [
           "shopping"
         ]
